@@ -15,8 +15,8 @@ public class Photo {
 
 	private String filename;
 	private Image image;
-	private Image imageBruitee;
-	private Image imageDebruitee;
+	
+	
 	private int largeurInit;
 	private int hauteurInit;
 	private float zoom;
