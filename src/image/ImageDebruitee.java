@@ -7,10 +7,12 @@ import java.util.Vector;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class ImageDebruitee {
 	private Image imageDebruitee;
 
+	// Adrien
 	public List<Patch> extractPatchs(Image image, int patchSize) {
 	    List<Patch> patches = new ArrayList<>();
 	    PixelReader pixelReader = image.getPixelReader();
@@ -23,7 +25,7 @@ public class ImageDebruitee {
 	            // Crée un tableau Float[][] pour le patch
 	            Float[][] patchArray = new Float[patchSize][patchSize];
 
-	            // on parcours chaque Patch
+	            // on parcours chaque Patchsrc/image/ImageDebruitee.java
 	            for (int dy = 0; dy < patchSize; dy++) {
 	                for (int dx = 0; dx < patchSize; dx++) {
 	                    int argb = pixelReader.getArgb(x + dx, y + dy);
@@ -38,6 +40,19 @@ public class ImageDebruitee {
 	        }
 	    }
 	    return patches;
+	}
+	
+	//Adrien
+	public List<Vector<Float>> vectorPatchs (ArrayList<Patch> patchs){
+		List<Vector<Float>> vecteurs= new ArrayList<>();
+		
+		for (Patch patch: patchs) {
+			Vector<Float> vecteur = new Vector<>();
+			vecteur = patch.toVector();
+			vecteurs.add(vecteur);
+		}
+		
+		return vecteurs;
 	}
 
 	public Image imageDen(Image imageBruitee) {
