@@ -62,11 +62,13 @@ public class ImageDebruitee {
 		Integer nbLignePatch = 10;
 		Integer nbColonnePatch = 10;
 		
-		List<Patch> patchs = extractPacths(imageBruitee, taillePatch);
+		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
+		
+		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 		
 		List<int[]> patchPosition = getPositions(patchs);
 		
-		vecteurs = vectorPatchs(patchs);
+		List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
 				
 		// transformation des vecteurs
 		//...
@@ -74,7 +76,7 @@ public class ImageDebruitee {
 		
 		Vector<Float> vecteursDebruitee;
 		
-		patchsDebruitee = patchsVector(vecteursDebruitee, nbLignePatch, nbColonnePatch, patchPosition);
+		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, nbLignePatch, nbColonnePatch, patchPosition);
 				
 		imageDebruitee = reconstructPatchs(patchsDebruitee);
 				
