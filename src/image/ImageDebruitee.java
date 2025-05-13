@@ -310,5 +310,105 @@ public class ImageDebruitee {
 
 	  return V_contrib;  
 	}
+	//Pierre Laforest 
+	public enum TypeSeuillage {
+	    DUR,
+	    DOUX
+	}
+	
+	//Pierre Laforest
+		//fonction qui permet de déterminer le seuille 
+		public void seuilV(Float sigma, int taille) {
+			int L = width * height; // Nombre total de pixels
+	        return sigma * Math.sqrt(2 * Math.log(L));
+		}
+		
+		//Pierre Laforest 
+		//fonction qui permet de déterminer la variance 
+		public static float calculerVarianceFloat(List<Vector<Float>> matriceImage) {
+		    int totalElements = 0;
+		    float somme = 0f;
+		    float sommeCarres = 0f;
+
+		    for (Vector<Float> ligne : matriceImage) {
+		        for (float coeff : ligne) {
+		            somme += coeff;
+		            sommeCarres += coeff * coeff;
+		            totalElements++;
+		        }
+		    }
+
+		    if (totalElements == 0) return 0f;
+
+		    float moyenne = somme / totalElements;
+		    float variance = (sommeCarres / totalElements) - (moyenne * moyenne);
+
+		    return variance;
+		}
+		
+		//Pierre Laforest
+		//focntion qui permet de déterminer dépendant de la variance s'il faut utiliser un seuillage doux ou dur 
+		public static TypeSeuillage choisirType(float variance) {
+	        float seuilVariance = 50.0f;  // heuristique, à ajuster selon les cas
+
+	        if (variance < seuilVariance) {
+	            return TypeSeuillage.DUR;
+	        } else {
+	            return TypeSeuillage.DOUX;
+	        }
+	    }
+		
+		//Pierre Laforest
+		//fonction qui permet de faire un seuillage dur
+		public static Map<Integer, Vector<Float>> seuillageDur(Map<Integer, Vector<Float>> data, float seuil) {
+		    Map<Integer, Vector<Float>> resultat = new HashMap<>();
+
+		    for (Map.Entry<Integer, Vector<Float>> entry : data.entrySet()) {
+		        int key = entry.getKey();
+		        Vector<Float> ligne = entry.getValue();
+		        Vector<Float> nouvelleLigne = new Vector<>();
+
+		        for (float coeff : ligne) {
+		            if (Math.abs(coeff) < seuil) {
+		                nouvelleLigne.add(0f);
+		            } else {
+		                nouvelleLigne.add(coeff);
+		            }
+		        }
+
+		        resultat.put(key, nouvelleLigne);
+		    }
+
+		    return resultat;
+		}
+
+		//Pierre Laforest
+		//fonction qui permet de faire un seuillage doux
+		public static Map<Integer, Vector<Float>> seuillageDoux(Map<Integer, Vector<Float>> data, float seuil) {
+		    Map<Integer, Vector<Float>> resultat = new HashMap<>();
+
+		    for (Map.Entry<Integer, Vector<Float>> entry : data.entrySet()) {
+		        int key = entry.getKey();
+		        Vector<Float> ligne = entry.getValue();
+		        Vector<Float> nouvelleLigne = new Vector<>();
+
+		        for (float coeff : ligne) {
+		            if (Math.abs(coeff) <= seuil) {
+		                nouvelleLigne.add(0f);
+		            } else {
+		                float signe = Math.signum(coeff);
+		                float nouveauCoeff = signe * (Math.abs(coeff) - seuil);
+		                nouvelleLigne.add(nouveauCoeff);
+		            }
+		        }
+
+		        resultat.put(key, nouvelleLigne);
+		    }
+
+		    return resultat;
+		}
+
+		
+		
 
 }
