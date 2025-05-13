@@ -111,12 +111,13 @@ public class ImageDebruitee {
 		return patchs;
 	}
 	
-	public static Vector<Float> mv_methode (List<Vector<Float>> collection_patch){ //Mathis B
+	//Mathis B
+	public static Vector<Float> mv_methode (List<Vector<Float>> V){ //ou V est la collection de patch vectorisée
 		
 		// Initialisation longueur de lacollection de patch et des patchs
 		
-		int n = collection_patch.size(); // Nombre de vecteur (patch)
-		int p = collection_patch.get(0).size(); // Nombre de composante du vecteur (patch)
+		int n = V.size(); // Nombre de vecteur (patch)
+		int p = V.get(0).size(); // Nombre de composante du vecteur (patch)
 		
 		// Initialisation des variables
 		
@@ -129,7 +130,7 @@ public class ImageDebruitee {
 			res = 0;
 			for(int j =0; j<n; j ++) { // On parcour les vecteurs
 				
-				res += collection_patch.get(j).get(i); // on fait la somme de chaque composante de tout les vecteurs
+				res += V.get(j).get(i); // on fait la somme de chaque composante de tout les vecteurs
 				
 			
 			
@@ -139,12 +140,14 @@ public class ImageDebruitee {
 		return mv;
 	}
 	
-	public static List<Vector<Float>> Cov_methode (List<Vector<Float>> collection_patch){// Mathis B
+	// Mathis B
+	
+	public static List<Vector<Float>> Cov_methode (List<Vector<Float>> V{// V collection de patch vectorisé
 		
 		// Initialisation longueur de lacollection de patch et des patchs
 		
-		int n = collection_patch.size(); // Nombre de vecteur (nbr de patch)
-		int p = collection_patch.get(0).size(); // Nombre de composante du vecteur (composant du patch)
+		int n = V.size(); // Nombre de vecteur (nbr de patch)
+		int p = V.get(0).size(); // Nombre de composante du vecteur (composant du patch)
 		
 		// Initialisation des variables
 		
@@ -166,7 +169,7 @@ public class ImageDebruitee {
 				
 				float somme = 0; // pour le calcul de (Vk -mv)*(Vk-mv)'
 				
-				for (Vector<Float> v : collection_patch) {
+				for (Vector<Float> v : V) {
 					
 					somme += (v.get(i)-mv.get(i))*(v.get(j)-mv.get(j));
 					
@@ -189,12 +192,14 @@ public class ImageDebruitee {
 		}
 	}
 	
-	public static List<Vector<Float>> vecteur_centre_methode (List<Vector<Float>> collection_patch){// Mathis B
+	// Mathis B
+	
+	public static List<Vector<Float>> vecteur_centre_methode (List<Vector<Float>> V){// idem
 		
 		// Initialisation longueur de lacollection de patch et des patchs
 		
-		int n = collection_patch.size(); // Nombre de vecteur (patch)
-		int p = collection_patch.get(0).size(); // Nombre de composante du vecteur (patch)
+		int n = V.size(); // Nombre de vecteur (patch)
+		int p = V.get(0).size(); // Nombre de composante du vecteur (patch)
 		
 		// Initialisation des variables
 		
@@ -206,7 +211,7 @@ public class ImageDebruitee {
 		for (int i = 0; i< n; i++) {
 			Vector<Float> v_centre = new Vector<>();
 	        for (int j = 0; j < p; j++) {
-	            float val = collection_patch.get(i).get(j) - mv.get(j); // soustraction composante par composante
+	            float val = V.get(i).get(j) - mv.get(j); // soustraction composante par composante
 	            v_centre.add(val);
 	        }
 	        Vc.add(v_centre);
@@ -216,18 +221,20 @@ public class ImageDebruitee {
 		return Vc;
 	}
 	
-	public static RealMatrix ACP (List<Vector<Float>> collection_patch) { //Mathis B
+	//Mathis B
+	
+	public static RealMatrix ACP (List<Vector<Float>> V) { //idem
 		
 		// Initialisation longueur de lacollection de patch et des patchs
 		
-		int n = collection_patch.size(); // Nombre de vecteur (patch)
-		int p = collection_patch.get(0).size(); // Nombre de composante du vecteur (patch)
+		int n = V.size(); // Nombre de vecteur (patch)
+		int p = V.get(0).size(); // Nombre de composante du vecteur (patch)
 		
 		// Initialisation des variables
 		
-		Vector<Float> mv = mv_methode(collection_patch); // Vecteur Moyen
-		List<Vector<Float>> Vc = vecteur_centre_methode(collection_patch); // List des vecteurs centré
-		List<Vector<Float>> Cov = Cov_methode(collection_patch);// List de vecteur de covariance
+		Vector<Float> mv = mv_methode(V); // Vecteur Moyen
+		List<Vector<Float>> Vc = vecteur_centre_methode(V); // List des vecteurs centré
+		List<Vector<Float>> Cov = Cov_methode(V);// List de vecteur de covariance
 		float [][] matrice_cov = new float[p][p]; // matrice de conversion de Cov
 		
 		// Convertion de Cov en matrice 2x2
@@ -271,7 +278,7 @@ public class ImageDebruitee {
 	    // Definition des variables 
 	    
 	    
-	    ArrayList<Vector<Float>> V_contrib = new ArrayList<Vector<Float>>() {
+	    ArrayList<Vector<Float>> V_contrib = new ArrayList<Vector<Float>>();
 	    
 	    for(int i = 0; i<p;i++) { // création d'une list de vecteur avec n patch
 			Vector<Float> ligne = new Vector<>();
