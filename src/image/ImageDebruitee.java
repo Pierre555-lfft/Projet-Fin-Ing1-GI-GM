@@ -1,13 +1,16 @@
 package image;
-
-import java.util.ArrayList;
+import org.apache.commons.math3.linear.RealMatrix;
 import java.util.List;
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import org.apache.commons.math3.linear.*;
+import java.util.*;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.EigenDecomposition;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
-import java.util.ArrayList;
-import java.util.Vector;
 
 public class ImageDebruitee {
 	private Image imageDebruitee;
@@ -142,7 +145,7 @@ public class ImageDebruitee {
 	
 	// Mathis B
 	
-	public static List<Vector<Float>> Cov_methode (List<Vector<Float>> V{// V collection de patch vectorisé
+	public static List<Vector<Float>> Cov_methode (List<Vector<Float>> V ){// V collection de patch vectorisé
 		
 		// Initialisation longueur de lacollection de patch et des patchs
 		
@@ -151,7 +154,7 @@ public class ImageDebruitee {
 		
 		// Initialisation des variables
 		
-		Vector<Float> mv = mv_methode(collection_patch);
+		Vector<Float> mv = mv_methode(V);
 		ArrayList<Vector<Float>> Cov = new ArrayList<Vector<Float>>();
 		
 		// Exploitation des données
@@ -159,7 +162,7 @@ public class ImageDebruitee {
 		for(int i = 0; i<p;i++) { // création d'une list de vecteur avec n patch
 			Vector<Float> ligne = new Vector<>();
 	        for (int j = 0; j < p; j++) {
-	            ligne.add(0); // init à zéro
+	            ligne.add(0f); // init à zéro
 	        }
 	        Cov.add(ligne);
 		}
@@ -194,7 +197,7 @@ public class ImageDebruitee {
 	
 	// Mathis B
 	
-	public static List<Vector<Float>> vecteur_centre_methode (List<Vector<Float>> V){// idem
+	public static List<Vector<Float>> vecteur_centre_methode (List<Vector<Float>> V){
 		
 		// Initialisation longueur de lacollection de patch et des patchs
 		
@@ -203,7 +206,7 @@ public class ImageDebruitee {
 		
 		// Initialisation des variables
 		
-		Vector<Float> mv = mv_methode(collection_patch);
+		Vector<Float> mv = mv_methode(V);
 		ArrayList<Vector<Float>> Vc = new ArrayList<Vector<Float>>();
 		
 		// Exploitation des données
@@ -223,7 +226,7 @@ public class ImageDebruitee {
 	
 	//Mathis B
 	
-	public static RealMatrix ACP (List<Vector<Float>> V) { //idem
+	public static RealMatrix ACP (List<Vector<Float>> V) { 
 		
 		// Initialisation longueur de lacollection de patch et des patchs
 		
@@ -283,7 +286,7 @@ public class ImageDebruitee {
 	    for(int i = 0; i<p;i++) { // création d'une list de vecteur avec n patch
 			Vector<Float> ligne = new Vector<>();
 	        for (int j = 0; j < p; j++) {
-	            ligne.add(0); // rempli de 0
+	            ligne.add(0f); // rempli de 0
 	        }
 	        V_contrib.add(ligne);
 		}
