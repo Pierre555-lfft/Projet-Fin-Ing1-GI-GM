@@ -110,5 +110,198 @@ public class ImageDebruitee {
 		
 		return patchs;
 	}
+	
+	public static Vector<Float> mv_methode (List<Vector<Float>> collection_patch){ //Mathis B
+		
+		// Initialisation longueur de lacollection de patch et des patchs
+		
+		int n = collection_patch.size(); // Nombre de vecteur (patch)
+		int p = collection_patch.get(0).size(); // Nombre de composante du vecteur (patch)
+		
+		// Initialisation des variables
+		
+		Vector<Float> mv = new Vector<Float>();
+		float res;
+		
+		// Exploitation des données
+		
+		for (int i = 0; i< p; i++) { // On parcour l'interieur du vecteur
+			res = 0;
+			for(int j =0; j<n; j ++) { // On parcour les vecteurs
+				
+				res += collection_patch.get(j).get(i); // on fait la somme de chaque composante de tout les vecteurs
+				
+			
+			
+			}
+			mv.add(res / n); // Puis on fait la moyenne pour avoir
+		}
+		return mv;
+	}
+	
+	public static List<Vector<Float>> Cov_methode (List<Vector<Float>> collection_patch){// Mathis B
+		
+		// Initialisation longueur de lacollection de patch et des patchs
+		
+		int n = collection_patch.size(); // Nombre de vecteur (nbr de patch)
+		int p = collection_patch.get(0).size(); // Nombre de composante du vecteur (composant du patch)
+		
+		// Initialisation des variables
+		
+		Vector<Float> mv = mv_methode(collection_patch);
+		ArrayList<Vector<Float>> Cov = new ArrayList<Vector<Float>>();
+		
+		// Exploitation des données
+		
+		for(int i = 0; i<p;i++) { // création d'une list de vecteur avec n patch
+			Vector<Float> ligne = new Vector<>();
+	        for (int j = 0; j < p; j++) {
+	            ligne.add(0); // init à zéro
+	        }
+	        Cov.add(ligne);
+		}
+		
+		for (int i = 0; i< p; i++) {
+			for (int j = i; j<p; j++) {
+				
+				float somme = 0; // pour le calcul de (Vk -mv)*(Vk-mv)'
+				
+				for (Vector<Float> v : collection_patch) {
+					
+					somme += (v.get(i)-mv.get(i))*(v.get(j)-mv.get(j));
+					
+				}
+				
+				float cov_ij = somme/(n-1); // Coefficiant de la ligne i et colonne j
+				
+				// Matrice symetrique
+				
+				Cov.get(i).set(j,cov_ij);
+				
+				if (i != j) {
+		            Cov.get(j).set(i, cov_ij); // par symetrie
+				}
+				
+			}
+		
+		return Cov ;
+		
+		}
+	}
+	
+	public static List<Vector<Float>> vecteur_centre_methode (List<Vector<Float>> collection_patch){// Mathis B
+		
+		// Initialisation longueur de lacollection de patch et des patchs
+		
+		int n = collection_patch.size(); // Nombre de vecteur (patch)
+		int p = collection_patch.get(0).size(); // Nombre de composante du vecteur (patch)
+		
+		// Initialisation des variables
+		
+		Vector<Float> mv = mv_methode(collection_patch);
+		ArrayList<Vector<Float>> Vc = new ArrayList<Vector<Float>>();
+		
+		// Exploitation des données
+		
+		for (int i = 0; i< n; i++) {
+			Vector<Float> v_centre = new Vector<>();
+	        for (int j = 0; j < p; j++) {
+	            float val = collection_patch.get(i).get(j) - mv.get(j); // soustraction composante par composante
+	            v_centre.add(val);
+	        }
+	        Vc.add(v_centre);
+		
+		}
+		
+		return Vc;
+	}
+	
+	public static RealMatrix ACP (List<Vector<Float>> collection_patch) { //Mathis B
+		
+		// Initialisation longueur de lacollection de patch et des patchs
+		
+		int n = collection_patch.size(); // Nombre de vecteur (patch)
+		int p = collection_patch.get(0).size(); // Nombre de composante du vecteur (patch)
+		
+		// Initialisation des variables
+		
+		Vector<Float> mv = mv_methode(collection_patch); // Vecteur Moyen
+		List<Vector<Float>> Vc = vecteur_centre_methode(collection_patch); // List des vecteurs centré
+		List<Vector<Float>> Cov = Cov_methode(collection_patch);// List de vecteur de covariance
+		float [][] matrice_cov = new float[p][p]; // matrice de conversion de Cov
+		
+		// Convertion de Cov en matrice 2x2
+		// Pour utiliser des lois utiles pour trouver les valeurs propres
+		
+		for (int i=0; i<p; i++) {
+			for(int j=0; j<p; j++) {
+				matrice_cov[i][j] = Cov.get(i).get(j);
+			}
+		}
+		
+		// Valeur propres :
+		
+		RealMatrix covMatrice = new Array2DRowRealMatrix(matrice_cov); 
+	    EigenDecomposition eig = new EigenDecomposition(covMatrice); //Eigen normalise les ui
+
+	    double[] valeurs_propres = eig.getRealEigenvalues();     
+	    RealMatrix vecteurs_propres = eig.getV();
+	    
+	    System.out.println("Vecteur moyen : " + mv);
+	    System.out.println("Valeurs propres : " + Arrays.toString(valeurs_propres));
+
+	    System.out.println("Vecteurs propres (axes principaux) :");
+	    for (int i = 0; i < p; i++) {
+	        System.out.println(Arrays.toString(vecteurs_propres.getColumn(i)));
+	    }
+	   return vecteurs_propres;
+	}
+	
+	// List<Vector<Float>> Vc = vecteur_centre_methode(collection_patch);//Vc c'est le terme Vk - mv
+	
+	//MathisB
+	
+	public static List<Vector<Float>> Proj (RealMatrix U, List<Vector<Float>> Vc ){
+		
+		// Definition Longueur
+		
+		int p = U.getRowDimension(); // nombnre de vecteur
+	    int n = Vc.size(); // nombre vecteur centré
+	    
+	    // Definition des variables 
+	    
+	    
+	    ArrayList<Vector<Float>> V_contrib = new ArrayList<Vector<Float>>() {
+	    
+	    for(int i = 0; i<p;i++) { // création d'une list de vecteur avec n patch
+			Vector<Float> ligne = new Vector<>();
+	        for (int j = 0; j < p; j++) {
+	            ligne.add(0); // rempli de 0
+	        }
+	        V_contrib.add(ligne);
+		}
+	    
+	    //Exploitation
+	    
+	    for(int k = 0; k<n; k++) {
+	    	Vector<Float> Vk = Vc.get(k);
+	    	
+	    	for (int i =0; i<p; i++) {// Pour la somme de i a s²
+	    		
+	    
+	    		float[] ui = U.getColumn(i);
+	    		float proj =0;
+	    		
+	    		for(int j =0; j<p; j++) {//parcourir chaque ligne et effcetuer l'operation de multiplication de colonne uitranspoe*Vc
+	    			proj += ui[j]*Vk.get(j);
+	    		}
+	    		V_contrib.get(i).add(proj); //Contrsuction de V_contrib coeff par coeff a_ki
+	    	}
+	    }
+	    	
+	    	
+
+	  return V_contrib;  
+	}
 
 }
