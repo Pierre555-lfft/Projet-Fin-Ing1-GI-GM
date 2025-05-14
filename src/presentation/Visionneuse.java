@@ -185,7 +185,7 @@ public class Visionneuse extends Application {
 		});
 		
 		btnDebruiter.setOnAction(arg0 -> {
-			//imageView.setImage(album.getPhotoCourante().debruiter(sliderBruitage.getValue()));
+			imageView.setImage(album.getPhotoCourante().debruiter());
 		});
 		
 		bruiter.getChildren().addAll(bruitage,btnBruiter);

@@ -15,6 +15,8 @@ public class Photo {
 
 	private String filename;
     private BufferedImage image;
+    private ImageDebruitee imageDebruitee;
+    private ImageBruitee imageBruitee;
 
 	
 	
@@ -45,13 +47,14 @@ public class Photo {
 	
 	
 	public BufferedImage bruiter(double ecartType) {
-        	ImageBruitee imageBruitee = new ImageBruitee(image, ecartType);
+        	imageBruitee = new ImageBruitee(image, ecartType);
         	return imageBruitee.getImage();
    	}
 	
-	public Image debruiter(double bruitage) {
-		// TODO
-		return imageDebruitee;
+	public Image debruiter() {
+		imageDebruitee = new ImageDebruitee(imageBruitee.getImage());
+		
+		return imageDebruitee.getImage();
 	}
 	
 	
