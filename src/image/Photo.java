@@ -1,9 +1,9 @@
 package image;
 
 
-
-
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import javafx.scene.image.Image;
 
@@ -14,7 +14,8 @@ public class Photo {
 	private final float ICON_SIZE = 80.0f;
 
 	private String filename;
-	private Image image;
+    	private BufferedImage image;
+    	private BufferedImage imageDebruitee;
 	
 	
 	private int largeurInit;
@@ -33,9 +34,9 @@ public class Photo {
 	 */
 	public Photo(String filename) {
 		this.filename = filename;
-		this.image = new Image(filename);
-		this.largeurInit = this.getLargeur();
-		this.hauteurInit = this.getHauteur();
+		this.image = ImageIO.read(new File(filename));
+		this.largeurInit = image.getWidth();
+        	this.hauteurInit = image.getHeight();
 		this.zoom = 1.0f;
 		this.nom = (new File(filename)).getName();
 		this.nom = this.nom.substring(0, this.nom.length() - 4);
@@ -43,10 +44,10 @@ public class Photo {
 	
 	
 	
-	public Image bruiter() {
-		// TODO
-		return imageBruitee;
-	}
+	public BufferedImage bruiter(double ecartType) {
+        	ImageBruitee imageBruitee = new ImageBruitee(image, ecartType);
+        	return imageBruitee.getImage();
+   	}
 	
 	public Image debruiter(double bruitage) {
 		// TODO
@@ -62,7 +63,7 @@ public class Photo {
 	 * 
 	 * @return l'image de la photo.
 	 */
-	public Image getImage() {
+	public BufferedImage getImage() {
 		return this.image;
 	}
 
