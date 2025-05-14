@@ -5,6 +5,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -154,21 +155,41 @@ public class Visionneuse extends Application {
 		
 	public HBox creerBandeauHaut() {
 		HBox bandeauHaut = new HBox();
-		Button bruiter = new Button("Bruiter");
-		Button debruiter = new Button("Débruiter");
+		
+		Button btnBruiter = new Button("Bruiter");
+		Button btnDebruiter = new Button("Débruiter");
+		
+		HBox bruiter = new HBox();
+		HBox debruiter = new HBox();
+		bruiter.setAlignment(Pos.BASELINE_LEFT);
 		bandeauHaut.setAlignment(Pos.CENTER);
 		
-		bruiter.setOnAction(arg0 -> {
+		VBox bruitage = new VBox();
+		bruitage.setAlignment(Pos.CENTER);
+		Label textBruitage = new Label("Bruitage");
+		Slider sliderBruitage = new Slider(0,100,50);
+
+		sliderBruitage.setOrientation(Orientation.HORIZONTAL);
+		sliderBruitage.setShowTickMarks(true);
+		sliderBruitage.setShowTickLabels(true);
+		sliderBruitage.setMajorTickUnit(10);
+		
+		bruitage.getChildren().addAll(textBruitage, sliderBruitage);
+		
+		
+		btnBruiter.setOnAction(arg0 -> {
 			
 			imageView.setImage(album.getPhotoCourante().bruiter());
 			
 			
 		});
 		
-		debruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter());
+		btnDebruiter.setOnAction(arg0 -> {
+			imageView.setImage(album.getPhotoCourante().debruiter(sliderBruitage.getValue()));
 		});
 		
+		bruiter.getChildren().addAll(bruitage,btnBruiter);
+		debruiter.getChildren().addAll(btnDebruiter);
 		bandeauHaut.getChildren().addAll(bruiter,debruiter);
 		
 		

@@ -48,7 +48,7 @@ public class Photo {
 		return imageBruitee;
 	}
 	
-	public Image debruiter() {
+	public Image debruiter(double bruitage) {
 		// TODO
 		return imageDebruitee;
 	}
