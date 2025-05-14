@@ -497,7 +497,7 @@ public class ImageDebruitee {
 		    Map<Integer, Vector<Float>> resultat = new HashMap<>();
 
 		    for (Map.Entry<Integer, Vector<Float>> entry : data.entrySet()) {
-		        int key = entry.getKey();
+		        int cle = entry.getKey();
 		        Vector<Float> ligne = entry.getValue();
 		        Vector<Float> nouvelleLigne = new Vector<>();
 
@@ -509,7 +509,7 @@ public class ImageDebruitee {
 		            }
 		        }
 
-		        resultat.put(key, nouvelleLigne);
+		        resultat.put(cle, nouvelleLigne);
 		    }
 
 		    return resultat;
@@ -521,7 +521,7 @@ public class ImageDebruitee {
 		    Map<Integer, Vector<Float>> resultat = new HashMap<>();
 
 		    for (Map.Entry<Integer, Vector<Float>> entry : data.entrySet()) {
-		        int key = entry.getKey();
+		        int cle = entry.getKey();
 		        Vector<Float> ligne = entry.getValue();
 		        Vector<Float> nouvelleLigne = new Vector<>();
 
@@ -535,7 +535,7 @@ public class ImageDebruitee {
 		            }
 		        }
 
-		        resultat.put(key, nouvelleLigne);
+		        resultat.put(cle, nouvelleLigne);
 		    }
 
 		    return resultat;
