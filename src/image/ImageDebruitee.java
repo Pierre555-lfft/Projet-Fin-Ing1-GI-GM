@@ -449,35 +449,37 @@ public class ImageDebruitee {
 	}
 	
 	//Pierre Laforest
-		//fonction qui permet de déterminer le seuille 
-		public static float seuilV(float sigma, int nbPatchs, int taillePatch) {
-			int l; // cette variable permet de calculer la taille pour calculer le seuil avec la méthode de VisuSrhrink
-			l = nbPatchs * taillePatch;
-	        return sigma * (float)Math.sqrt(2 * Math.log(l)); // calcule du seuil avec la méthoe de VisuSrhrink
-		}
-		
-		//Pierre Laforest 
-		//fonction qui permet de déterminer la variance 
-		public static float calculerVarianceFloat(List<Vector<Float>> matriceImage) {
-		    int totalElements = 0;
-		    float somme = 0f;
-		    float sommeCarres = 0f;
+	//fonction qui permet de déterminer le seuille 
+	public static float seuilV(float sigma, int nbPatchs, int taillePatch) {
+		int l; // cette variable permet de calculer la taille pour calculer le seuil avec la méthode de VisuSrhrink
+		float visuSrhrink; // seuil de VisuSrhrink
+		l = nbPatchs * taillePatch;
+		visuSrhrink = sigma * (float)Math.sqrt(2 * Math.log(l)); // calcule du seuil avec la méthoe de VisuSrhrink
+        return visuSrhrink; // retourner le seuilV
+	}
+	
+	//Pierre Laforest 
+	//fonction qui permet de déterminer la variance 
+	public static float calculerVarianceFloat(List<Vector<Float>> matriceImage) {
+	    int elementTotals = 0;
+	    float somme = 0f;
+	    float sommeCarres = 0f;
 
-		    for (Vector<Float> ligne : matriceImage) {
-		        for (float coeff : ligne) {
-		            somme += coeff;
-		            sommeCarres += coeff * coeff;
-		            totalElements++;
-		        }
-		    }
+	    for (Vector<Float> ligne : matriceImage) {
+	        for (float coeff : ligne) {
+	            somme += coeff;
+	            sommeCarres += coeff * coeff;
+	            elementTotals++;
+	        }
+	    }
 
-		    if (totalElements == 0) return 0f;
+	    if (elementTotals == 0) return 0f;
 
-		    float moyenne = somme / totalElements;
-		    float variance = (sommeCarres / totalElements) - (moyenne * moyenne);
+	    float moyenne = somme / elementTotals;
+	    float variance = (sommeCarres / elementTotals) - (moyenne * moyenne);
 
-		    return variance;
-		}
+	    return variance;
+	}
 		
 		//Pierre Laforest
 		//focntion qui permet de déterminer dépendant de la variance s'il faut utiliser un seuillage doux ou dur 
