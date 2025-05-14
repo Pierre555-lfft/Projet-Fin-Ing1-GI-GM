@@ -15,7 +15,7 @@ public class ImageDebruitee {
 	private Image imageDebruitee;
 
 	// Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
-	private int obtenirValeurGris(int argb) {
+	public static int obtenirValeurGris(int argb) {
 	    int r = (argb >> 16) & 0xFF;
 	    int g = (argb >> 8) & 0xFF;
 	    int b = argb & 0xFF;
