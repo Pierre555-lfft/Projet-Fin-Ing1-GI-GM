@@ -6,6 +6,8 @@ import java.util.Vector;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
+import javafx.scene.image.PixelWriter;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -13,34 +15,105 @@ public class ImageDebruitee {
 	private Image imageDebruitee;
 
 	// Adrien
-	public List<Patch> extractPatchs(Image image, int patchSize) {
-	    List<Patch> patches = new ArrayList<>();
-	    PixelReader pixelReader = image.getPixelReader();
+	public List<Patch> extractPatchs(Image image, int taillePatch) {
+	    List<Patch> listePatchs = new ArrayList<>();
+	    PixelReader lecteurPixel = image.getPixelReader();
 	    int largeur = (int) image.getWidth();
 	    int hauteur = (int) image.getHeight();
 
-	    // on parcours l'image
-	    for (int y = 0; y <= hauteur - patchSize; y++) {
-	        for (int x = 0; x <= largeur - patchSize; x++) {
-	            // Crée un tableau Float[][] pour le patch
-	            Float[][] patchArray = new Float[patchSize][patchSize];
+	    // Calculer le nombre de patchs qui peuvent être extraits sans chevauchement
+	    int nbPatchsX = largeur / taillePatch;
+	    int nbPatchsY = hauteur / taillePatch;
 
-	            // on parcours chaque Patchsrc/image/ImageDebruitee.java
-	            for (int dy = 0; dy < patchSize; dy++) {
-	                for (int dx = 0; dx < patchSize; dx++) {
-	                    int argb = pixelReader.getArgb(x + dx, y + dy);
+	    // Extraire les patchs non superposés
+	    for (int y = 0; y < nbPatchsY; y++) {
+	        for (int x = 0; x < nbPatchsX; x++) {
+	            int debutX = x * taillePatch;
+	            int debutY = y * taillePatch;
+	            Float[][] matricePatch = new Float[taillePatch][taillePatch];
+
+	            for (int dy = 0; dy < taillePatch; dy++) {
+	                for (int dx = 0; dx < taillePatch; dx++) {
+	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
 	                    int r = (argb >> 16) & 0xFF;
 	                    int g = (argb >> 8) & 0xFF;
 	                    int b = argb & 0xFF;
 	                    float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
-	                    patchArray[dy][dx] = luminance; // Stocke en Float
+	                    matricePatch[dy][dx] = luminance;
 	                }
 	            }
-	            patches.add(new Patch(patchArray, x, y)); // Utilise le constructeur Patch(Float[][], Integer, Integer)
+	            listePatchs.add(new Patch(matricePatch, debutX, debutY));
 	        }
 	    }
-	    return patches;
+
+	    // Gérer les bords droit et inférieur si nécessaire
+	    boolean resteX = (largeur % taillePatch) != 0;
+	    boolean resteY = (hauteur % taillePatch) != 0;
+
+	    // Bord droit
+	    if (resteX) {
+	        for (int y = 0; y < nbPatchsY; y++) {
+	            int debutX = largeur - taillePatch;
+	            int debutY = y * taillePatch;
+	            Float[][] matricePatch = new Float[taillePatch][taillePatch];
+
+	            for (int dy = 0; dy < taillePatch; dy++) {
+	                for (int dx = 0; dx < taillePatch; dx++) {
+	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
+	                    int r = (argb >> 16) & 0xFF;
+	                    int g = (argb >> 8) & 0xFF;
+	                    int b = argb & 0xFF;
+	                    float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
+	                    matricePatch[dy][dx] = luminance;
+	                }
+	            }
+	            listePatchs.add(new Patch(matricePatch, debutX, debutY));
+	        }
+	    }
+
+	    // Bord inférieur
+	    if (resteY) {
+	        for (int x = 0; x < nbPatchsX; x++) {
+	            int debutX = x * taillePatch;
+	            int debutY = hauteur - taillePatch;
+	            Float[][] matricePatch = new Float[taillePatch][taillePatch];
+
+	            for (int dy = 0; dy < taillePatch; dy++) {
+	                for (int dx = 0; dx < taillePatch; dx++) {
+	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
+	                    int r = (argb >> 16) & 0xFF;
+	                    int g = (argb >> 8) & 0xFF;
+	                    int b = argb & 0xFF;
+	                    float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
+	                    matricePatch[dy][dx] = luminance;
+	                }
+	            }
+	            listePatchs.add(new Patch(matricePatch, debutX, debutY));
+	        }
+	    }
+
+	    // Coin inférieur droit (si nécessaire)
+	    if (resteX && resteY) {
+	        int debutX = largeur - taillePatch;
+	        int debutY = hauteur - taillePatch;
+	        Float[][] matricePatch = new Float[taillePatch][taillePatch];
+
+	        for (int dy = 0; dy < taillePatch; dy++) {
+	            for (int dx = 0; dx < taillePatch; dx++) {
+	                int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
+	                int r = (argb >> 16) & 0xFF;
+	                int g = (argb >> 8) & 0xFF;
+	                int b = argb & 0xFF;
+	                float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
+	                matricePatch[dy][dx] = luminance;
+	            }
+	        }
+	        listePatchs.add(new Patch(matricePatch, debutX, debutY));
+	    }
+
+	    return listePatchs;
 	}
+
 	
 	//Adrien
 	public List<Vector<Float>> vectorPatchs (ArrayList<Patch> patchs){
@@ -55,9 +128,63 @@ public class ImageDebruitee {
 		return vecteurs;
 	}
 
-	public Image reconstructPatchs (List<Patch> patchsDebruitee) {
-		
+	// Adrien
+	public Image reconstructPatchs(List<Patch> patchsDebruitee) {
+	    if (patchsDebruitee == null || patchsDebruitee.isEmpty()) {
+	        return null;
+	    }
+
+	    // 1. Déterminer la taille de l'image à reconstruire
+	    int largeurMax = 0;
+	    int hauteurMax = 0;
+	    int taillePatch = patchsDebruitee.get(0).getTab().length; // On suppose que les patchs sont carrés
+
+	    for (Patch patch : patchsDebruitee) {
+	        int finX = patch.getX() + taillePatch;
+	        int finY = patch.getY() + taillePatch;
+	        if (finX > largeurMax) largeurMax = finX;
+	        if (finY > hauteurMax) hauteurMax = finY;
+	    }
+
+	    // 2. Créer les tableaux pour stocker la somme des luminances et le nombre de contributions par pixel
+	    float[][] sommeLuminance = new float[hauteurMax][largeurMax];
+	    int[][] compteur = new int[hauteurMax][largeurMax];
+
+	    // 3. Ajouter les valeurs des patchs
+	    for (Patch patch : patchsDebruitee) {
+	        Float[][] tab = patch.getTab();
+	        int debutX = patch.getX();
+	        int debutY = patch.getY();
+
+	        for (int dy = 0; dy < tab.length; dy++) {
+	            for (int dx = 0; dx < tab[0].length; dx++) {
+	                int x = debutX + dx;
+	                int y = debutY + dy;
+	                sommeLuminance[y][x] += tab[dy][dx];
+	                compteur[y][x]++;
+	            }
+	        }
+	    }
+
+	    // 4. Créer l’image avec lissage (moyenne des patchs)
+	    WritableImage imageReconstruite = new WritableImage(largeurMax, hauteurMax);
+	    PixelWriter ecrivain = imageReconstruite.getPixelWriter();
+
+	    for (int y = 0; y < hauteurMax; y++) {
+	        for (int x = 0; x < largeurMax; x++) {
+	            if (compteur[y][x] > 0) {
+	                float moyenne = sommeLuminance[y][x] / compteur[y][x];
+	                int niveauGris = Math.min(255, Math.max(0, Math.round(moyenne)));
+	                // on combine plusieurs entiers binaires pour avoir le argb
+	                int argb = (0xFF << 24) | (niveauGris << 16) | (niveauGris << 8) | niveauGris;
+	                ecrivain.setArgb(x, y, argb);
+	            }
+	        }
+	    }
+
+	    return imageReconstruite;
 	}
+
 	
 	public Image imageDen(Image imageBruitee) {
 		Integer taillePatch = 10;
@@ -148,7 +275,7 @@ public class ImageDebruitee {
 	
 	// Mathis B
 	
-	public static List<Vector<Float>> Cov_methode (List<Vector<Float>> V{// V collection de patch vectorisé
+	public static List<Vector<Float>> Cov_methode (List<Vector<Float>> V){// V collection de patch vectorisé
 		
 		// Initialisation longueur de lacollection de patch et des patchs
 		
@@ -370,7 +497,7 @@ public class ImageDebruitee {
 		    Map<Integer, Vector<Float>> resultat = new HashMap<>();
 
 		    for (Map.Entry<Integer, Vector<Float>> entry : data.entrySet()) {
-		        int key = entry.getKey();
+		        int cle = entry.getKey();
 		        Vector<Float> ligne = entry.getValue();
 		        Vector<Float> nouvelleLigne = new Vector<>();
 
@@ -382,7 +509,7 @@ public class ImageDebruitee {
 		            }
 		        }
 
-		        resultat.put(key, nouvelleLigne);
+		        resultat.put(cle, nouvelleLigne);
 		    }
 
 		    return resultat;
@@ -394,7 +521,7 @@ public class ImageDebruitee {
 		    Map<Integer, Vector<Float>> resultat = new HashMap<>();
 
 		    for (Map.Entry<Integer, Vector<Float>> entry : data.entrySet()) {
-		        int key = entry.getKey();
+		        int cle = entry.getKey();
 		        Vector<Float> ligne = entry.getValue();
 		        Vector<Float> nouvelleLigne = new Vector<>();
 
@@ -408,7 +535,7 @@ public class ImageDebruitee {
 		            }
 		        }
 
-		        resultat.put(key, nouvelleLigne);
+		        resultat.put(cle, nouvelleLigne);
 		    }
 
 		    return resultat;
