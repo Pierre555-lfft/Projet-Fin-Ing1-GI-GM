@@ -15,7 +15,7 @@ public class ImageDebruitee {
 	private Image imageDebruitee;
 
 	// Adrien
-	public List<Patch> extrairePatchs(Image image, int taillePatch) {
+	public List<Patch> extractPatchs(Image image, int taillePatch) {
 	    List<Patch> listePatchs = new ArrayList<>();
 	    PixelReader lecteurPixel = image.getPixelReader();
 	    int largeur = (int) image.getWidth();
