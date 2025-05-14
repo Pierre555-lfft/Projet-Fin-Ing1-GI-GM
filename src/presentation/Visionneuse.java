@@ -33,7 +33,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Visionneuse extends Application {
-	private static final String[][] String = null;
+
 	private Album album;
 	private ImageView imageView;
 	private Slider slider;
@@ -179,13 +179,13 @@ public class Visionneuse extends Application {
 		
 		btnBruiter.setOnAction(arg0 -> {
 			
-			imageView.setImage(album.getPhotoCourante().bruiter());
+			imageView.setImage(album.getPhotoCourante().bruiter(sliderBruitage.getValue()));
 			
 			
 		});
 		
 		btnDebruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter(sliderBruitage.getValue()));
+			//imageView.setImage(album.getPhotoCourante().debruiter(sliderBruitage.getValue()));
 		});
 		
 		bruiter.getChildren().addAll(bruitage,btnBruiter);

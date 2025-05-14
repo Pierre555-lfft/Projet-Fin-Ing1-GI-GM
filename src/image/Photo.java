@@ -14,8 +14,8 @@ public class Photo {
 	private final float ICON_SIZE = 80.0f;
 
 	private String filename;
-    	private BufferedImage image;
-    	private BufferedImage imageDebruitee;
+    private BufferedImage image;
+
 	
 	
 	private int largeurInit;

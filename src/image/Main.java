@@ -16,7 +16,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             // 1. Charger la photo
-            Photo photo = new Photo("resources/gibbon.jpg");
+            Photo photo = new Photo("images/gibbon.jpg");
 
             // 2. Bruiter l'image
             BufferedImage bufferedBruitee = photo.bruiter(50.0);
