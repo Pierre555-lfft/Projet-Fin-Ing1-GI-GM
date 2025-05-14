@@ -55,6 +55,10 @@ public class ImageDebruitee {
 		return vecteurs;
 	}
 
+	public Image reconstructPatchs (List<Patch> patchsDebruitee) {
+		
+	}
+	
 	public Image imageDen(Image imageBruitee) {
 		Integer taillePatch = 10;
 		Integer ligne = 100;
@@ -74,7 +78,7 @@ public class ImageDebruitee {
 		//...
 		
 		
-		Vector<Float> vecteursDebruitee;
+		List<Vector<Float>> vecteursDebruitee;
 		
 		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, nbLignePatch, nbColonnePatch, patchPosition);
 				
