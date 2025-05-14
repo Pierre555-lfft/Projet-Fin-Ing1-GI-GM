@@ -450,9 +450,10 @@ public class ImageDebruitee {
 	
 	//Pierre Laforest
 		//fonction qui permet de déterminer le seuille 
-		public void seuilV(Float sigma, int taille) {
-			int L = width * height; // Nombre total de pixels
-	        return sigma * Math.sqrt(2 * Math.log(L));
+		public static float seuilV(float sigma, int nbPatchs, int taillePatch) {
+			int l; // cette variable permet de calculer la taille pour calculer le seuil avec la méthode de VisuSrhrink
+			l = nbPatchs * taillePatch;
+	        return sigma * (float)Math.sqrt(2 * Math.log(l)); // calcule du seuil avec la méthoe de VisuSrhrink
 		}
 		
 		//Pierre Laforest 
