@@ -14,7 +14,15 @@ import java.util.Vector;
 public class ImageDebruitee {
 	private Image imageDebruitee;
 
-	// Adrien
+	// Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
+	private int obtenirValeurGris(int argb) {
+	    int r = (argb >> 16) & 0xFF;
+	    int g = (argb >> 8) & 0xFF;
+	    int b = argb & 0xFF;
+	    // Formule de luminance
+	    return (int) (0.299 * r + 0.587 * g + 0.114 * b);
+	}
+
 	public List<Patch> extractPatchs(Image image, int taillePatch) {
 	    List<Patch> listePatchs = new ArrayList<>();
 	    PixelReader lecteurPixel = image.getPixelReader();
@@ -35,10 +43,8 @@ public class ImageDebruitee {
 	            for (int dy = 0; dy < taillePatch; dy++) {
 	                for (int dx = 0; dx < taillePatch; dx++) {
 	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
-	                    int r = (argb >> 16) & 0xFF;
-	                    int g = (argb >> 8) & 0xFF;
-	                    int b = argb & 0xFF;
-	                    float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
+	                    // Utilisation de la méthode obtenirValeurGris pour la luminance
+	                    float luminance = obtenirValeurGris(argb);
 	                    matricePatch[dy][dx] = luminance;
 	                }
 	            }
@@ -60,10 +66,8 @@ public class ImageDebruitee {
 	            for (int dy = 0; dy < taillePatch; dy++) {
 	                for (int dx = 0; dx < taillePatch; dx++) {
 	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
-	                    int r = (argb >> 16) & 0xFF;
-	                    int g = (argb >> 8) & 0xFF;
-	                    int b = argb & 0xFF;
-	                    float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
+	                    // Utilisation de la méthode obtenirValeurGris pour la luminance
+	                    float luminance = obtenirValeurGris(argb);
 	                    matricePatch[dy][dx] = luminance;
 	                }
 	            }
@@ -81,10 +85,8 @@ public class ImageDebruitee {
 	            for (int dy = 0; dy < taillePatch; dy++) {
 	                for (int dx = 0; dx < taillePatch; dx++) {
 	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
-	                    int r = (argb >> 16) & 0xFF;
-	                    int g = (argb >> 8) & 0xFF;
-	                    int b = argb & 0xFF;
-	                    float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
+	                    // Utilisation de la méthode obtenirValeurGris pour la luminance
+	                    float luminance = obtenirValeurGris(argb);
 	                    matricePatch[dy][dx] = luminance;
 	                }
 	            }
@@ -101,10 +103,8 @@ public class ImageDebruitee {
 	        for (int dy = 0; dy < taillePatch; dy++) {
 	            for (int dx = 0; dx < taillePatch; dx++) {
 	                int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
-	                int r = (argb >> 16) & 0xFF;
-	                int g = (argb >> 8) & 0xFF;
-	                int b = argb & 0xFF;
-	                float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
+	                // Utilisation de la méthode obtenirValeurGris pour la luminance
+	                float luminance = obtenirValeurGris(argb);
 	                matricePatch[dy][dx] = luminance;
 	            }
 	        }
@@ -113,7 +113,6 @@ public class ImageDebruitee {
 
 	    return listePatchs;
 	}
-
 	
 	//Adrien
 	public List<Vector<Float>> vectorPatchs (ArrayList<Patch> patchs){
