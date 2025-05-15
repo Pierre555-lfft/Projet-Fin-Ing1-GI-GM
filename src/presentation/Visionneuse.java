@@ -46,7 +46,7 @@ public class Visionneuse extends Application {
 		primaryStage.setTitle("Album Photo");
 	
 
-		album = new Album("/home/etienne/eclipse-workspace/FXTP3/images");
+		album = new Album("/home/etienne/CyTech/Projet_java/Projet-Fin-Ing1-GI-GM/images");
 		 
 		VBox vbox = new VBox();
 		
@@ -158,7 +158,8 @@ public class Visionneuse extends Application {
 		
 		Button btnBruiter = new Button("Bruiter");
 		Button btnDebruiter = new Button("Débruiter");
-		
+		Button btnReset = new Button("Reset");
+		btnReset.setOnAction(arg0 -> imageView.setImage(album.getPhotoCourante().reset()));
 		HBox bruiter = new HBox();
 		HBox debruiter = new HBox();
 		bruiter.setAlignment(Pos.BASELINE_LEFT);
@@ -174,6 +175,7 @@ public class Visionneuse extends Application {
 		sliderBruitage.setShowTickLabels(true);
 		sliderBruitage.setMajorTickUnit(10);
 		
+		
 		bruitage.getChildren().addAll(textBruitage, sliderBruitage);
 		
 		
@@ -185,12 +187,13 @@ public class Visionneuse extends Application {
 		});
 		
 		btnDebruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter());
+			//imageView.setImage(album.getPhotoCourante().debruiter());
+			
 		});
 		
 		bruiter.getChildren().addAll(bruitage,btnBruiter);
 		debruiter.getChildren().addAll(btnDebruiter);
-		bandeauHaut.getChildren().addAll(bruiter,debruiter);
+		bandeauHaut.getChildren().addAll(bruiter,debruiter,btnReset);
 		
 		
 		return bandeauHaut;

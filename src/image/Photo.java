@@ -17,6 +17,7 @@ public class Photo {
 
     private String filename;
     private Image image;
+    private Image imageOriginelle;
     private ImageDebruitee imageDebruitee;
     private ImageBruitee imageBruitee;
 
@@ -37,14 +38,11 @@ public class Photo {
 	 *            chemin complet du fichier image
 	 */
 	public Photo(String filename) {
-        this.filename = filename;
-        try {
-            this.image = new Image(new FileInputStream(filename));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-		this.largeurInit = (int) image.getWidth();
-        	this.hauteurInit = (int) image.getHeight();
+		this.filename = filename;
+		this.image = new Image(filename);
+		this.imageOriginelle = this.image;
+		this.largeurInit = this.getLargeur();
+		this.hauteurInit = this.getHauteur();
 		this.zoom = 1.0f;
 		this.nom = (new File(filename)).getName();
 		this.nom = this.nom.substring(0, this.nom.length() - 4);
@@ -53,13 +51,19 @@ public class Photo {
 	
 	
 	public Image bruiter(double ecartType) {
-        	imageBruitee = new ImageBruitee(image, ecartType);
+        	imageBruitee = new ImageBruitee(imageOriginelle, ecartType);
+        	image = imageBruitee.getImage();
         	return imageBruitee.getImage();
    	}
+	
+	public Image reset() {
+		image = imageOriginelle;
+		return image;
+	}
 	/*
 	public Image debruiter() {
-		imageDebruitee = new ImageDebruitee(imageBruitee.getImage());
-		
+		imageDebruitee = new ImageDebruitee(image);
+		image = imageBruitee.getImage();
 		return imageDebruitee.getImage();
 	}*/
 	
