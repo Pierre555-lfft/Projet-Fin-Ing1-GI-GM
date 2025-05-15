@@ -14,6 +14,7 @@ import java.util.Vector;
 public class ImageDebruitee {
 	private Image imageDebruitee;
 
+	// Adrien
 	// Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
 	public static int obtenirValeurGris(int argb) {
 	    int r = (argb >> 16) & 0xFF;
@@ -23,6 +24,7 @@ public class ImageDebruitee {
 	    return (int) (0.299 * r + 0.587 * g + 0.114 * b);
 	}
 
+	// Adrien
 	public List<Patch> extractPatchs(Image image, int taillePatch) {
 	    List<Patch> listePatchs = new ArrayList<>();
 	    PixelReader lecteurPixel = image.getPixelReader();
