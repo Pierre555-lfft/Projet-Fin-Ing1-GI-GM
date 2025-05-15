@@ -305,11 +305,9 @@ public class ImageDebruitee {
 				    ArrayList<Vector<Float>> V_contrib = new ArrayList<Vector<Float>>();
 				    
 				    for(int i = 0; i<p;i++) { // création d'une list de vecteur avec n patch
-						Vector<Float> ligne = new Vector<>();
-				        for (int j = 0; j < p; j++) {
-				            ligne.add(0f); // rempli de 0
-				        }
-				        V_contrib.add(ligne);
+						V_contrib.add(new Vector<Float>());
+				       
+				        
 					}
 				    
 				    //Exploitation
@@ -413,7 +411,7 @@ public class ImageDebruitee {
 		
 		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
 		
-		
+		//List<Vector<Float>> seuillageDur(Map<Integer, Vector<Float>> data, float seuil); //Pierre
 		
 		
 		List<Vector<Float>> vecteursDebruitee;
