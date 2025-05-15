@@ -556,6 +556,32 @@ public class ImageDebruitee {
 		    return resultat;
 		}
 
+		//Pierre Laforest 
+		//fonction qui permet de faire reconstruire les patchs depuis l'ACP
+		public static Map<Integer, Vector<Float>> reconstruireDepuisACP(Map<Integer, Vector<Float>> dataSeuillé, float[][] baseU,Vector<Float> moyenne) {
+			    Map<Integer, Vector<Float>> patchesReconstitues = new HashMap<>();
+
+			    for (Map.Entry<Integer, Vector<Float>> entry : dataSeuillé.entrySet()) {
+			        int cle = entry.getKey();
+			        Vector<Float> alpha = entry.getValue();
+			        Vector<Float> patchReconstruit = new Vector<>();
+
+			        // Produit matriciel : U * alpha^{(k)}
+			        for (int i = 0; i < baseU.length; i++) {
+			            float somme = 0f;
+			            for (int j = 0; j < alpha.size(); j++) {
+			                somme += baseU[i][j] * alpha.get(j);
+			            }
+			            // Ajout de la moyenne : v_k = U * alpha + moyenne
+			            patchReconstruit.add(somme + moyenne.get(i));
+			        }
+
+			        patchesReconstitues.put(cle, patchReconstruit);
+			    }
+
+			    return patchesReconstitues;
+			}
+
 		
 		
 
