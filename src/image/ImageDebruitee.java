@@ -313,11 +313,9 @@ public class ImageDebruitee {
 				    ArrayList<Vector<Float>> V_contrib = new ArrayList<Vector<Float>>();
 				    
 				    for(int i = 0; i<p;i++) { // création d'une list de vecteur avec n patch
-						Vector<Float> ligne = new Vector<>();
-				        for (int j = 0; j < p; j++) {
-				            ligne.add(0f); // rempli de 0
-				        }
-				        V_contrib.add(ligne);
+						V_contrib.add(new Vector<Float>());
+				       
+				        
 					}
 				    
 				    //Exploitation
@@ -421,7 +419,7 @@ public class ImageDebruitee {
 		
 		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
 		
-		
+		//List<Vector<Float>> seuillageDur(Map<Integer, Vector<Float>> data, float seuil); //Pierre
 		
 		
 		List<Vector<Float>> vecteursDebruitee = alpha_i;
@@ -563,6 +561,32 @@ public class ImageDebruitee {
 
 		    return resultat;
 		}
+
+		//Pierre Laforest 
+		//fonction qui permet de faire reconstruire les patchs depuis l'ACP
+		public static Map<Integer, Vector<Float>> reconstruireDepuisACP(Map<Integer, Vector<Float>> dataSeuillé, float[][] baseU,Vector<Float> moyenne) {
+			    Map<Integer, Vector<Float>> patchesReconstitues = new HashMap<>();
+
+			    for (Map.Entry<Integer, Vector<Float>> entry : dataSeuillé.entrySet()) {
+			        int cle = entry.getKey();
+			        Vector<Float> alpha = entry.getValue();
+			        Vector<Float> patchReconstruit = new Vector<>();
+
+			        // Produit matriciel : U * alpha^{(k)}
+			        for (int i = 0; i < baseU.length; i++) {
+			            float somme = 0f;
+			            for (int j = 0; j < alpha.size(); j++) {
+			                somme += baseU[i][j] * alpha.get(j);
+			            }
+			            // Ajout de la moyenne : v_k = U * alpha + moyenne
+			            patchReconstruit.add(somme + moyenne.get(i));
+			        }
+
+			        patchesReconstitues.put(cle, patchReconstruit);
+			    }
+
+			    return patchesReconstitues;
+			}
 
 		
 		
