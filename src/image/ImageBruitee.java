@@ -1,44 +1,47 @@
-package image2;
+package image;
 
-import java.awt.image.BufferedImage;
+import javafx.scene.image.*;
+import javafx.scene.paint.Color;
+
 import java.util.Random;
 
 public class ImageBruitee {
-    private BufferedImage imageBruitee;
+    private Image imageBruitee;
 
-    public ImageBruitee(BufferedImage image, double ecartType) {
+    public ImageBruitee(Image image, double ecartType) {
         this.imageBruitee = ajouterBruit(image, ecartType);
     }
 
-    private BufferedImage ajouterBruit(BufferedImage original, double ecartType) {
-        BufferedImage resultat = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+    private Image ajouterBruit(Image original, double ecartType) {
+        int width = (int) original.getWidth();
+        int height = (int) original.getHeight();
+
+        WritableImage result = new WritableImage(width, height);
+        PixelReader reader = original.getPixelReader();
+        PixelWriter writer = result.getPixelWriter();
+
         Random rand = new Random();
 
-        for (int x = 0; x < original.getWidth(); x++) {
-            for (int y = 0; y < original.getHeight(); y++) {
-                int rgb = original.getRGB(x, y);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
 
-                int r = (rgb >> 16) & 0xFF;
-                int g = (rgb >> 8) & 0xFF;
-                int b = rgb & 0xFF;
+                double r = clamp(color.getRed() + rand.nextGaussian() * ecartType / 255.0);
+                double g = clamp(color.getGreen() + rand.nextGaussian() * ecartType / 255.0);
+                double b = clamp(color.getBlue() + rand.nextGaussian() * ecartType / 255.0);
 
-                r = clamp(r + (int) (rand.nextGaussian() * ecartType));
-                g = clamp(g + (int) (rand.nextGaussian() * ecartType));
-                b = clamp(b + (int) (rand.nextGaussian() * ecartType));
-                
-                int newRGB = (r << 16) | (g << 8) | b;
-                resultat.setRGB(x, y, newRGB);
+                writer.setColor(x, y, new Color(r, g, b, color.getOpacity()));
             }
         }
 
-        return resultat;
+        return result;
     }
 
-    private int clamp(int value) {
-        return Math.max(0, Math.min(255, value));
+    private double clamp(double value) {
+        return Math.max(0.0, Math.min(1.0, value));
     }
 
-    public BufferedImage getImage() {
+    public Image getImage() {
         return imageBruitee;
     }
 }

@@ -3,6 +3,8 @@ package image;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javafx.scene.image.Image;
@@ -13,8 +15,8 @@ public class Photo {
 	private final float ZOOM_MAX = 5.0f;
 	private final float ICON_SIZE = 80.0f;
 
-	private String filename;
-    private BufferedImage image;
+    private String filename;
+    private Image image;
     private ImageDebruitee imageDebruitee;
     private ImageBruitee imageBruitee;
 
@@ -35,10 +37,14 @@ public class Photo {
 	 *            chemin complet du fichier image
 	 */
 	public Photo(String filename) {
-		this.filename = filename;
-		this.image = ImageIO.read(new File(filename));
-		this.largeurInit = image.getWidth();
-        	this.hauteurInit = image.getHeight();
+        this.filename = filename;
+        try {
+            this.image = new Image(new FileInputStream(filename));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+		this.largeurInit = (int) image.getWidth();
+        	this.hauteurInit = (int) image.getHeight();
 		this.zoom = 1.0f;
 		this.nom = (new File(filename)).getName();
 		this.nom = this.nom.substring(0, this.nom.length() - 4);
@@ -46,16 +52,16 @@ public class Photo {
 	
 	
 	
-	public BufferedImage bruiter(double ecartType) {
+	public Image bruiter(double ecartType) {
         	imageBruitee = new ImageBruitee(image, ecartType);
         	return imageBruitee.getImage();
    	}
-	
+	/*
 	public Image debruiter() {
 		imageDebruitee = new ImageDebruitee(imageBruitee.getImage());
 		
 		return imageDebruitee.getImage();
-	}
+	}*/
 	
 	
 	
@@ -66,7 +72,7 @@ public class Photo {
 	 * 
 	 * @return l'image de la photo.
 	 */
-	public BufferedImage getImage() {
+	public Image getImage() {
 		return this.image;
 	}
 
