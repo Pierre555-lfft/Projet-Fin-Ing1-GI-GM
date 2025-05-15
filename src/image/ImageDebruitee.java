@@ -21,6 +21,14 @@ import java.util.Vector;
 public class ImageDebruitee {
 	private Image imageDebruitee;
 
+	public ImageDebruitee(Image imageBruitee) {
+		imageDebruitee = imageDen(imageBruitee);
+	}
+	
+	public Image getImage() {
+		return imageDebruitee;
+	}
+	
 	// Adrien
 	// Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
 	public static int obtenirValeurGris(int argb) {
@@ -395,8 +403,8 @@ public class ImageDebruitee {
 	
 	public Image imageDen(Image imageBruitee) {
 		Integer taillePatch = 10;
-		Integer ligne = 100;
-		Integer colonne = 100;
+		Integer ligne = 450;
+		Integer colonne = 600;
 		Integer nbLignePatch = 10;
 		Integer nbColonnePatch = 10;
 		
@@ -416,7 +424,7 @@ public class ImageDebruitee {
 		
 		
 		
-		List<Vector<Float>> vecteursDebruitee;
+		List<Vector<Float>> vecteursDebruitee = alpha_i;
 		
 		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, nbLignePatch, nbColonnePatch, patchPosition);
 				
