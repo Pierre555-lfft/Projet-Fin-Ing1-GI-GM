@@ -425,7 +425,9 @@ public class ImageDebruitee {
 		
 		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
 		
-		
+		Vector<Float> moyenne = vecteur_centre_methode(vecteurs);
+		RealMatrix baseU = ACP(vecteurs);
+
 	    float variance = ImageDebruitee.calculerVarianceFloat(alpha_i);  // Pierre : fonction qui sert à calculer la variance 
 	    float sigma = (float) Math.sqrt(variance); // Pierre : fonction qui sert à déterminer le paramètre sigma 
 	    float seuil = ImageDebruitee.seuilV(sigma, alpha_i.size(), alpha_i.get(0).size()); // Pierre : fonction qui permettra de déterminer le seuil 
@@ -441,7 +443,7 @@ public class ImageDebruitee {
 	    }
 	    
 
-	    List<Vector<Float>> vecteursDebruitee = ACPUtils.reconstruireDepuisACP(alphaSeuil, baseU, moyenne); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
+	    List<Vector<Float>> vecteursDebruitee = reconstruireDepuisACP(alphaSeuil, baseU, moyenne); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
 
 		
 		//List<Vector<Float>> vecteursDebruitee = alpha_i;
