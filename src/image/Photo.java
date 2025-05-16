@@ -60,12 +60,12 @@ public class Photo {
 		image = imageOriginelle;
 		return image;
 	}
-	/*
+	
 	public Image debruiter() {
 		imageDebruitee = new ImageDebruitee(image);
 		image = imageBruitee.getImage();
 		return imageDebruitee.getImage();
-	}*/
+	}
 	
 	
 	

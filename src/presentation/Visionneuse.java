@@ -59,8 +59,6 @@ public class Visionneuse extends Application {
 		creerListe = creerListe();
 		window.setLeft(creerListe);
 		
-		HBox bandeauBas = creerBandeauBas();
-		window.setBottom(bandeauBas);
 		
 		HBox bandeauHaut = creerBandeauHaut();
 		window.setTop(bandeauHaut);
@@ -122,36 +120,10 @@ public class Visionneuse extends Application {
 			 album.setIndexCourant(listView.getSelectionModel().getSelectedIndex());
 			 imageView.setImage(album.getPhotoCourante().getImage());
 			 slider.setValue(album.getPhotoCourante().getZoom());
-			 listButton.get(listView.getSelectionModel().getSelectedIndex()).setSelected(true);
-		 });
+			 });
 		 return listView;
 	}
 	
-	public HBox creerBandeauBas() {
-		ToggleGroup toggleGroup = new ToggleGroup();
-		listButton = new ArrayList<RadioButton>();
-		HBox p = new HBox();
-		p.setAlignment(Pos.CENTER);
-		RadioButton b;
-		for (Integer i = 0; i < album.getSize(); i++) {
-			b = new RadioButton();
-			b.setToggleGroup(toggleGroup);
-			b.setGraphic(new ImageView(album.getPhoto(i).getIcone()));;
-			b.getStyleClass().add("custom-radio");
-			listButton.add(b);
-			b.setOnAction(arg0 -> {
-				
-				album.setIndexCourant(listButton.indexOf(arg0.getSource()));
-				imageView.setImage(album.getPhotoCourante().getImage());
-				slider.setValue(album.getPhotoCourante().getZoom());
-				creerListe.getSelectionModel().selectIndices(listButton.indexOf(arg0.getSource()));
-			});
-			
-			p.getChildren().add(b);
-		}
-		return p;
-			
-	}
 		
 	public HBox creerBandeauHaut() {
 		HBox bandeauHaut = new HBox();
@@ -187,7 +159,7 @@ public class Visionneuse extends Application {
 		});
 		
 		btnDebruiter.setOnAction(arg0 -> {
-			//imageView.setImage(album.getPhotoCourante().debruiter());
+			imageView.setImage(album.getPhotoCourante().debruiter());
 			
 		});
 		
@@ -215,7 +187,7 @@ public class Visionneuse extends Application {
 			 File selectedFile = fileChooser.showOpenDialog(primaryStage);
 			 if (selectedFile != null) {
 				 album.addPhoto(selectedFile.toURI().toString());
-				 window.setBottom(creerBandeauBas());
+				 
 				 creerListe = creerListe();
 				window.setLeft(creerListe);
 			 }

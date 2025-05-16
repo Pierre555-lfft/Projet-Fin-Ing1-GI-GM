@@ -43,8 +43,24 @@ public class Patch {
 		return x;
 	}
 	
+	
 	public Integer getY() {
 		return y;
+	}
+	
+	//Etienne
+	@Override
+	public String toString() {
+		String string = "";
+		
+		for (int i = 0; i < tab.length; i++) {
+			for (int j = 0; j < tab[i].length; j++) {
+				string = string + "-" + tab[i][j].toString(); 
+			}
+			string = string + "\n";
+		}		
+		return string;
+				
 	}
 	
 	

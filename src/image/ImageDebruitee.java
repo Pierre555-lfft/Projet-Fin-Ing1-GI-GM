@@ -414,6 +414,11 @@ public class ImageDebruitee {
 		
 		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
 		
+		
+		for(Patch p : patchs) {
+			System.out.println(p.toString());
+		}
+		
 		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 		
 		List<int[]> patchPosition = getPositions(patchs);
