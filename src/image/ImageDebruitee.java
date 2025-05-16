@@ -441,7 +441,7 @@ public class ImageDebruitee {
 	    }
 	    
 
-	    List<Vector<Float>> vecteursDebruitee = ACPUtils.reconstruireDepuisACP(alphaSeuil, baseU, moyenne); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
+	    List<Vector<Float>> vecteursDebruitee = reconstruireDepuisACP(alphaSeuil, ACP(vecteurs), mv_methode(vecteurs)); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
 
 		
 		//List<Vector<Float>> vecteursDebruitee = alpha_i;
