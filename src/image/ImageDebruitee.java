@@ -419,8 +419,24 @@ public class ImageDebruitee {
 		
 		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
 		
-		//List<Vector<Float>> seuillageDur(Map<Integer, Vector<Float>> data, float seuil); //Pierre
 		
+	    float variance = ImageDebruitee.calculerVarianceFloat(alpha_i);  // Pierre : fonction qui sert à calculer la variance 
+	    float sigma = (float) Math.sqrt(variance); // Pierre : fonction qui sert à déterminer le paramètre sigma 
+	    float seuil = ImageDebruitee.seuilV(sigma, alpha_i.size(), alpha_i.get(0).size()); // Pierre : fonction qui permettra de déterminer le seuil 
+
+	 
+	    TypeSeuillage type = ImageDebruitee.choisirType(variance); // Pierre : fonction qui permet de déterminer le type de seuillage à utiliser selon la variance 
+
+	    List<Vector<Float>> alphaSeuil;  // Pierre : fonction qui permet d'utiliser le bon seuillage
+	    if (type == TypeSeuillage.DUR) {
+	        alphaSeuil = ImageDebruitee.seuillageDur(alpha_i, seuil);
+	    } else {
+	        alphaSeuil = ImageDebruitee.seuillageDoux(alpha_i, seuil);
+	    }
+	    
+
+	    List<Vector<Float>> vecteursDebruitee = ACPUtils.reconstruireDepuisACP(alphaSeuil, baseU, moyenne); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
+
 		
 		List<Vector<Float>> vecteursDebruitee = alpha_i;
 		
