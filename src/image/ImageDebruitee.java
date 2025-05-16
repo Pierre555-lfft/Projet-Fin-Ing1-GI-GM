@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 //Pierre Laforest : permet de définir un type de seuillage 
-	enum TypeSeuillage {
+	public enum TypeSeuillage {
 	    DUR,
 	    DOUX
 	}
@@ -441,10 +441,10 @@ public class ImageDebruitee {
 	    }
 	    
 
-	    List<Vector<Float>> vecteursDebruitee = reconstruireDepuisACP(alphaSeuil, ACP(vecteurs), mv_methode(vecteurs)); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
+	    List<Vector<Float>> vecteursDebruitee = ACPUtils.reconstruireDepuisACP(alphaSeuil, baseU, moyenne); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
 
 		
-		//List<Vector<Float>> vecteursDebruitee = alpha_i;
+		List<Vector<Float>> vecteursDebruitee = alpha_i;
 		
 		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, nbLignePatch, nbColonnePatch, patchPosition);
 				
