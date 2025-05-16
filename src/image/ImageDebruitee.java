@@ -514,14 +514,11 @@ public class ImageDebruitee {
 		
 		//Pierre Laforest
 		//fonction qui permet de faire un seuillage dur
-		public static Map<Integer, Vector<Float>> seuillageDur(Map<Integer, Vector<Float>> data, float seuil) {
-		    Map<Integer, Vector<Float>> resultat = new HashMap<>();
+		public static List<Vector<Float>> seuillageDur(List<Vector<Float>> data, float seuil) {
+		    List<Vector<Float>> resultat = new ArrayList<>();
 
-		    for (Map.Entry<Integer, Vector<Float>> entry : data.entrySet()) {
-		        int cle = entry.getKey();
-		        Vector<Float> ligne = entry.getValue();
+		    for (Vector<Float> ligne : data) {
 		        Vector<Float> nouvelleLigne = new Vector<>();
-
 		        for (float coeff : ligne) {
 		            if (Math.abs(coeff) < seuil) {
 		                nouvelleLigne.add(0f);
@@ -529,8 +526,7 @@ public class ImageDebruitee {
 		                nouvelleLigne.add(coeff);
 		            }
 		        }
-
-		        resultat.put(cle, nouvelleLigne);
+		        resultat.add(nouvelleLigne);
 		    }
 
 		    return resultat;
@@ -538,14 +534,11 @@ public class ImageDebruitee {
 
 		//Pierre Laforest
 		//fonction qui permet de faire un seuillage doux
-		public static Map<Integer, Vector<Float>> seuillageDoux(Map<Integer, Vector<Float>> data, float seuil) {
-		    Map<Integer, Vector<Float>> resultat = new HashMap<>();
+		public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> data, float seuil) {
+		    List<Vector<Float>> resultat = new ArrayList<>();
 
-		    for (Map.Entry<Integer, Vector<Float>> entry : data.entrySet()) {
-		        int cle = entry.getKey();
-		        Vector<Float> ligne = entry.getValue();
+		    for (Vector<Float> ligne : data) {
 		        Vector<Float> nouvelleLigne = new Vector<>();
-
 		        for (float coeff : ligne) {
 		            if (Math.abs(coeff) <= seuil) {
 		                nouvelleLigne.add(0f);
@@ -555,38 +548,42 @@ public class ImageDebruitee {
 		                nouvelleLigne.add(nouveauCoeff);
 		            }
 		        }
-
-		        resultat.put(cle, nouvelleLigne);
+		        resultat.add(nouvelleLigne);
 		    }
 
 		    return resultat;
 		}
 
+
 		//Pierre Laforest 
 		//fonction qui permet de faire reconstruire les patchs depuis l'ACP
-		public static Map<Integer, Vector<Float>> reconstruireDepuisACP(Map<Integer, Vector<Float>> dataSeuillé, float[][] baseU,Vector<Float> moyenne) {
-			    Map<Integer, Vector<Float>> patchesReconstitues = new HashMap<>();
+		public static List<Vector<Float>> reconstruireDepuisACP(List<Vector<Float>> alphaSeuillé,RealMatrix baseU,Vector<Float> moyenne) {
+			
+		        List<Vector<Float>> resultat = new ArrayList<>();
 
-			    for (Map.Entry<Integer, Vector<Float>> entry : dataSeuillé.entrySet()) {
-			        int cle = entry.getKey();
-			        Vector<Float> alpha = entry.getValue();
-			        Vector<Float> patchReconstruit = new Vector<>();
+		        for (Vector<Float> alpha : alphaSeuillé) {
+		            // Convertir alpha (Vector<Float>) en RealMatrix colonne
+		            double[] alphaArray = new double[alpha.size()];
+		            for (int i = 0; i < alpha.size(); i++) {
+		                alphaArray[i] = alpha.get(i);
+		            }
+		            RealMatrix alphaColonne = new Array2DRowRealMatrix(alphaArray);
 
-			        // Produit matriciel : U * alpha^{(k)}
-			        for (int i = 0; i < baseU.length; i++) {
-			            float somme = 0f;
-			            for (int j = 0; j < alpha.size(); j++) {
-			                somme += baseU[i][j] * alpha.get(j);
-			            }
-			            // Ajout de la moyenne : v_k = U * alpha + moyenne
-			            patchReconstruit.add(somme + moyenne.get(i));
-			        }
+		            // Reprojection : U * alpha
+		            RealMatrix projection = baseU.multiply(alphaColonne);
 
-			        patchesReconstitues.put(cle, patchReconstruit);
-			    }
+		            // Ajout de la moyenne
+		            Vector<Float> patchReconstruit = new Vector<>();
+		            for (int i = 0; i < projection.getRowDimension(); i++) {
+		                float valeur = (float) projection.getEntry(i, 0) + moyenne.get(i);
+		                patchReconstruit.add(valeur);
+		            }
 
-			    return patchesReconstitues;
-			}
+		            resultat.add(patchReconstruit);
+		        }
+
+		        return resultat;
+		    }
 
 		
 		
