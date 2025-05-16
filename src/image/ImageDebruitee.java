@@ -415,7 +415,7 @@ public class ImageDebruitee {
 		List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
 				
 		// transformation des vecteurs
-		//...
+		
 		
 		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
 		
