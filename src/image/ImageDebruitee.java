@@ -18,6 +18,12 @@ import javafx.scene.image.PixelWriter;
 import java.util.ArrayList;
 import java.util.Vector;
 
+//Pierre Laforest : permet de définir un type de seuillage 
+	public enum TypeSeuillage {
+	    DUR,
+	    DOUX
+	}
+
 public class ImageDebruitee {
 	private Image imageDebruitee;
 
@@ -477,11 +483,7 @@ public class ImageDebruitee {
 		return patchs;
 	}
 	
-	//Pierre Laforest 
-	public enum TypeSeuillage {
-	    DUR,
-	    DOUX
-	}
+	
 	
 	//Pierre Laforest
 	//fonction qui permet de déterminer le seuille 
