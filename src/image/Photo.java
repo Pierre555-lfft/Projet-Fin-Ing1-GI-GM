@@ -62,8 +62,8 @@ public class Photo {
 	}
 	
 	public Image debruiter() {
-		imageDebruitee = new ImageDebruitee(image);
-		image = imageBruitee.getImage();
+		imageDebruitee = new ImageDebruitee(imageBruitee.getImage());
+		image = imageDebruitee.getImage();
 		return imageDebruitee.getImage();
 	}
 	

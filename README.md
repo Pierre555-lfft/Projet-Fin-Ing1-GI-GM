@@ -7,4 +7,5 @@ Importer le projet avec un IDE java et ajouter la librairie ```javafx``` et ```c
 
 ## Exécuter le projet via un jar exécutable
 Télécharger la librairie javaFX : [ici](https://gluonhq.com/products/javafx/)
+Avoir java 21 installé
 Exécuter le .jar : ```java --module-path {le chemin vers la librairie}/lib --add-modules javafx.controls,javafx.fxml,javafx.media -jar exec.jar```

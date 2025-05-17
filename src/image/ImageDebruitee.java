@@ -318,7 +318,7 @@ public class ImageDebruitee {
 				    
 				    ArrayList<Vector<Float>> V_contrib = new ArrayList<Vector<Float>>();
 				    
-				    for(int i = 0; i<p;i++) { // création d'une list de vecteur avec n patch
+				    for(int i = 0; i<n;i++) { // création d'une list de vecteur avec n patch
 						V_contrib.add(new Vector<Float>());
 				       
 				        
@@ -338,7 +338,7 @@ public class ImageDebruitee {
 				    		for(int j =0; j<p; j++) {//parcourir chaque ligne et effcetuer l'operation de multiplication de colonne uitranspoe*Vc
 				    			proj += ui[j]*Vk.get(j);
 				    		}
-				    		V_contrib.get(i).add((float)proj); //Contrsuction de V_contrib coeff par coeff a_ki
+				    		V_contrib.get(k).add((float)proj); //Contrsuction de V_contrib coeff par coeff a_ki
 				    	}
 				    }
 				    	
@@ -388,7 +388,7 @@ public class ImageDebruitee {
 	    // 4. Créer l’image avec lissage (moyenne des patchs)
 	    WritableImage imageReconstruite = new WritableImage(largeurMax, hauteurMax);
 	    PixelWriter ecrivain = imageReconstruite.getPixelWriter();
-
+	 
 	    for (int y = 0; y < hauteurMax; y++) {
 	        for (int x = 0; x < largeurMax; x++) {
 	            if (compteur[y][x] > 0) {
@@ -417,6 +417,7 @@ public class ImageDebruitee {
 		
 		
 		
+		
 		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 		
 		List<int[]> patchPosition = getPositions(patchs);
@@ -428,9 +429,7 @@ public class ImageDebruitee {
 		
 		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
 		
-		System.out.println("dois etre égal a 2700: " + alpha_i.size());
-		System.out.println("dois etre égal a 100 : " + alpha_i.get(0).size());
-		System.exit(0);
+		
 		
 	    float variance = ImageDebruitee.calculerVarianceFloat(alpha_i);  // Pierre : fonction qui sert à calculer la variance 
 	    float sigma = (float) Math.sqrt(variance); // Pierre : fonction qui sert à déterminer le paramètre sigma 
@@ -452,7 +451,7 @@ public class ImageDebruitee {
 		
 		
 		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, nbLignePatch, nbColonnePatch, patchPosition);
-				
+		
 		imageDebruitee = reconstructPatchs(patchsDebruitee);
 				
 		return imageDebruitee;
@@ -482,7 +481,7 @@ public class ImageDebruitee {
 		for(Vector<Float> vecteur : vecteurs) { // pour chaque vecteur
 			
 			patchs.add(new Patch(vecteur, nbColonne, nbLigne, patchPosition.get(i)[0], patchPosition.get(i)[1]) );
-			
+			i=i+1;
 		}
 		
 		return patchs;
