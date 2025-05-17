@@ -407,29 +407,30 @@ public class ImageDebruitee {
 	
 	public Image imageDen(Image imageBruitee) {
 		Integer taillePatch = 10;
-		Integer ligne = 450;
-		Integer colonne = 600;
+		Integer ligneImage = 450;
+		Integer colonneImage = 600;
 		Integer nbLignePatch = 10;
 		Integer nbColonnePatch = 10;
 		
 		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
 		
 		
-		for(Patch p : patchs) {
-			System.out.println(p.toString());
-		}
+		
 		
 		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 		
 		List<int[]> patchPosition = getPositions(patchs);
 		
 		List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
-				
+		
 		// transformation des vecteurs
 		
 		
 		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
 		
+		System.out.println("dois etre égal a 2700: " + alpha_i.size());
+		System.out.println("dois etre égal a 100 : " + alpha_i.get(0).size());
+		System.exit(0);
 		
 	    float variance = ImageDebruitee.calculerVarianceFloat(alpha_i);  // Pierre : fonction qui sert à calculer la variance 
 	    float sigma = (float) Math.sqrt(variance); // Pierre : fonction qui sert à déterminer le paramètre sigma 
@@ -449,7 +450,6 @@ public class ImageDebruitee {
 	    List<Vector<Float>> vecteursDebruitee = reconstruireDepuisACP(alphaSeuil, ACP(vecteurs), mv_methode(vecteurs)); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
 
 		
-//		List<Vector<Float>> vecteursDebruitee = alpha_i;
 		
 		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, nbLignePatch, nbColonnePatch, patchPosition);
 				
@@ -541,6 +541,9 @@ public class ImageDebruitee {
 		    List<Vector<Float>> resultat = new ArrayList<>();
 
 		    for (Vector<Float> ligne : data) {
+		
+		    	
+
 		        Vector<Float> nouvelleLigne = new Vector<>();
 		        for (float coeff : ligne) {
 		            if (Math.abs(coeff) < seuil) {
@@ -561,6 +564,7 @@ public class ImageDebruitee {
 		    List<Vector<Float>> resultat = new ArrayList<>();
 
 		    for (Vector<Float> ligne : data) {
+		    	
 		        Vector<Float> nouvelleLigne = new Vector<>();
 		        for (float coeff : ligne) {
 		            if (Math.abs(coeff) <= seuil) {
@@ -591,6 +595,9 @@ public class ImageDebruitee {
 		                alphaArray[i] = alpha.get(i);
 		            }
 		            RealMatrix alphaColonne = new Array2DRowRealMatrix(alphaArray);
+		            
+		            System.out.println("baseU: " + baseU.getRowDimension() + "x" + baseU.getColumnDimension());
+		            System.out.println("alphaColonne: " + alphaColonne.getRowDimension() + "x" + alphaColonne.getColumnDimension());
 
 		            // Reprojection : U * alpha
 		            RealMatrix projection = baseU.multiply(alphaColonne);
