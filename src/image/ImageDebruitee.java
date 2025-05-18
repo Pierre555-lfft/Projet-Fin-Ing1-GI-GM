@@ -325,51 +325,43 @@ public class ImageDebruitee {
 	    return new Array2DRowRealMatrix(vecteurs_principaux);
 	}
 				
-				// List<Vector<Float>> Vc = vecteur_centre_methode(collection_patch);//Vc c'est le terme Vk - mv
+	// List<Vector<Float>> Vc = vecteur_centre_methode(collection_patch);//Vc c'est le terme Vk - mv
 				
-				//MathisB
+	//MathisB
 				
-				public static List<Vector<Float>> proj (RealMatrix U, List<Vector<Float>> Vc ){
+	public static List<Vector<Float>> proj (RealMatrix U, List<Vector<Float>> Vc ){
 					
-					// Definition Longueur
+		// Definition Longueur
 					
-					int p = U.getRowDimension(); // nombnre de vecteur
-				    int n = Vc.size(); // nombre vecteur centré
-				    
-				    // Definition des variables 
-				    
-				    
-				    ArrayList<Vector<Float>> V_contrib = new ArrayList<Vector<Float>>();
-				    
-				    for(int i = 0; i<n;i++) { // création d'une list de vecteur avec n patch
-						V_contrib.add(new Vector<Float>());
-				       
-				        
-					}
-				    
-				    //Exploitation
-				    
-				    for(int k = 0; k<n; k++) {
-				    	Vector<Float> Vk = Vc.get(k);
-				    	
-				    	for (int i =0; i<p; i++) {// Pour la somme de i a s²
-				    		
-				    
-				    		double[] ui = U.getColumn(i);
-				    		double proj =0;
-				    		
-				    		for(int j =0; j<p; j++) {//parcourir chaque ligne et effcetuer l'operation de multiplication de colonne uitranspoe*Vc
-				    			proj += ui[j]*Vk.get(j);
-				    		}
-				    		V_contrib.get(k).add((float)proj); //Contrsuction de V_contrib coeff par coeff a_ki
-				    	}
-				    }
-				    	
-				    	
+		int p = U.getRowDimension();       // dimension des vecteurs (ex: 64 si 8x8 patchs)
+		int s2 = U.getColumnDimension();   // nombre de composantes principales (ex: 64)
+		int M = Vc.size();                 // nombre de patchs (vecteurs centrés)
 
-				  return V_contrib;  
+		// Initialiser s² vecteurs (un pour chaque composante principale)
+		ArrayList<Vector<Float>> V_contrib = new ArrayList<>();
+		for (int i = 0; i < s2; i++) {
+			V_contrib.add(new Vector<Float>());
+		}
+
+		// Pour chaque vecteur centré
+		for (int k = 0; k < M; k++) {
+			Vector<Float> Vk = Vc.get(k);
+
+			// Projeter Vk sur chaque composante principale ui
+			for (int i = 0; i < s2; i++) {
+				double[] ui = U.getColumn(i);
+				double projection = 0.0;
+
+				for (int j = 0; j < p; j++) {
+					projection += ui[j] * Vk.get(j);
 				}
 
+				V_contrib.get(i).add((float) projection);  // α_i^(k)
+			}
+		}
+
+		return V_contrib; // Liste de s² vecteurs de taille M
+	}
 	// Adrien
 	public Image reconstructPatchs(List<Patch> patchsDebruitee) {
 	    if (patchsDebruitee == null || patchsDebruitee.isEmpty()) {
