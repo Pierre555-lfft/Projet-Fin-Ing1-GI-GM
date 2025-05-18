@@ -344,7 +344,7 @@ public class ImageDebruitee {
 
 		// Initialiser s² vecteurs (un pour chaque composante principale)
 		ArrayList<Vector<Float>> V_contrib = new ArrayList<>();
-		for (int i = 0; i < s2; i++) {
+		for (int i = 0; i < M; i++) {
 			V_contrib.add(new Vector<Float>());
 		}
 
@@ -361,7 +361,7 @@ public class ImageDebruitee {
 					projection += ui[j] * Vk.get(j);
 				}
 
-				V_contrib.get(i).add((float) projection);  // α_i^(k)
+				V_contrib.get(k).add((float) projection);  // α_i^(k)
 			}
 		}
 
