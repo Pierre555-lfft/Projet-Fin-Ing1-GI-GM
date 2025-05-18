@@ -18,6 +18,8 @@ import javafx.scene.image.PixelWriter;
 import java.util.ArrayList;
 import java.util.Vector;
 
+
+
 //Pierre Laforest : permet de définir un type de seuillage 
 	enum TypeSeuillage {
 	    DUR,
@@ -444,8 +446,9 @@ public class ImageDebruitee {
 		
 		// transformation des vecteurs
 		
-		
-		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
+		RealMatrix U = ACP(vecteurs); // Pierre
+		Vector<Float> moyenne = mv_methode(vecteurs); // Pierre
+		List<Vector<Float>> alpha_i = proj(U, vecteur_centre_methode(vecteurs)); //Mathis
 		
 		System.out.println("nombre vecteur : "+alpha_i.size());
 		System.out.println("dimension vecteur :"+alpha_i.get(0).size());
@@ -465,7 +468,7 @@ public class ImageDebruitee {
 	    }
 	    
 
-	    List<Vector<Float>> vecteursDebruitee = reconstruireDepuisACP(alphaSeuil, ACP(vecteurs), mv_methode(vecteurs)); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
+	    List<Vector<Float>> vecteursDebruitee = reconstruireDepuisACP(alphaSeuil, U, moyenne); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
 
 		
 		
