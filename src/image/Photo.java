@@ -141,4 +141,23 @@ public class Photo {
 		int hauteur = (int) (this.hauteurInit * this.zoom);
 		image = new Image(this.filename, largeur, hauteur, false, false);
 	}
+	public Image nb() {
+       		int width = (int) image.getWidth();
+        	int height = (int) image.getHeight();
+	
+        	WritableImage result = new WritableImage(width, height);
+        	PixelReader reader = image.getPixelReader();
+        	PixelWriter writer = result.getPixelWriter();
+
+        	for (int y = 0; y < height; y++) {
+            	for (int x = 0; x < width; x++) {
+                	Color color = reader.getColor(x, y);
+                	double gris = 0.299 * color.getRed() + 0.587 * color.getGreen() + 0.114 * color.getBlue();
+                	Color grisColor = new Color(gris, gris, gris, color.getOpacity());
+                	writer.setColor(x, y, grisColor);
+            	}
+        }
+
+        return result;
+    }
 }
