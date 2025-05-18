@@ -308,11 +308,17 @@ public class ImageDebruitee {
 	    for (double val : valeurs_propres) sommeTotale += val;
 
 	    double sommePartielle = 0.0;
-	    int k = 0;
-	    while (k < p && (sommePartielle / sommeTotale) < seuil) {
-	        sommePartielle += valeurs_propres[indices[k]];
-	        k++;
-	    }
+	int k = 0;
+	while (k < p) {
+    		sommePartielle += valeurs_propres[indices[k]];
+    	if ((sommePartielle / sommeTotale) >= seuil) break;
+    	k++;
+	}
+
+	System.out.println("Valeurs propres triées : ");
+	for (int i = 0; i < p; i++) {
+    		System.out.println("λ_" + i + " = " + valeurs_propres[indices[i]]); // TEST
+	}
 				    
 		System.out.println("Vecteur moyen : " + mv);
 		System.out.println("Valeurs propres : " + Arrays.toString(valeurs_propres));
