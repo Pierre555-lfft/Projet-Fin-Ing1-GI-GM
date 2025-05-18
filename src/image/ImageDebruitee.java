@@ -292,14 +292,37 @@ public class ImageDebruitee {
 		double[] valeurs_propres = eig.getRealEigenvalues();     
 		RealMatrix vecteurs_propres = eig.getV();
 				    
+		// Tri décroissant des valeurs propres (et garder leur index)
+	    Integer[] indices = new Integer[p];
+	    for (int i = 0; i < p; i++) indices[i] = i;
+	    Arrays.sort(indices, (i, j) -> Double.compare(valeurs_propres[j], valeurs_propres[i]));
+	    
+	    // Calcul du nombre de composantes à garder (ex: 90% de la variance)
+	    double seuil = 0.90;
+	    double sommeTotale = 0.0;
+	    for (double val : valeurs_propres) sommeTotale += val;
+
+	    double sommePartielle = 0.0;
+	    int k = 0;
+	    while (k < p && (sommePartielle / sommeTotale) < seuil) {
+	        sommePartielle += valeurs_propres[indices[k]];
+	        k++;
+	    }
+				    
 		System.out.println("Vecteur moyen : " + mv);
 		System.out.println("Valeurs propres : " + Arrays.toString(valeurs_propres));
+		System.out.println("Nombre de composantes principales gardées (k) : " + k);
 
-		System.out.println("Vecteurs propres (axes principaux) :");
-		for (int i = 0; i < p; i++) {
-			System.out.println(Arrays.toString(vecteurs_propres.getColumn(i)));
-		}
-		return vecteurs_propres;
+		// Construction de la matrice des k vecteurs propres associés aux plus grandes valeurs propres
+	    double[][] vecteurs_principaux = new double[p][k];
+	    for (int i = 0; i < k; i++) {
+	        double[] col = vecteurs_propres.getColumn(indices[i]);
+	        for (int j = 0; j < p; j++) {
+	            vecteurs_principaux[j][i] = col[j];
+	        }
+	    }
+
+	    return new Array2DRowRealMatrix(vecteurs_principaux);
 	}
 				
 				// List<Vector<Float>> Vc = vecteur_centre_methode(collection_patch);//Vc c'est le terme Vk - mv
