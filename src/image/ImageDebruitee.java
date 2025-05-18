@@ -215,7 +215,7 @@ public class ImageDebruitee {
 							
 				for (Vector<Float> v : V) {
 								
-					somme += (v.get(i)-mv.get(i))*(v.get(j)-mv.get(j));
+					somme += v.get(i)*v.get(j)
 								
 				}
 							
@@ -276,7 +276,7 @@ public class ImageDebruitee {
 					
 		Vector<Float> mv = mv_methode(V); // Vecteur Moyen
 		List<Vector<Float>> Vc = vecteur_centre_methode(V); // List des vecteurs centré
-		List<Vector<Float>> Cov = cov_methode(V);// List de vecteur de covariance
+		List<Vector<Float>> Cov = cov_methode(Vc);// List de vecteur de covariance
 		double [][] matrice_cov = new double[p][p]; // matrice de conversion de Cov
 					
 		// Convertion de Cov en matrice 2x2
