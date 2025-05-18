@@ -8,7 +8,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 
+/**
+ * Photo permet de gérer une Image, donc de la bruiter/débruiter. Photo contient également les métadonnées de l'image
+ */
 public class Photo {
 
 	private final float ZOOM_MIN = 0.1f;
@@ -53,7 +60,8 @@ public class Photo {
 	public Image bruiter(double ecartType) {
         	imageBruitee = new ImageBruitee(imageOriginelle, ecartType);
         	image = imageBruitee.getImage();
-        	return imageBruitee.getImage();
+        	image = nb();
+        	return image;
    	}
 	
 	public Image reset() {

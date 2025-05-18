@@ -6,6 +6,9 @@ package image;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * Permet de gérer un catalogue de Photo
+ */
 public class Album {
 
 	private ArrayList<Photo> lesPhotos; // biblioth�que d'images

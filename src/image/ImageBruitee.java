@@ -5,6 +5,9 @@ import javafx.scene.paint.Color;
 
 import java.util.Random;
 
+/**
+ * Permet de gérer le bruitage d'une Image
+ */
 public class ImageBruitee {
     private Image imageBruitee;
 

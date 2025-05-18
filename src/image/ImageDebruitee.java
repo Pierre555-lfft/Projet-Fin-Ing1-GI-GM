@@ -23,7 +23,10 @@ import java.util.Vector;
 	    DUR,
 	    DOUX
 	}
-
+	
+/**
+ * Permet de gérer le débruitage d'une image
+ */
 public class ImageDebruitee {
 	private Image imageDebruitee;
 
@@ -444,7 +447,8 @@ public class ImageDebruitee {
 		
 		List<Vector<Float>> alpha_i = proj(ACP(vecteurs), vecteur_centre_methode(vecteurs)); //Mathis
 		
-		
+		System.out.println("nombre vecteur : "+alpha_i.size());
+		System.out.println("dimension vecteur :"+alpha_i.get(0).size());
 		
 	    float variance = ImageDebruitee.calculerVarianceFloat(alpha_i);  // Pierre : fonction qui sert à calculer la variance 
 	    float sigma = (float) Math.sqrt(variance); // Pierre : fonction qui sert à déterminer le paramètre sigma 
@@ -473,7 +477,11 @@ public class ImageDebruitee {
 		
 	}
 	
-	// Etienne Angé
+	/** Renvoie un tableau de position (x,y) permetant de garder la postion des patch vectoriser
+	 * @author Etienne Angé
+	 * @param patchs
+	 * @return
+	 */
 	public List<int[]> getPositions(List<Patch> patchs){
 		List<int[]> patchPosition = new ArrayList<>();
 		
@@ -487,7 +495,14 @@ public class ImageDebruitee {
 		return patchPosition;
 	}
 	
-	// Etienne Angé
+	/** Renvoie les Patchs depuis les patchs vectorisé
+	 * @author Etienne Angé
+	 * @param vecteurs
+	 * @param nbLigne
+	 * @param nbColonne
+	 * @param patchPosition
+	 * @return
+	 */
 	public List<Patch> patchsVector(List<Vector<Float>> vecteurs,Integer nbLigne, Integer nbColonne, List<int[]> patchPosition){
 		
 		

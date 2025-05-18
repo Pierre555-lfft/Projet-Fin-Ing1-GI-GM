@@ -32,6 +32,10 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * Interface utilisateur permettant de tester les differente fonction de bruitage et débruitage
+ *@author Etienne Angé
+ */
 public class Visionneuse extends Application {
 
 	private Album album;
