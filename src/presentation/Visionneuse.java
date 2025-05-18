@@ -75,7 +75,7 @@ public class Visionneuse extends Application {
 		
 		
 		Scene scene = new Scene(vbox);
-		scene.getStylesheets().add("style.css");
+		
 		//scene.getStylesheets().add("style.css");
 		primaryStage.setScene(scene);
 		primaryStage.show();
