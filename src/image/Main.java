@@ -16,9 +16,11 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         Photo photo = new Photo("images/gibbon.jpg");
+	
 
         Image imageBruitee = photo.bruiter(50.0);
         Image imageOriginale = photo.getImage();
+	Image imageNoiretBlanc = photo.nb();
 		
 		ImageView viewOriginale = new ImageView(imageOriginale);
 		ImageView viewBruitee = new ImageView(imageBruitee);
