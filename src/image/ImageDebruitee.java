@@ -461,7 +461,7 @@ public class ImageDebruitee {
 	    TypeSeuillage type = ImageDebruitee.choisirType(variance); // Pierre : fonction qui permet de déterminer le type de seuillage à utiliser selon la variance 
 
 	    List<Vector<Float>> alphaSeuil;  // Pierre : fonction qui permet d'utiliser le bon seuillage
-	    if (type == TypeSeuillage.DUR) {
+	    if (TypeSeuillage.DUR == TypeSeuillage.DUR) {
 	        alphaSeuil = ImageDebruitee.seuillageDur(alpha_i, seuil);
 	    } else {
 	        alphaSeuil = ImageDebruitee.seuillageDoux(alpha_i, seuil);
