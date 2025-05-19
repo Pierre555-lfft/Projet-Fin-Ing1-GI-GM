@@ -87,4 +87,21 @@ public class Patch {
 	    }
 	    return vector;
 	}
+	
+	public void fromVector(Vector<Float> vecteur) {
+	    int taille = (int) Math.sqrt(vecteur.size());
+	    Float[][] matrice = new Float[taille][taille];
+	    for (int i = 0; i < taille; i++) {
+	        for (int j = 0; j < taille; j++) {
+	            matrice[i][j] = vecteur.get(i * taille + j);
+	        }
+	    }
+	    this.setTab(matrice); // ou this.tab = matrice;
+	}
+	
+	public void setTab(Float[][] nouveauTab) {
+	    this.tab = nouveauTab;
+	}
+
+
 }

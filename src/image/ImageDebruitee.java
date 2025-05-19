@@ -40,7 +40,11 @@ public class ImageDebruitee {
 		return imageDebruitee;
 	}
 	
-	// Adrien
+	/** Renvoie un 
+	 * @author Adrien
+	 * @param 
+	 * @return
+	 */
 	// Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
 	public static int obtenirValeurGris(int argb) {
 	    int r = (argb >> 16) & 0xFF;
@@ -50,7 +54,12 @@ public class ImageDebruitee {
 	    return (int) (0.299 * r + 0.587 * g + 0.114 * b);
 	}
 
-	// Adrien
+	/** Renvoie un 
+	 * @author Adrien
+	 * @param 
+	 * @return
+	 */
+	
 	public List<Patch> extractPatchs(Image image, int taillePatch) {
 	    List<Patch> listePatchs = new ArrayList<>();
 	    PixelReader lecteurPixel = image.getPixelReader();
@@ -142,7 +151,11 @@ public class ImageDebruitee {
 	    return listePatchs;
 	}
 	
-	//Adrien
+	/** Renvoie un 
+	 * @author Adrien
+	 * @param 
+	 * @return
+	 */
 	public List<Vector<Float>> vectorPatchs (ArrayList<Patch> patchs){
 		List<Vector<Float>> vecteurs= new ArrayList<>();
 		
@@ -155,7 +168,11 @@ public class ImageDebruitee {
 		return vecteurs;
 	}
 	
-	// MathisB
+	/** Renvoie un 
+	 * @author Mathis Bohain
+	 * @param 
+	 * @return
+	 */
 	
 	public static Vector<Float> mv_methode (List<Vector<Float>> V){ //ou V est la collection de patch vectorisée
 				
@@ -185,7 +202,11 @@ public class ImageDebruitee {
 		return mv;
 	}
 				
-	// Mathis B
+	/** Renvoie un 
+	 * @author Mathis Bohain
+	 * @param 
+	 * @return
+	 */
 				
 	public static List<Vector<Float>> cov_methode (List<Vector<Float>> V ){// V collection de patch vectorisé
 					
@@ -222,7 +243,7 @@ public class ImageDebruitee {
 								
 				}
 							
-				double cov_ij = somme/(n-1); // Coefficiant de la ligne i et colonne j
+				double cov_ij = somme/n; // Coefficiant de la ligne i et colonne j
 							
 				// Matrice symetrique
 							
@@ -237,7 +258,11 @@ public class ImageDebruitee {
 		return Cov ;
 	}
 				
-	// Mathis B
+	/** Renvoie un 
+	 * @author Mathis Bohain
+	 * @param 
+	 * @return
+	 */
 				
 	public static List<Vector<Float>> vecteur_centre_methode (List<Vector<Float>> V){
 					
@@ -266,7 +291,11 @@ public class ImageDebruitee {
 		return Vc;
 	}
 				
-	//Mathis B
+	/** Renvoie un 
+	 * @author Mathis Bohain
+	 * @param 
+	 * @return
+	 */
 				
 	public static RealMatrix ACP (List<Vector<Float>> V) { 
 					
@@ -295,8 +324,12 @@ public class ImageDebruitee {
 	    EigenDecomposition eig = new EigenDecomposition(covMatrice);
 
 	    // Construire la matrice U dont les colonnes sont les vecteurs propres
+	    
 	    double[][] U = new double[p][p];
+
+	    
 	    for (int i = 0; i < p; i++) {
+	    
 	        RealVector vp = eig.getEigenvector(i);
 	        for (int j = 0; j < p; j++) {
 	            U[j][i] = vp.getEntry(j);
@@ -306,9 +339,11 @@ public class ImageDebruitee {
 	    
 	}
 				
-	// List<Vector<Float>> Vc = vecteur_centre_methode(collection_patch);//Vc c'est le terme Vk - mv
-				
-	//MathisB
+	/** Renvoie un 
+	 * @author Mathis Bohain
+	 * @param 
+	 * @return
+	 */
 				
 	public static List<Vector<Float>> proj (RealMatrix U, List<Vector<Float>> Vc ){
 					
@@ -344,6 +379,7 @@ public class ImageDebruitee {
 	    return V_contrib;
 	}
 	// Adrien
+	// Reconstruction de l'image à partir des patchs débruités
 	public Image reconstructPatchs(List<Patch> patchsDebruitee) {
 	    if (patchsDebruitee == null || patchsDebruitee.isEmpty()) {
 	        return null;
@@ -384,15 +420,17 @@ public class ImageDebruitee {
 	    // 4. Créer l’image avec lissage (moyenne des patchs)
 	    WritableImage imageReconstruite = new WritableImage(largeurMax, hauteurMax);
 	    PixelWriter ecrivain = imageReconstruite.getPixelWriter();
-	 
+
 	    for (int y = 0; y < hauteurMax; y++) {
 	        for (int x = 0; x < largeurMax; x++) {
 	            if (compteur[y][x] > 0) {
 	                float moyenne = sommeLuminance[y][x] / compteur[y][x];
 	                int niveauGris = Math.min(255, Math.max(0, Math.round(moyenne)));
-	                // on combine plusieurs entiers binaires pour avoir le argb
 	                int argb = (0xFF << 24) | (niveauGris << 16) | (niveauGris << 8) | niveauGris;
 	                ecrivain.setArgb(x, y, argb);
+	            } else {
+	                // Remplir les pixels non couverts avec noir (optionnel)
+	                ecrivain.setArgb(x, y, 0xFF000000);
 	            }
 	        }
 	    }
@@ -400,57 +438,60 @@ public class ImageDebruitee {
 	    return imageReconstruite;
 	}
 
-	
 
 	public Image imageDen(Image imageBruitee, Integer taillePatch) {
-		
+	    // 1. Extraction des patchs non superposés
+	    List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
+	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 
-		
-		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
-		
-		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
-		
-		List<int[]> patchPosition = getPositions(patchs);
-		
-		List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
-		
-		// transformation des vecteurs
-		
-		RealMatrix U = ACP(vecteurs); // Pierre
-		Vector<Float> moyenne = mv_methode(vecteurs); // Pierre
-		List<Vector<Float>> alpha_i = proj(U, vecteur_centre_methode(vecteurs)); //Mathis
-		
-		System.out.println("nombre vecteur : "+alpha_i.size());
-		System.out.println("dimension vecteur :"+alpha_i.get(0).size());
-		
-	    float variance = ImageDebruitee.calculerVarianceFloat(alpha_i);  // Pierre : fonction qui sert à calculer la variance 
-	    float sigma = (float) Math.sqrt(variance); // Pierre : fonction qui sert à déterminer le paramètre sigma 
-	    float seuil = ImageDebruitee.seuilV(sigma, alpha_i.size(), alpha_i.get(0).size()); // Pierre : fonction qui permettra de déterminer le seuil 
+	    // 2. Passage des patchs en vecteurs Float
+	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
 
-	 
-	    TypeSeuillage type = ImageDebruitee.choisirType(variance); // Pierre : fonction qui permet de déterminer le type de seuillage à utiliser selon la variance 
+	    // 3. Centrer les vecteurs (Vk - mv)
+	    List<Vector<Float>> vecteursCentres = vecteur_centre_methode(vecteurs);
 
-	    List<Vector<Float>> alphaSeuil;  // Pierre : fonction qui permet d'utiliser le bon seuillage
-	    if (TypeSeuillage.DUR == TypeSeuillage.DUR) {
-	        alphaSeuil = ImageDebruitee.seuillageDur(alpha_i, seuil);
-	    } else {
-	        alphaSeuil = ImageDebruitee.seuillageDoux(alpha_i, seuil);
+	    // 4. Calcul de la matrice U (vecteurs propres) par ACP sur vecteurs centrés
+	    RealMatrix U = ACP(vecteursCentres);
+
+	    // 5. Projection des vecteurs centrés sur les composantes principales
+	    List<Vector<Float>> projections = proj(U, vecteursCentres);
+
+	    // 6. Seuillage sur les projections (par exemple seuillage dur)
+	    // Choix du type de seuillage (ici dur, à améliorer si besoin)
+	    TypeSeuillage type = TypeSeuillage.DUR;
+	    double sigma = 20; // exemple, à calculer idéalement
+	    double seuil = VisuShrink(sigma);
+
+	    List<Vector<Float>> projectionsSeuillage = seuillage(projections, seuil, type);
+
+	    // 7. Reconstruction des vecteurs centrés débruités
+	    List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillage);
+
+	    // 8. Ajout du vecteur moyen
+	    List<Vector<Float>> vecteursDebruites = new ArrayList<>();
+	    Vector<Float> mv = mv_methode(vecteurs);
+	    for (Vector<Float> v : vecteursCentresDebruites) {
+	        Vector<Float> vDebruite = new Vector<>();
+	        for (int i = 0; i < v.size(); i++) {
+	            vDebruite.add(v.get(i) + mv.get(i));
+	        }
+	        vecteursDebruites.add(vDebruite);
 	    }
-	    
 
-	    List<Vector<Float>> vecteursDebruitee = reconstruireDepuisACP(alphaSeuil, U, moyenne); // Pierre : fonction qui renvoie les patchs vectorisé débruiter 
+	    // 9. Reconstruction des patchs à partir des vecteurs débruités
+	    for (int i = 0; i < arrayListPatches.size(); i++) {
+	        Patch p = arrayListPatches.get(i);
+	        p.fromVector(vecteursDebruites.get(i));
+	    }
 
-		
-		
+	    // 10. Reconstruction de l'image à partir des patchs débruités
+	    Image imageReconstruite = reconstructPatchs(arrayListPatches);
 
-		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, taillePatch, patchPosition);
-
-		
-		imageDebruitee = reconstructPatchs(patchsDebruitee);
-				
-		return imageDebruitee;
-		
+	    return imageReconstruite;
 	}
+
+
+	
 	
 	/** Renvoie un tableau de position (x,y) permetant de garder la postion des patch vectoriser
 	 * @author Etienne Angé
@@ -470,14 +511,6 @@ public class ImageDebruitee {
 		return patchPosition;
 	}
 	
-	/** Renvoie les Patchs depuis les patchs vectorisé
-	 * @author Etienne Angé
-	 * @param vecteurs
-	 * @param nbLigne
-	 * @param nbColonne
-	 * @param patchPosition
-	 * @return
-	 */
 	public List<Patch> patchsVector(List<Vector<Float>> vecteurs, int taillePatch, List<int[]> patchPosition) {
 	    List<Patch> patchs = new ArrayList<>();
 	    for (int i = 0; i < vecteurs.size(); i++) {
@@ -488,150 +521,68 @@ public class ImageDebruitee {
 	    return patchs;
 	}
 
+	/** Renvoie un 
+	 * @author Pierre
+	 * @param 
+	 * @return
+	 */
 	
-	
-	
-	//Pierre Laforest
-	//fonction qui permet de déterminer le seuilleV 
-	public static float seuilV(float sigma, int nbPatchs, int taillePatch) {
-		int l; // cette variable permet de calculer la taille pour calculer le seuil avec la méthode de VisuSrhrink
-		float visuSrhrink; // seuil de VisuSrhrink
-		l = nbPatchs * taillePatch * taillePatch;
-		visuSrhrink = sigma * (float)Math.sqrt(2 * Math.log(l)); // calcule du seuil avec la méthoe de VisuSrhrink
-        return visuSrhrink; // retourner le seuilV
+	public static double VisuShrink(double sigma) {
+	    // VisuShrink threshold: sigma * sqrt(2*log(N))
+	    // N = taille patch squared
+	    return sigma * Math.sqrt(2 * Math.log(64)); // 64 = 8x8 patch (adapter si taille différente)
 	}
 	
-	//Pierre Laforest
-	//fonction qui permet de déterminer le seuilleB
-	public static float seuilB(float sigma, float sigmaImageBruitee) {
-		float varBruit = sigma * sigma;
-		float varImage = sigmaImageBruitee * sigmaImageBruitee;
-		
-		float varSignal = Math.max(varImage - varBruit, 0);
-		
-		float sigmaSignal = (float)Math.sqrt(varSignal);
-		  if (sigmaSignal == 0) {
-		        return 0f;
-		    }
-		  float seuilB = varBruit / sigmaSignal;
-		  return seuilB;
-	}
-	//Pierre Laforest 
-	//fonction qui permet de déterminer la variance 
-	public static float calculerVarianceFloat(List<Vector<Float>> matriceImage) {
-	    int elementTotals = 0;
-	    float somme = 0f;
-	    float sommeCarres = 0f;
+	/** Renvoie un 
+	 * @author Pierre
+	 * @param 
+	 * @return
+	 */
 
-	    for (Vector<Float> ligne : matriceImage) {
-	        for (float coeff : ligne) {
-	            somme += coeff;
-	            sommeCarres += coeff * coeff;
-	            elementTotals++;
+
+	public static double BayesShrink(List<Vector<Float>> projections, double sigma) {
+	    // Calcul de la variance du signal
+	    int n = projections.size();
+	    int p = projections.get(0).size();
+
+	    double varianceSignal = 0.0;
+	    for (Vector<Float> v : projections) {
+	        for (int i = 0; i < p; i++) {
+	            varianceSignal += v.get(i) * v.get(i);
 	        }
 	    }
+	    varianceSignal /= (n * p);
 
-	    if (elementTotals == 0) return 0f;
-
-	    float moyenne = somme / elementTotals;
-	    float variance = (sommeCarres / elementTotals) - (moyenne * moyenne);
-
-	    return variance;
+	    double seuil = sigma * sigma / Math.sqrt(varianceSignal);
+	    return seuil;
 	}
-		
-		//Pierre Laforest
-		//focntion qui permet de déterminer dépendant de la variance s'il faut utiliser un seuillage doux ou dur 
-		public static TypeSeuillage choisirType(float variance) {
-	        float seuilVariance = 50.0f;  // heuristique, à ajuster selon les cas
-
-	        if (variance < seuilVariance) {
-	            return TypeSeuillage.DUR;
-	        } else {
-	            return TypeSeuillage.DOUX;
+	
+	/** Renvoie un 
+	 * @author Pierre
+	 * @param 
+	 * @return
+	 */
+	
+	public static List<Vector<Float>> seuillage(List<Vector<Float>> projections, double seuil, TypeSeuillage type) {
+	    List<Vector<Float>> result = new ArrayList<>();
+	    for (Vector<Float> v : projections) {
+	        Vector<Float> vSeuillage = new Vector<>();
+	        for (Float val : v) {
+	            if (type == TypeSeuillage.DUR) {
+	                vSeuillage.add(Math.abs(val) < seuil ? 0f : val);
+	            } else { // DOUX
+	                float signe = val >= 0 ? 1f : -1f;
+	                float valSeuillage = (Math.abs(val) - (float)seuil) > 0 ? signe * (Math.abs(val) - (float)seuil) : 0f;
+	                vSeuillage.add(valSeuillage);
+	            }
 	        }
+	        result.add(vSeuillage);
 	    }
-		
-		//Pierre Laforest
-		//fonction qui permet de faire un seuillage dur
-		public static List<Vector<Float>> seuillageDur(List<Vector<Float>> data, float seuil) {
-		    List<Vector<Float>> resultat = new ArrayList<>();
-
-		    for (Vector<Float> ligne : data) {
-		
-		    	
-
-		        Vector<Float> nouvelleLigne = new Vector<>();
-		        for (float coeff : ligne) {
-		            if (Math.abs(coeff) < seuil) {
-		                nouvelleLigne.add(0f);
-		            } else {
-		                nouvelleLigne.add(coeff);
-		            }
-		        }
-		        resultat.add(nouvelleLigne);
-		    }
-
-		    return resultat;
-		}
-
-		//Pierre Laforest
-		//fonction qui permet de faire un seuillage doux
-		public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> data, float seuil) {
-		    List<Vector<Float>> resultat = new ArrayList<>();
-
-		    for (Vector<Float> ligne : data) {
-		    	
-		        Vector<Float> nouvelleLigne = new Vector<>();
-		        for (float coeff : ligne) {
-		            if (Math.abs(coeff) <= seuil) {
-		                nouvelleLigne.add(0f);
-		            } else {
-		                float signe = Math.signum(coeff);
-		                float nouveauCoeff = signe * (Math.abs(coeff) - seuil);
-		                nouvelleLigne.add(nouveauCoeff);
-		            }
-		        }
-		        resultat.add(nouvelleLigne);
-		    }
-
-		    return resultat;
-		}
+	    return result;
+	}
 
 
-		//Pierre Laforest 
-		//fonction qui permet de faire reconstruire les patchs depuis l'ACP
-		public static List<Vector<Float>> reconstruireDepuisACP(List<Vector<Float>> alphaSeuillé,RealMatrix baseU,Vector<Float> moyenne) {
-			
-		        List<Vector<Float>> resultat = new ArrayList<>();
 
-		        for (Vector<Float> alpha : alphaSeuillé) {
-		            // Convertir alpha (Vector<Float>) en RealMatrix colonne
-		            double[] alphaArray = new double[alpha.size()];
-		            for (int i = 0; i < alpha.size(); i++) {
-		                alphaArray[i] = alpha.get(i);
-		            }
-		            RealMatrix alphaColonne = new Array2DRowRealMatrix(alphaArray);
-		            
-		            System.out.println("baseU: " + baseU.getRowDimension() + "x" + baseU.getColumnDimension());
-		            System.out.println("alphaColonne: " + alphaColonne.getRowDimension() + "x" + alphaColonne.getColumnDimension());
-
-		            // Reprojection : U * alpha
-		            RealMatrix projection = baseU.multiply(alphaColonne);
-
-		            // Ajout de la moyenne
-		            Vector<Float> patchReconstruit = new Vector<>();
-		            for (int i = 0; i < projection.getRowDimension(); i++) {
-		                float valeur = (float) projection.getEntry(i, 0) + moyenne.get(i);
-		                patchReconstruit.add(valeur);
-		            }
-
-		            resultat.add(patchReconstruit);
-		        }
-
-		        return resultat;
-		    }
-
-		
-		
+   
 
 }
