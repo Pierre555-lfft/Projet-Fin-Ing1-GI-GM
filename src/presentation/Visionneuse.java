@@ -12,11 +12,13 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -50,7 +52,7 @@ public class Visionneuse extends Application {
 		primaryStage.setTitle("Album Photo");
 	
 
-		album = new Album("/home/etienne/CyTech/Projet_java/Projet-Fin-Ing1-GI-GM/images");
+		album = new Album("images");
 		 
 		VBox vbox = new VBox();
 		
@@ -130,19 +132,25 @@ public class Visionneuse extends Application {
 	
 		
 	public HBox creerBandeauHaut() {
+		
+		
 		HBox bandeauHaut = new HBox();
 		
-		Button btnBruiter = new Button("Bruiter");
-		Button btnDebruiter = new Button("Débruiter");
 		Button btnReset = new Button("Reset");
 		btnReset.setOnAction(arg0 -> imageView.setImage(album.getPhotoCourante().reset()));
+		
+		
+		//bruiter
 		HBox bruiter = new HBox();
-		HBox debruiter = new HBox();
-		bruiter.setAlignment(Pos.BASELINE_LEFT);
-		bandeauHaut.setAlignment(Pos.CENTER);
+		bruiter.setAlignment(Pos.CENTER);
+	
+		Button btnBruiter = new Button("Bruiter");
+		
 		
 		VBox bruitage = new VBox();
-		bruitage.setAlignment(Pos.CENTER);
+		Button btnDebruiter = new Button("Débruiter");
+		
+		
 		Label textBruitage = new Label("Bruitage");
 		Slider sliderBruitage = new Slider(0,100,50);
 
@@ -161,16 +169,35 @@ public class Visionneuse extends Application {
 			
 			
 		});
+		bruiter.getChildren().addAll(bruitage,btnBruiter);
 		
+		
+		
+		// débruiter
+		HBox debruiter = new HBox();
+		debruiter.setAlignment(Pos.CENTER);
+		
+		VBox choixTaillePatch = new VBox();
+		
+		Slider sliderTaillePatch = new Slider(0,50,10);
+
+		sliderTaillePatch.setOrientation(Orientation.HORIZONTAL);
+		sliderTaillePatch.setShowTickMarks(true);
+		sliderTaillePatch.setShowTickLabels(true);
+		sliderTaillePatch.setMajorTickUnit(10);
 		btnDebruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter());
+			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue()));
 			
 		});
+		choixTaillePatch.getChildren().addAll(new Label("Taille patch"),sliderTaillePatch);
 		
-		bruiter.getChildren().addAll(bruitage,btnBruiter);
-		debruiter.getChildren().addAll(btnDebruiter);
-		bandeauHaut.getChildren().addAll(bruiter,debruiter,btnReset);
-		
+		debruiter.getChildren().addAll(choixTaillePatch, btnDebruiter);
+		Separator sep1 = new Separator();
+		sep1.setOrientation(Orientation.VERTICAL);
+		Separator sep2 = new Separator();
+		sep2.setOrientation(Orientation.VERTICAL);
+		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset);
+		bandeauHaut.setAlignment(Pos.CENTER);
 		
 		return bandeauHaut;
 	}

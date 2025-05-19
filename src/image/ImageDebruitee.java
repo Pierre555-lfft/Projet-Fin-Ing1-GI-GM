@@ -32,8 +32,8 @@ import java.util.Vector;
 public class ImageDebruitee {
 	private Image imageDebruitee;
 
-	public ImageDebruitee(Image imageBruitee) {
-		imageDebruitee = imageDen(imageBruitee);
+	public ImageDebruitee(Image imageBruitee, double taillePatch) {
+		imageDebruitee = imageDen(imageBruitee, (int)taillePatch);
 	}
 	
 	public Image getImage() {
@@ -215,7 +215,7 @@ public class ImageDebruitee {
 							
 				for (Vector<Float> v : V) {
 								
-					somme += v.get(i)*v.get(j)
+					somme += v.get(i)*v.get(j);
 								
 				}
 							
@@ -431,12 +431,11 @@ public class ImageDebruitee {
 	}
 
 	
-	public Image imageDen(Image imageBruitee) {
-		Integer taillePatch = 10;
+	public Image imageDen(Image imageBruitee, Integer taillePatch) {
+		
 		Integer ligneImage = 450;
 		Integer colonneImage = 600;
-		Integer nbLignePatch = 10;
-		Integer nbColonnePatch = 10;
+		
 		
 		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
 		
@@ -478,7 +477,7 @@ public class ImageDebruitee {
 
 		
 		
-		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, nbLignePatch, nbColonnePatch, patchPosition);
+		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, taillePatch, taillePatch, patchPosition);
 		
 		imageDebruitee = reconstructPatchs(patchsDebruitee);
 				
