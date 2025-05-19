@@ -492,7 +492,7 @@ public class ImageDebruitee {
 	
 	
 	//Pierre Laforest
-	//fonction qui permet de déterminer le seuille 
+	//fonction qui permet de déterminer le seuilleV 
 	public static float seuilV(float sigma, int nbPatchs, int taillePatch) {
 		int l; // cette variable permet de calculer la taille pour calculer le seuil avec la méthode de VisuSrhrink
 		float visuSrhrink; // seuil de VisuSrhrink
@@ -501,6 +501,21 @@ public class ImageDebruitee {
         return visuSrhrink; // retourner le seuilV
 	}
 	
+	//Pierre Laforest
+	//fonction qui permet de déterminer le seuilleB
+	public static float seuilB(float sigma, float sigmaImageBruitee) {
+		float varBruit = sigma * sigma;
+		float varImage = sigmaImageBruitee * sigmaImageBruitee;
+		
+		float varSignal = Math.max(varImage - varBruit, 0);
+		
+		float sigmaSignal = (float)Math.sqrt(varSignal);
+		  if (sigmaSignal == 0) {
+		        return 0f;
+		    }
+		  float seuilB = varBruit / sigmaSignal;
+		  return seuilB;
+	}
 	//Pierre Laforest 
 	//fonction qui permet de déterminer la variance 
 	public static float calculerVarianceFloat(List<Vector<Float>> matriceImage) {
