@@ -20,20 +20,24 @@ import java.util.Vector;
 
 
 
-//Pierre Laforest : permet de définir un type de seuillage 
-	enum TypeSeuillage {
-	    DUR,
-	    DOUX
-	}
+
 	
 /**
  * Permet de gérer le débruitage d'une image
  */
 public class ImageDebruitee {
+	
+	//Pierre Laforest : permet de définir un type de seuillage 
+	public enum TypeSeuillage {
+		    DUR,
+		    DOUX,
+		    AUTO
+	}
+		    
 	private Image imageDebruitee;
 
-	public ImageDebruitee(Image imageBruitee, double taillePatch) {
-		imageDebruitee = imageDen(imageBruitee, (int)taillePatch);
+	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
+		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage);
 	}
 	
 	public Image getImage() {
@@ -439,7 +443,7 @@ public class ImageDebruitee {
 	}
 
 
-	public Image imageDen(Image imageBruitee, Integer taillePatch) {
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
 	    // 1. Extraction des patchs non superposés
 	    List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);

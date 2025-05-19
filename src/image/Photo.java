@@ -69,8 +69,8 @@ public class Photo {
 		return image;
 	}
 	
-	public Image debruiter(double taillePatch) {
-		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch);
+	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
+		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage);
 		image = imageDebruitee.getImage();
 		return imageDebruitee.getImage();
 	}

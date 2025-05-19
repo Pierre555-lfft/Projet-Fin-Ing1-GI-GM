@@ -15,6 +15,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import image.Album;
+import image.ImageDebruitee;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,7 +41,7 @@ import javafx.collections.ObservableList;
  *@author Etienne Angé
  */
 public class Visionneuse extends Application {
-
+	public ImageDebruitee.TypeSeuillage typeSeuillage = ImageDebruitee.TypeSeuillage.DOUX;
 	private Album album;
 	private ImageView imageView;
 	private Slider slider;
@@ -179,19 +181,33 @@ public class Visionneuse extends Application {
 		
 		VBox choixTaillePatch = new VBox();
 		
-		Slider sliderTaillePatch = new Slider(0,50,10);
+		Slider sliderTaillePatch = new Slider(0,25,5);
 
 		sliderTaillePatch.setOrientation(Orientation.HORIZONTAL);
 		sliderTaillePatch.setShowTickMarks(true);
 		sliderTaillePatch.setShowTickLabels(true);
 		sliderTaillePatch.setMajorTickUnit(10);
 		btnDebruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue()));
+			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage));
 			
 		});
 		choixTaillePatch.getChildren().addAll(new Label("Taille patch"),sliderTaillePatch);
 		
-		debruiter.getChildren().addAll(choixTaillePatch, btnDebruiter);
+		ToggleButton btnSeuillageDur = new ToggleButton("Dur");
+		ToggleButton btnSeuillageDoux = new ToggleButton("Doux");
+		ToggleButton btnSeuillageAuto = new ToggleButton("Auto");
+		
+		ToggleGroup btnSeuillage = new ToggleGroup();
+		btnSeuillageDur.setToggleGroup(btnSeuillage);
+		btnSeuillageDoux.setToggleGroup(btnSeuillage);
+		btnSeuillageAuto.setToggleGroup(btnSeuillage);
+		btnSeuillageDur.setOnAction(arg0 ->  typeSeuillage = ImageDebruitee.TypeSeuillage.DUR);
+		btnSeuillageDoux.setOnAction(arg0 ->  typeSeuillage = ImageDebruitee.TypeSeuillage.DOUX);
+		btnSeuillageAuto.setOnAction(arg0 ->  typeSeuillage = ImageDebruitee.TypeSeuillage.AUTO);
+		VBox hBoxSeuillage = new VBox();
+		hBoxSeuillage.getChildren().addAll(new Label("Seuillage"),btnSeuillageDur, btnSeuillageDoux, btnSeuillageAuto);
+		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage, btnDebruiter);
+		
 		Separator sep1 = new Separator();
 		sep1.setOrientation(Orientation.VERTICAL);
 		Separator sep2 = new Separator();
