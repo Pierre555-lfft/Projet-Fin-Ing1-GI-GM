@@ -75,9 +75,9 @@ public class Photo {
 		return imageDebruitee.getImage();
 	}
 	
-	
-	
-	
+	public Image getImageOriginelle() {
+	    return this.imageOriginelle;
+	}	
 
 	/**
 	 * Retourne l'image de la photo

@@ -36,6 +36,9 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import image.EvaluateurQualiteImage;
+import javafx.scene.image.Image;
+
 /**
  * Interface utilisateur permettant de tester les differente fonction de bruitage et débruitage
  *@author Etienne Angé
@@ -131,9 +134,9 @@ public class Visionneuse extends Application {
 			 });
 		 return listView;
 	}
-	
 		
 	public HBox creerBandeauHaut() {
+
 		
 		
 		HBox bandeauHaut = new HBox();
@@ -208,11 +211,21 @@ public class Visionneuse extends Application {
 		hBoxSeuillage.getChildren().addAll(new Label("Seuillage"),btnSeuillageDur, btnSeuillageDoux, btnSeuillageAuto);
 		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage, btnDebruiter);
 		
+		// Bouton évaluation qualité
+	    Button btnEvaluerQualite = new Button("Évaluer qualité");
+	    btnEvaluerQualite.setOnAction(arg0 -> {
+	        Image originale = album.getPhotoCourante().getImageOriginelle();
+	        Image actuelle = album.getPhotoCourante().getImage();
+	        
+	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle);
+	        evaluateur.resultatsQualite();
+	    });
+	    
 		Separator sep1 = new Separator();
 		sep1.setOrientation(Orientation.VERTICAL);
 		Separator sep2 = new Separator();
 		sep2.setOrientation(Orientation.VERTICAL);
-		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset);
+		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset,btnEvaluerQualite);
 		bandeauHaut.setAlignment(Pos.CENTER);
 		
 		return bandeauHaut;
