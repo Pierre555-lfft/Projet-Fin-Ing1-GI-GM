@@ -279,7 +279,7 @@ public class ImageDebruitee {
 					
 		Vector<Float> mv = mv_methode(V); // Vecteur Moyen
 		List<Vector<Float>> Vc = vecteur_centre_methode(V); // List des vecteurs centré
-		List<Vector<Float>> Cov = cov_methode(V);// List de vecteur de covariance
+		List<Vector<Float>> Cov = cov_methode(Vc);// List de vecteur de covariance
 		double [][] matrice_cov = new double[p][p]; // matrice de conversion de Cov
 					
 		// Convertion de Cov en matrice 2x2
@@ -291,52 +291,19 @@ public class ImageDebruitee {
 			}
 		}
 					
-		// Valeur propres :
-					
 		RealMatrix covMatrice = new Array2DRowRealMatrix(matrice_cov);
+	    EigenDecomposition eig = new EigenDecomposition(covMatrice);
 
-		EigenDecomposition eig = new EigenDecomposition(covMatrice); //Eigen normalise les ui
-
-		double[] valeurs_propres = eig.getRealEigenvalues();     
-		RealMatrix vecteurs_propres = eig.getV();
-				    
-		// Tri décroissant des valeurs propres (et garder leur index)
-	    Integer[] indices = new Integer[p];
-	    for (int i = 0; i < p; i++) indices[i] = i;
-	    Arrays.sort(indices, (i, j) -> Double.compare(valeurs_propres[j], valeurs_propres[i]));
-	    
-	    // Calcul du nombre de composantes à garder (ex: 90% de la variance)
-	    double seuil = 0.90;
-	    double sommeTotale = 0.0;
-	    for (double val : valeurs_propres) sommeTotale += val;
-
-	    double sommePartielle = 0.0;
-	int k = 0;
-	while (k < p) {
-    		sommePartielle += valeurs_propres[indices[k]];
-    	if ((sommePartielle / sommeTotale) >= seuil) break;
-    	k++;
-	}
-
-	System.out.println("Valeurs propres triées : ");
-	for (int i = 0; i < p; i++) {
-    		System.out.println("λ_" + i + " = " + valeurs_propres[indices[i]]); // TEST
-	}
-				    
-		System.out.println("Vecteur moyen : " + mv);
-		System.out.println("Valeurs propres : " + Arrays.toString(valeurs_propres));
-		System.out.println("Nombre de composantes principales gardées (k) : " + k);
-
-		// Construction de la matrice des k vecteurs propres associés aux plus grandes valeurs propres
-	    double[][] vecteurs_principaux = new double[p][k];
-	    for (int i = 0; i < k; i++) {
-	        double[] col = vecteurs_propres.getColumn(indices[i]);
+	    // Construire la matrice U dont les colonnes sont les vecteurs propres
+	    double[][] U = new double[p][p];
+	    for (int i = 0; i < p; i++) {
+	        RealVector vp = eig.getEigenvector(i);
 	        for (int j = 0; j < p; j++) {
-	            vecteurs_principaux[j][i] = col[j];
+	            U[j][i] = vp.getEntry(j);
 	        }
 	    }
-
-	    return new Array2DRowRealMatrix(vecteurs_principaux);
+	    return new Array2DRowRealMatrix(U);
+	    
 	}
 				
 	// List<Vector<Float>> Vc = vecteur_centre_methode(collection_patch);//Vc c'est le terme Vk - mv
@@ -347,7 +314,7 @@ public class ImageDebruitee {
 					
 		// Definition Longueur
 					
-		int p = U.getRowDimension();       // dimension des vecteurs (ex: 64 si 8x8 patchs)
+      // dimension des vecteurs (ex: 64 si 8x8 patchs)
 		int s2 = U.getColumnDimension();   // nombre de composantes principales (ex: 64)
 		int M = Vc.size();                 // nombre de patchs (vecteurs centrés)
 
@@ -366,7 +333,7 @@ public class ImageDebruitee {
 				double[] ui = U.getColumn(i);
 				double projection = 0.0;
 
-				for (int j = 0; j < p; j++) {
+				for (int j = 0; j < s2; j++) {
 					projection += ui[j] * Vk.get(j);
 				}
 
