@@ -324,24 +324,24 @@ public class ImageDebruitee {
 			V_contrib.add(new Vector<Float>());
 		}
 
-		// Pour chaque vecteur centré
-		for (int k = 0; k < M; k++) {
-			Vector<Float> Vk = Vc.get(k);
+		// Pour chaque vecteur centré Vk
+	    for (int k = 0; k < M; k++) {
+	        Vector<Float> Vk = Vc.get(k);
 
-			// Projeter Vk sur chaque composante principale ui
-			for (int i = 0; i < s2; i++) {
-				double[] ui = U.getColumn(i);
-				double projection = 0.0;
+	        // Projeter Vk sur chaque composante principale i (ui)
+	        for (int i = 0; i < s2; i++) {
+	            double projection = 0.0;
 
-				for (int j = 0; j < s2; j++) {
-					projection += ui[j] * Vk.get(j);
-				}
+	            // Produit scalaire entre Vk et la i-ème composante principale ui
+	            for (int j = 0; j < s2; j++) {
+	                projection += Vk.get(j) * U.getEntry(j, i);  // pas de transpose !
+	            }
 
-				V_contrib.get(k).add((float) projection);  // α_i^(k)
-			}
-		}
+	            V_contrib.get(k).add((float) projection);  // α_i^(k)
+	        }
+	    }
 
-		return V_contrib; // Liste de s² vecteurs de taille M
+	    return V_contrib;
 	}
 	// Adrien
 	public Image reconstructPatchs(List<Patch> patchsDebruitee) {
