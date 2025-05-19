@@ -50,7 +50,7 @@ public class Visionneuse extends Application {
 		primaryStage.setTitle("Album Photo");
 	
 
-		album = new Album("/home/etienne/CyTech/Projet_java/Projet-Fin-Ing1-GI-GM/images");
+		album = new Album("images");
 		 
 		VBox vbox = new VBox();
 		
