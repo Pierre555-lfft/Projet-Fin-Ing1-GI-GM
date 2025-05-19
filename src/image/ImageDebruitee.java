@@ -155,9 +155,9 @@ public class ImageDebruitee {
 	    return listePatchs;
 	}
 	
-	/** Renvoie un 
-	 * @author Adrien
-	 * @param 
+	/**
+	 * 
+	 * @param patchs
 	 * @return
 	 */
 	public List<Vector<Float>> vectorPatchs (ArrayList<Patch> patchs){
@@ -172,15 +172,15 @@ public class ImageDebruitee {
 		return vecteurs;
 	}
 	
-	/** Renvoie un 
+	/** Renvoie le vecteur moyen mv
 	 * @author Mathis Bohain
-	 * @param 
+	 * @param V
 	 * @return
 	 */
 	
 	public static Vector<Float> mv_methode (List<Vector<Float>> V){ //ou V est la collection de patch vectorisée
 				
-	// Initialisation longueur de lacollection de patch et des patchs
+	   // Initialisation longueur de la collection de patch et des patchs
 					
 		int n = V.size(); // Nombre de vecteur (patch)
 		int p = V.get(0).size(); // Nombre de composante du vecteur (patch)
@@ -206,9 +206,9 @@ public class ImageDebruitee {
 		return mv;
 	}
 				
-	/** Renvoie un 
+	/** Renvoie la matrice de covariance de V en format List de Vecteurs
 	 * @author Mathis Bohain
-	 * @param 
+	 * @param V
 	 * @return
 	 */
 				
@@ -262,9 +262,9 @@ public class ImageDebruitee {
 		return Cov ;
 	}
 				
-	/** Renvoie un 
+	/** Renvoie la liste des vecteurs centrées de V
 	 * @author Mathis Bohain
-	 * @param 
+	 * @param V
 	 * @return
 	 */
 				
@@ -295,12 +295,12 @@ public class ImageDebruitee {
 		return Vc;
 	}
 				
-	/** Renvoie un 
+	
+	/** Renvoie la base orthogonal U (la liste des vecteurs propres de V)
 	 * @author Mathis Bohain
-	 * @param 
+	 * @param V
 	 * @return
 	 */
-				
 	public static RealMatrix ACP (List<Vector<Float>> V) { 
 					
 		// Initialisation longueur de lacollection de patch et des patchs
@@ -316,18 +316,17 @@ public class ImageDebruitee {
 		double [][] matrice_cov = new double[p][p]; // matrice de conversion de Cov
 					
 		// Convertion de Cov en matrice 2x2
-		// Pour utiliser des lois utiles pour trouver les valeurs propres
 					
 		for (int i=0; i<p; i++) {
 			for(int j=0; j<p; j++) {
 				matrice_cov[i][j] = Cov.get(i).get(j);
 			}
 		}
-					
+			
+		// Obtention des valeurs propres 
+		
 		RealMatrix covMatrice = new Array2DRowRealMatrix(matrice_cov);
 	    EigenDecomposition eig = new EigenDecomposition(covMatrice);
-
-	    // Construire la matrice U dont les colonnes sont les vecteurs propres
 	    
 	    double[][] U = new double[p][p];
 
@@ -343,19 +342,19 @@ public class ImageDebruitee {
 	    
 	}
 				
-	/** Renvoie un 
+	/** Renvoi la projection des vecteur centrés Vc sur dans la base U
 	 * @author Mathis Bohain
-	 * @param 
+	 * @param U
+	 * @param Vc
 	 * @return
 	 */
 				
 	public static List<Vector<Float>> proj (RealMatrix U, List<Vector<Float>> Vc ){
 					
-		// Definition Longueur
-					
-      // dimension des vecteurs (ex: 64 si 8x8 patchs)
-		int s2 = U.getColumnDimension();   // nombre de composantes principales (ex: 64)
-		int M = Vc.size();                 // nombre de patchs (vecteurs centrés)
+        // dimension 
+		
+		int s2 = U.getColumnDimension();   // nombre de composantes principales
+		int M = Vc.size();                 // nombre de patchs 
 
 		// Initialiser s² vecteurs (un pour chaque composante principale)
 		ArrayList<Vector<Float>> V_contrib = new ArrayList<>();
@@ -382,6 +381,7 @@ public class ImageDebruitee {
 
 	    return V_contrib;
 	}
+	
 	// Adrien
 	// Reconstruction de l'image à partir des patchs débruités
 	public Image reconstructPatchs(List<Patch> patchsDebruitee) {
@@ -443,7 +443,9 @@ public class ImageDebruitee {
 	}
 
 
+
 	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
+
 	    // 1. Extraction des patchs non superposés
 	    List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
@@ -461,12 +463,25 @@ public class ImageDebruitee {
 	    List<Vector<Float>> projections = proj(U, vecteursCentres);
 
 	    // 6. Seuillage sur les projections (par exemple seuillage dur)
-	    // Choix du type de seuillage (ici dur, à améliorer si besoin)
-	    TypeSeuillage type = TypeSeuillage.DUR;
+	                                                   // à modifier selon le type
 	    double sigma = 20; // exemple, à calculer idéalement
-	    double seuil = VisuShrink(sigma);
-
-	    List<Vector<Float>> projectionsSeuillage = seuillage(projections, seuil, type);
+	    double seuil = VisuShrink(sigma);   
+	    
+	    // Definir le seuil Bayes ou Visu???
+	    
+	    // Choix du type de seuillage
+	    
+	   // variance = ???
+	    List<Vector<Float>> projectionsSeuillage;
+	    		
+	    if (choisirType(variance) == TypeSeuillage.DUR) {
+	    	
+	    	projectionsSeuillage =  seuillageDur(projections, seuil);
+	    	
+	    } else {
+	    	projectionsSeuillage =  seuillageDoux(projections, seuil);
+	    }
+	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
 
 	    // 7. Reconstruction des vecteurs centrés débruités
 	    List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillage);
@@ -567,24 +582,31 @@ public class ImageDebruitee {
 	 * @return
 	 */
 	
-	public static List<Vector<Float>> seuillage(List<Vector<Float>> projections, double seuil, TypeSeuillage type) {
+	public static List<Vector<Float>> seuillageDur(List<Vector<Float>> projections, double seuil) {
 	    List<Vector<Float>> result = new ArrayList<>();
 	    for (Vector<Float> v : projections) {
 	        Vector<Float> vSeuillage = new Vector<>();
 	        for (Float val : v) {
-	            if (type == TypeSeuillage.DUR) {
-	                vSeuillage.add(Math.abs(val) < seuil ? 0f : val);
-	            } else { // DOUX
-	                float signe = val >= 0 ? 1f : -1f;
-	                float valSeuillage = (Math.abs(val) - (float)seuil) > 0 ? signe * (Math.abs(val) - (float)seuil) : 0f;
-	                vSeuillage.add(valSeuillage);
-	            }
+	            vSeuillage.add(Math.abs(val) < seuil ? 0f : val);
 	        }
 	        result.add(vSeuillage);
 	    }
 	    return result;
 	}
 
+	public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> projections, double seuil) {
+	    List<Vector<Float>> result = new ArrayList<>();
+	    for (Vector<Float> v : projections) {
+	        Vector<Float> vSeuillage = new Vector<>();
+	        for (Float val : v) {
+	            float signe = val >= 0 ? 1f : -1f;
+	            float valSeuillage = (Math.abs(val) - (float)seuil) > 0 ? signe * (Math.abs(val) - (float)seuil) : 0f;
+	            vSeuillage.add(valSeuillage);
+	        }
+	        result.add(vSeuillage);
+	    }
+	    return result;
+	}
 
 
    
