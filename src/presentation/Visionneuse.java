@@ -34,6 +34,9 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import image.EvaluateurQualiteImage;
+import javafx.scene.image.Image;
+
 /**
  * Interface utilisateur permettant de tester les differente fonction de bruitage et débruitage
  *@author Etienne Angé
@@ -129,77 +132,78 @@ public class Visionneuse extends Application {
 			 });
 		 return listView;
 	}
-	
 		
 	public HBox creerBandeauHaut() {
-		
-		
-		HBox bandeauHaut = new HBox();
-		
-		Button btnReset = new Button("Reset");
-		btnReset.setOnAction(arg0 -> imageView.setImage(album.getPhotoCourante().reset()));
-		
-		
-		//bruiter
-		HBox bruiter = new HBox();
-		bruiter.setAlignment(Pos.CENTER);
-	
-		Button btnBruiter = new Button("Bruiter");
-		
-		
-		VBox bruitage = new VBox();
-		Button btnDebruiter = new Button("Débruiter");
-		
-		
-		Label textBruitage = new Label("Bruitage");
-		Slider sliderBruitage = new Slider(0,100,50);
-
-		sliderBruitage.setOrientation(Orientation.HORIZONTAL);
-		sliderBruitage.setShowTickMarks(true);
-		sliderBruitage.setShowTickLabels(true);
-		sliderBruitage.setMajorTickUnit(10);
-		
-		
-		bruitage.getChildren().addAll(textBruitage, sliderBruitage);
-		
-		
-		btnBruiter.setOnAction(arg0 -> {
-			
-			imageView.setImage(album.getPhotoCourante().bruiter(sliderBruitage.getValue()));
-			
-			
-		});
-		bruiter.getChildren().addAll(bruitage,btnBruiter);
-		
-		
-		
-		// débruiter
-		HBox debruiter = new HBox();
-		debruiter.setAlignment(Pos.CENTER);
-		
-		VBox choixTaillePatch = new VBox();
-		
-		Slider sliderTaillePatch = new Slider(0,50,10);
-
-		sliderTaillePatch.setOrientation(Orientation.HORIZONTAL);
-		sliderTaillePatch.setShowTickMarks(true);
-		sliderTaillePatch.setShowTickLabels(true);
-		sliderTaillePatch.setMajorTickUnit(10);
-		btnDebruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue()));
-			
-		});
-		choixTaillePatch.getChildren().addAll(new Label("Taille patch"),sliderTaillePatch);
-		
-		debruiter.getChildren().addAll(choixTaillePatch, btnDebruiter);
-		Separator sep1 = new Separator();
-		sep1.setOrientation(Orientation.VERTICAL);
-		Separator sep2 = new Separator();
-		sep2.setOrientation(Orientation.VERTICAL);
-		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset);
-		bandeauHaut.setAlignment(Pos.CENTER);
-		
-		return bandeauHaut;
+	    HBox bandeauHaut = new HBox();
+	    
+	    Button btnReset = new Button("Reset");
+	    btnReset.setOnAction(arg0 -> imageView.setImage(album.getPhotoCourante().reset()));
+	    
+	    //bruiter
+	    HBox bruiter = new HBox();
+	    bruiter.setAlignment(Pos.CENTER);
+	    Button btnBruiter = new Button("Bruiter");
+	    
+	    VBox bruitage = new VBox();
+	    Label textBruitage = new Label("Bruitage");
+	    Slider sliderBruitage = new Slider(0,100,50);
+	    sliderBruitage.setOrientation(Orientation.HORIZONTAL);
+	    sliderBruitage.setShowTickMarks(true);
+	    sliderBruitage.setShowTickLabels(true);
+	    sliderBruitage.setMajorTickUnit(10);
+	    
+	    bruitage.getChildren().addAll(textBruitage, sliderBruitage);
+	    btnBruiter.setOnAction(arg0 -> {
+	        imageView.setImage(album.getPhotoCourante().bruiter(sliderBruitage.getValue()));
+	    });
+	    bruiter.getChildren().addAll(bruitage, btnBruiter);
+	    
+	    // débruiter
+	    HBox debruiter = new HBox();
+	    debruiter.setAlignment(Pos.CENTER);
+	    VBox choixTaillePatch = new VBox();
+	    Slider sliderTaillePatch = new Slider(0,50,10);
+	    sliderTaillePatch.setOrientation(Orientation.HORIZONTAL);
+	    sliderTaillePatch.setShowTickMarks(true);
+	    sliderTaillePatch.setShowTickLabels(true);
+	    sliderTaillePatch.setMajorTickUnit(10);
+	    
+	    Button btnDebruiter = new Button("Débruiter");
+	    btnDebruiter.setOnAction(arg0 -> {
+	        imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue()));
+	    });
+	    
+	    choixTaillePatch.getChildren().addAll(new Label("Taille patch"), sliderTaillePatch);
+	    debruiter.getChildren().addAll(choixTaillePatch, btnDebruiter);
+	    
+	    // Bouton évaluation qualité
+	    Button btnEvaluerQualite = new Button("Évaluer qualité");
+	    btnEvaluerQualite.setOnAction(arg0 -> {
+	        Image originale = album.getPhotoCourante().getImageOriginelle();
+	        Image actuelle = album.getPhotoCourante().getImage();
+	        
+	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle);
+	        evaluateur.resultatsQualite();
+	    });
+	    
+	    // Séparateurs
+	    Separator sep1 = new Separator();
+	    sep1.setOrientation(Orientation.VERTICAL);
+	    Separator sep2 = new Separator();
+	    sep2.setOrientation(Orientation.VERTICAL);
+	    Separator sep3 = new Separator();
+	    sep3.setOrientation(Orientation.VERTICAL);
+	    
+	    // Ajout UNIQUE de tous les éléments
+	    bandeauHaut.getChildren().addAll(
+	        bruiter, sep1, 
+	        debruiter, sep2, 
+	        btnReset, sep3, 
+	        btnEvaluerQualite
+	    );
+	    
+	    bandeauHaut.setAlignment(Pos.CENTER);
+	    return bandeauHaut;
 	}
 	
 	public MenuBar creerMenu() {
