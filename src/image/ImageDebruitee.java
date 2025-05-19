@@ -215,7 +215,10 @@ public class ImageDebruitee {
 							
 				for (Vector<Float> v : V) {
 								
-					somme += v.get(i)*v.get(j);
+
+					somme += (v.get(i)-mv.get(i))*(v.get(j)-mv.get(j));
+
+		
 								
 				}
 							
@@ -276,7 +279,7 @@ public class ImageDebruitee {
 					
 		Vector<Float> mv = mv_methode(V); // Vecteur Moyen
 		List<Vector<Float>> Vc = vecteur_centre_methode(V); // List des vecteurs centré
-		List<Vector<Float>> Cov = cov_methode(Vc);// List de vecteur de covariance
+		List<Vector<Float>> Cov = cov_methode(V);// List de vecteur de covariance
 		double [][] matrice_cov = new double[p][p]; // matrice de conversion de Cov
 					
 		// Convertion de Cov en matrice 2x2
@@ -431,17 +434,12 @@ public class ImageDebruitee {
 	}
 
 	
+
 	public Image imageDen(Image imageBruitee, Integer taillePatch) {
 		
-		Integer ligneImage = 450;
-		Integer colonneImage = 600;
-		
+
 		
 		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
-		
-		
-		
-		
 		
 		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 		
@@ -477,7 +475,9 @@ public class ImageDebruitee {
 
 		
 		
-		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, taillePatch, taillePatch, patchPosition);
+
+		List<Patch> patchsDebruitee = patchsVector(vecteursDebruitee, taillePatch, patchPosition);
+
 		
 		imageDebruitee = reconstructPatchs(patchsDebruitee);
 				
@@ -511,19 +511,16 @@ public class ImageDebruitee {
 	 * @param patchPosition
 	 * @return
 	 */
-	public List<Patch> patchsVector(List<Vector<Float>> vecteurs,Integer nbLigne, Integer nbColonne, List<int[]> patchPosition){
-		
-		
-		List<Patch> patchs = new ArrayList<>();
-		int i = 0;
-		for(Vector<Float> vecteur : vecteurs) { // pour chaque vecteur
-			
-			patchs.add(new Patch(vecteur, nbColonne, nbLigne, patchPosition.get(i)[0], patchPosition.get(i)[1]) );
-			i=i+1;
-		}
-		
-		return patchs;
+	public List<Patch> patchsVector(List<Vector<Float>> vecteurs, int taillePatch, List<int[]> patchPosition) {
+	    List<Patch> patchs = new ArrayList<>();
+	    for (int i = 0; i < vecteurs.size(); i++) {
+	        Vector<Float> vecteur = vecteurs.get(i);
+	        int[] pos = patchPosition.get(i);
+	        patchs.add(new Patch(vecteur, taillePatch, taillePatch, pos[0], pos[1]));
+	    }
+	    return patchs;
 	}
+
 	
 	
 	
@@ -532,7 +529,7 @@ public class ImageDebruitee {
 	public static float seuilV(float sigma, int nbPatchs, int taillePatch) {
 		int l; // cette variable permet de calculer la taille pour calculer le seuil avec la méthode de VisuSrhrink
 		float visuSrhrink; // seuil de VisuSrhrink
-		l = nbPatchs * taillePatch;
+		l = nbPatchs * taillePatch * taillePatch;
 		visuSrhrink = sigma * (float)Math.sqrt(2 * Math.log(l)); // calcule du seuil avec la méthoe de VisuSrhrink
         return visuSrhrink; // retourner le seuilV
 	}
