@@ -215,7 +215,7 @@ public class ImageDebruitee {
 							
 				for (Vector<Float> v : V) {
 								
-					somme += (v.get(i)-mv.get(i))*(v.get(j)-mv.get(j))
+					somme += (v.get(i)-mv.get(i))*(v.get(j)-mv.get(j));
 								
 				}
 							
