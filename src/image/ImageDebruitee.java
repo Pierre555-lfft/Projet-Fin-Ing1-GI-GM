@@ -464,8 +464,9 @@ public class ImageDebruitee {
 	                                                   // à modifier selon le type
 	    double sigma = ecartType(projections);
 
-
-	    double seuil = seuilV(sigma);   
+	    Integer nbPixel = (int) (imageBruitee.getWidth() * (int)imageBruitee.getHeight());
+	    double seuil = seuilV(sigma,nbPixel);
+	    seuil = 30;
 	    
 	    // Definir le seuil Bayes ou Visu???
 	    
@@ -561,10 +562,10 @@ public class ImageDebruitee {
 	 * @return
 	 */
 	
-	public static double seuilV(double sigma) {
+	public static double seuilV(double sigma,Integer nbPixel) {
 	    // VisuShrink threshold: sigma * sqrt(2*log(N))
 	    // N = taille patch squared
-	    return sigma * Math.sqrt(2 * Math.log(64)); // 64 = 8x8 patch (adapter si taille différente)
+	    return sigma * Math.sqrt(2 * Math.log(nbPixel)); // 64 = 8x8 patch (adapter si taille différente)
 	}
 	
 	public static double variance(double ecartT) {
