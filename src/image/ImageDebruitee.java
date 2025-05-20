@@ -477,14 +477,25 @@ public class ImageDebruitee {
 	    double variance = variance(ecartT);
 	    
 	    List<Vector<Float>> projectionsSeuillage;
-	    		
-	    if (choisirType(variance) == TypeSeuillage.DUR) {
-	    	
-	    	projectionsSeuillage =  seuillageDur(projections, seuil);
-	    	
-	    } else {
-	    	projectionsSeuillage =  seuillageDoux(projections, seuil);
+	    
+	    if(typeSeuillage == TypeSeuillage.AUTO) {
+	    	if (choisirType(variance) == TypeSeuillage.DUR) {
+		    	
+		    	projectionsSeuillage =  seuillageDur(projections, seuil);
+		    	
+		    } else {
+		    	projectionsSeuillage =  seuillageDoux(projections, seuil);
+		    }
 	    }
+	    else {
+	    	if(typeSeuillage == TypeSeuillage.DUR) {
+	    		projectionsSeuillage =  seuillageDur(projections, seuil);
+	    	}
+	    	else {
+	    		projectionsSeuillage =  seuillageDoux(projections, seuil);
+	    	}
+	    }
+	    
 	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
 
 	    // Reconstruction des vecteurs centrés débruités
