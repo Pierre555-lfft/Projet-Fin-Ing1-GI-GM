@@ -7,13 +7,19 @@ public class EvaluateurQualiteImage {
 	private Image imageOriginale;
 	private Image imageDebruitee;
 	
-	// Adrien
+	/** Constructeur de la classe
+	 * @author Adrien
+	 * @return
+	 */
 	public EvaluateurQualiteImage (Image imageOriginale, Image imageDebruitee) {
 		this.imageOriginale = imageOriginale;
 		this.imageDebruitee = imageDebruitee;
 	}
 	
-	// Adrien
+	/** Effectue le calcul de l'Erreur quadratique moyenne
+	 * @author Adrien
+	 * @return l'erreur quadratique moyenne
+	 */
 	public double calculerMSE() {
 
 	    PixelReader lecteurOriginal = imageOriginale.getPixelReader();
@@ -41,7 +47,10 @@ public class EvaluateurQualiteImage {
 	    return sommeErreursCarrees / nombrePixels;
 	}
 	
-	// Adrien
+	/** Effectue le rapport du signal sur le bruit
+	 * @author Adrien
+	 * @return le rapport du signal sur le bruit
+	 */
 	public double calculerPSNR() {
 
 	    double mse = calculerMSE();
@@ -55,7 +64,10 @@ public class EvaluateurQualiteImage {
 	    return psnr;
 	}
 	
-	// Adrien
+	/** Affiche le résultat des méthodes calculerMSE et calculerPSNR
+	 * @author Adrien
+	 * @return
+	 */
 	public void resultatsQualite() {
 	    double mse = calculerMSE();
 	    double psnr = calculerPSNR();
