@@ -464,21 +464,21 @@ public class ImageDebruitee {
 
 	    // Seuillage sur les projections (par exemple seuillage dur)
 	                                                   // à modifier selon le type
-	    double sigma = 20; // exemple, à calculer idéalement
+	    double sigma = ecartType(projections);
+
 	    double seuil = seuilV(sigma);   
 	    
 	    // Definir le seuil Bayes ou Visu???
 	    
 	    // Choix du type de seuillage
-	    // calcul de l'écart-type
-	    double ecartT = ecartType(projections);
 	    
-	   // variance = ???
-	    double variance = variance(ecartT);
+	    
+	   // variance : Pierr
+	    double variance = variance(sigma);
 	    
 	    List<Vector<Float>> projectionsSeuillage;
 	    		
-	    if (choisirType(variance) == TypeSeuillage.DUR) {
+	    if (choisirType(variance, sigma) == TypeSeuillage.DUR) {
 	    	
 	    	projectionsSeuillage =  seuillageDur(projections, seuil);
 	    	
@@ -615,9 +615,9 @@ public class ImageDebruitee {
 	 */
 
 	
-	public static TypeSeuillage choisirType(double variance) {
+	public static TypeSeuillage choisirType(double variance, double seuilVi) {
 	   
-	    double seuilDecision = 50.0;
+	    double seuilDecision = seuilVi;
 
 	    if (variance > seuilDecision) {
 	        return TypeSeuillage.DUR;
