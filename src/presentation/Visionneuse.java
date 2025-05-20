@@ -214,7 +214,7 @@ public class Visionneuse extends Application {
 		// Bouton évaluation qualité
 	    Button btnEvaluerQualite = new Button("Évaluer qualité");
 	    btnEvaluerQualite.setOnAction(arg0 -> {
-	        Image originale = album.getPhotoCourante().getImageOriginelle();
+	        Image originale = album.getPhotoCourante().getImageOriginelleGrisee();
 	        Image actuelle = album.getPhotoCourante().getImage();
 	        
 	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle);
