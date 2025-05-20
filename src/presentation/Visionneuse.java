@@ -44,7 +44,7 @@ import javafx.scene.image.Image;
  *@author Etienne Angé
  */
 public class Visionneuse extends Application {
-	public ImageDebruitee.TypeSeuillage typeSeuillage = ImageDebruitee.TypeSeuillage.DOUX;
+	public ImageDebruitee.TypeSeuillage typeSeuillage = ImageDebruitee.TypeSeuillage.AUTO;
 	private Album album;
 	private ImageView imageView;
 	private Slider slider;
@@ -52,6 +52,8 @@ public class Visionneuse extends Application {
 	private List<RadioButton> listButton;
 	private Stage primaryStage;
 	private BorderPane window;
+	private Label labelEvaluateur;
+	
 	
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Album Photo");
@@ -137,12 +139,16 @@ public class Visionneuse extends Application {
 		
 	public HBox creerBandeauHaut() {
 
-		
+		labelEvaluateur = new Label("Pas d'image débruitée");
 		
 		HBox bandeauHaut = new HBox();
 		
 		Button btnReset = new Button("Reset");
-		btnReset.setOnAction(arg0 -> imageView.setImage(album.getPhotoCourante().reset()));
+		btnReset.setOnAction(arg0 -> {
+			imageView.setImage(album.getPhotoCourante().reset());
+			labelEvaluateur.setText("Pas d'image débruitée");
+		});
+		
 		
 		
 		//bruiter
@@ -171,7 +177,7 @@ public class Visionneuse extends Application {
 		btnBruiter.setOnAction(arg0 -> {
 			
 			imageView.setImage(album.getPhotoCourante().bruiter(sliderBruitage.getValue()));
-			
+			labelEvaluateur.setText("Pas d'image débruitée");
 			
 		});
 		bruiter.getChildren().addAll(bruitage,btnBruiter);
@@ -192,6 +198,15 @@ public class Visionneuse extends Application {
 		sliderTaillePatch.setMajorTickUnit(10);
 		btnDebruiter.setOnAction(arg0 -> {
 			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage));
+			Image originale = album.getPhotoCourante().getImageOriginelle();
+	        Image actuelle = album.getPhotoCourante().getImage();
+	        
+	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle);
+	        //evaluateur.resultatsQualite();
+	        Double mseEval = (Double)evaluateur.calculerMSE();
+	        Double psnrEval = (Double)evaluateur.calculerPSNR();
+	        labelEvaluateur.setText("MSE : " + mseEval.toString() + "\nPSNR : " + psnrEval.toString() + " dB");
+	        
 			
 		});
 		choixTaillePatch.getChildren().addAll(new Label("Taille patch"),sliderTaillePatch);
@@ -212,20 +227,18 @@ public class Visionneuse extends Application {
 		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage, btnDebruiter);
 		
 		// Bouton évaluation qualité
-	    Button btnEvaluerQualite = new Button("Évaluer qualité");
-	    btnEvaluerQualite.setOnAction(arg0 -> {
-	        Image originale = album.getPhotoCourante().getImageOriginelle();
-	        Image actuelle = album.getPhotoCourante().getImage();
-	        
-	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle);
-	        evaluateur.resultatsQualite();
-	    });
+	    
+	    VBox vboxEvaluerQualite = new VBox();
+	    vboxEvaluerQualite.getChildren().addAll(new Label("Evaluateur"),labelEvaluateur);
+	    
 	    
 		Separator sep1 = new Separator();
 		sep1.setOrientation(Orientation.VERTICAL);
 		Separator sep2 = new Separator();
 		sep2.setOrientation(Orientation.VERTICAL);
-		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset,btnEvaluerQualite);
+		Separator sep3 = new Separator();
+		sep3.setOrientation(Orientation.VERTICAL);
+		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset,sep3,vboxEvaluerQualite);
 		bandeauHaut.setAlignment(Pos.CENTER);
 		
 		return bandeauHaut;
