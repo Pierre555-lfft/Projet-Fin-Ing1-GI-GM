@@ -450,25 +450,20 @@ public class ImageDebruitee {
 
 	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
 
-	    // Extraction des patchs non superposés
+	    // Patch
 	    List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
-
-	    // Passage des patchs en vecteurs Float
 	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
 
-	    // Centrer les vecteurs (Vk - mv)
+	    // Projection
 	    List<Vector<Float>> vecteursCentres = vecteur_centre_methode(vecteurs);
-
-	    // Calcul de la matrice U (vecteurs propres) par ACP sur vecteurs centrés
-	    RealMatrix U = ACP(vecteursCentres);
-
-	    // Projection des vecteurs centrés sur les composantes principales
+	    RealMatrix U = ACP(vecteurs);
 	    List<Vector<Float>> projections = proj(U, vecteursCentres);
 
 	    // Seuillage sur les projections (par exemple seuillage dur)
 	                                                   // à modifier selon le type
 	    double sigma = ecartType(projections);
+
 
 	    double seuil = seuilV(sigma);   
 	    

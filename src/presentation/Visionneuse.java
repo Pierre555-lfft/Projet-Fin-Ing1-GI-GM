@@ -198,7 +198,7 @@ public class Visionneuse extends Application {
 		sliderTaillePatch.setMajorTickUnit(10);
 		btnDebruiter.setOnAction(arg0 -> {
 			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage));
-			Image originale = album.getPhotoCourante().getImageOriginelle();
+			Image originale = album.getPhotoCourante().getImageOriginelleGrisee();
 	        Image actuelle = album.getPhotoCourante().getImage();
 	        
 	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle);
@@ -227,10 +227,12 @@ public class Visionneuse extends Application {
 		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage, btnDebruiter);
 		
 		// Bouton évaluation qualité
+
 	    
 	    VBox vboxEvaluerQualite = new VBox();
 	    vboxEvaluerQualite.getChildren().addAll(new Label("Evaluateur"),labelEvaluateur);
 	    
+
 	    
 		Separator sep1 = new Separator();
 		sep1.setOrientation(Orientation.VERTICAL);
