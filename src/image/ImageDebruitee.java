@@ -44,12 +44,12 @@ public class ImageDebruitee {
 		return imageDebruitee;
 	}
 	
-	/** Renvoie un 
+	/** Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
 	 * @author Adrien
-	 * @param 
+	 * @param argb
 	 * @return
 	 */
-	// Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
+
 	public static int obtenirValeurGris(int argb) {
 	    int r = (argb >> 16) & 0xFF;
 	    int g = (argb >> 8) & 0xFF;
@@ -58,10 +58,11 @@ public class ImageDebruitee {
 	    return (int) (0.299 * r + 0.587 * g + 0.114 * b);
 	}
 
-	/** Renvoie un 
+	/** Extrait les patchs de l'image
 	 * @author Adrien
-	 * @param 
-	 * @return
+	 * @param image
+	 * @param taillePatch
+	 * @return les patchs de l'image
 	 */
 	
 	public List<Patch> extractPatchs(Image image, int taillePatch) {
@@ -155,10 +156,10 @@ public class ImageDebruitee {
 	    return listePatchs;
 	}
 	
-	/**
-	 * 
+	/** Transforme une liste de patchs en une liste de vecteurs
+	 * @author Adrien
 	 * @param patchs
-	 * @return
+	 * @return une liste de patchs
 	 */
 	public List<Vector<Float>> vectorPatchs (ArrayList<Patch> patchs){
 		List<Vector<Float>> vecteurs= new ArrayList<>();
@@ -382,8 +383,11 @@ public class ImageDebruitee {
 	    return V_contrib;
 	}
 	
-	// Adrien
-	// Reconstruction de l'image à partir des patchs débruités
+	/** Reconstruction de l'image à partir des patchs débruités
+	 * @author Adrien
+	 * @param patchsDebruitee
+	 * @return
+	 */
 	public Image reconstructPatchs(List<Patch> patchsDebruitee) {
 	    if (patchsDebruitee == null || patchsDebruitee.isEmpty()) {
 	        return null;
