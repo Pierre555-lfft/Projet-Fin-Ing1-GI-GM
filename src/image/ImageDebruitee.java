@@ -44,12 +44,12 @@ public class ImageDebruitee {
 		return imageDebruitee;
 	}
 	
-	/** Renvoie un 
+	/** Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
 	 * @author Adrien
-	 * @param 
+	 * @param argb
 	 * @return
 	 */
-	// Méthode pour obtenir la luminance d'un pixel à partir de sa valeur ARGB
+
 	public static int obtenirValeurGris(int argb) {
 	    int r = (argb >> 16) & 0xFF;
 	    int g = (argb >> 8) & 0xFF;
@@ -58,10 +58,11 @@ public class ImageDebruitee {
 	    return (int) (0.299 * r + 0.587 * g + 0.114 * b);
 	}
 
-	/** Renvoie un 
+	/** Extrait les patchs de l'image
 	 * @author Adrien
-	 * @param 
-	 * @return
+	 * @param image
+	 * @param taillePatch
+	 * @return les patchs de l'image
 	 */
 	
 	public List<Patch> extractPatchs(Image image, int taillePatch) {
@@ -155,10 +156,10 @@ public class ImageDebruitee {
 	    return listePatchs;
 	}
 	
-	/**
-	 * 
+	/** Transforme une liste de patchs en une liste de vecteurs
+	 * @author Adrien
 	 * @param patchs
-	 * @return
+	 * @return une liste de patchs
 	 */
 	public List<Vector<Float>> vectorPatchs (ArrayList<Patch> patchs){
 		List<Vector<Float>> vecteurs= new ArrayList<>();
@@ -382,8 +383,11 @@ public class ImageDebruitee {
 	    return V_contrib;
 	}
 	
-	// Adrien
-	// Reconstruction de l'image à partir des patchs débruités
+	/** Reconstruction de l'image à partir des patchs débruités
+	 * @author Adrien
+	 * @param patchsDebruitee
+	 * @return
+	 */
 	public Image reconstructPatchs(List<Patch> patchsDebruitee) {
 	    if (patchsDebruitee == null || patchsDebruitee.isEmpty()) {
 	        return null;
@@ -456,28 +460,42 @@ public class ImageDebruitee {
 	    RealMatrix U = ACP(vecteurs);
 	    List<Vector<Float>> projections = proj(U, vecteursCentres);
 
-	    // Seuillage                                           
-	    double sigma = 20; // exemple, à calculer idéalement
+	    // Seuillage sur les projections (par exemple seuillage dur)
+	                                                   // à modifier selon le type
+	    double sigma = ecartType(projections);
+
+
 	    double seuil = seuilV(sigma);   
 	    
 	    // Definir le seuil Bayes ou Visu???
 	    
 	    // Choix du type de seuillage
-	    // calcul de l'écart-type
-	    double ecartT = ecartType(projections);
 	    
-	   // variance = ???
-	    double variance = variance(ecartT);
+	    
+	   // variance : Pierr
+	    double variance = variance(sigma);
 	    
 	    List<Vector<Float>> projectionsSeuillage;
-	    		
-	    if (choisirType(variance) == TypeSeuillage.DUR) {
-	    	
-	    	projectionsSeuillage =  seuillageDur(projections, seuil);
-	    	
-	    } else {
-	    	projectionsSeuillage =  seuillageDoux(projections, seuil);
+
+	    
+	    if(typeSeuillage == TypeSeuillage.AUTO) {
+	    	if (choisirType(variance,sigma) == TypeSeuillage.DUR) {
+		    	
+		    	projectionsSeuillage =  seuillageDur(projections, seuil);
+		    	
+		    } else {
+		    	projectionsSeuillage =  seuillageDoux(projections, seuil);
+		    }
 	    }
+	    else {
+	    	if(typeSeuillage == TypeSeuillage.DUR) {
+	    		projectionsSeuillage =  seuillageDur(projections, seuil);
+	    	}
+	    	else {
+	    		projectionsSeuillage =  seuillageDoux(projections, seuil);
+	    	}
+	    }
+	    
 	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
 
 	    // Reconstruction des vecteurs centrés débruités
@@ -608,9 +626,9 @@ public class ImageDebruitee {
 	 */
 
 	
-	public static TypeSeuillage choisirType(double variance) {
+	public static TypeSeuillage choisirType(double variance, double seuilVi) {
 	   
-	    double seuilDecision = 50.0;
+	    double seuilDecision = seuilVi;
 
 	    if (variance > seuilDecision) {
 	        return TypeSeuillage.DUR;
