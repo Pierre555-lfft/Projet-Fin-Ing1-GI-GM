@@ -446,32 +446,36 @@ public class ImageDebruitee {
 
 	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
 
-	    // 1. Extraction des patchs non superposés
+	    // Extraction des patchs non superposés
 	    List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 
-	    // 2. Passage des patchs en vecteurs Float
+	    // Passage des patchs en vecteurs Float
 	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
 
-	    // 3. Centrer les vecteurs (Vk - mv)
+	    // Centrer les vecteurs (Vk - mv)
 	    List<Vector<Float>> vecteursCentres = vecteur_centre_methode(vecteurs);
 
-	    // 4. Calcul de la matrice U (vecteurs propres) par ACP sur vecteurs centrés
+	    // Calcul de la matrice U (vecteurs propres) par ACP sur vecteurs centrés
 	    RealMatrix U = ACP(vecteursCentres);
 
-	    // 5. Projection des vecteurs centrés sur les composantes principales
+	    // Projection des vecteurs centrés sur les composantes principales
 	    List<Vector<Float>> projections = proj(U, vecteursCentres);
 
-	    // 6. Seuillage sur les projections (par exemple seuillage dur)
+	    // Seuillage sur les projections (par exemple seuillage dur)
 	                                                   // à modifier selon le type
 	    double sigma = 20; // exemple, à calculer idéalement
-	    double seuil = VisuShrink(sigma);   
+	    double seuil = seuilV(sigma);   
 	    
 	    // Definir le seuil Bayes ou Visu???
 	    
 	    // Choix du type de seuillage
+	    // calcul de l'écart-type
+	    double ecartT = ecartType(projections);
 	    
 	   // variance = ???
+	    double variance = variance(ecartT);
+	    
 	    List<Vector<Float>> projectionsSeuillage;
 	    		
 	    if (choisirType(variance) == TypeSeuillage.DUR) {
@@ -483,10 +487,10 @@ public class ImageDebruitee {
 	    }
 	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
 
-	    // 7. Reconstruction des vecteurs centrés débruités
+	    // Reconstruction des vecteurs centrés débruités
 	    List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillage);
 
-	    // 8. Ajout du vecteur moyen
+	    // Ajout du vecteur moyen
 	    List<Vector<Float>> vecteursDebruites = new ArrayList<>();
 	    Vector<Float> mv = mv_methode(vecteurs);
 	    for (Vector<Float> v : vecteursCentresDebruites) {
@@ -497,7 +501,7 @@ public class ImageDebruitee {
 	        vecteursDebruites.add(vDebruite);
 	    }
 
-	    // 9. Reconstruction des patchs à partir des vecteurs débruités
+	    // Reconstruction des patchs à partir des vecteurs débruités
 	    for (int i = 0; i < arrayListPatches.size(); i++) {
 	        Patch p = arrayListPatches.get(i);
 	        p.fromVector(vecteursDebruites.get(i));
@@ -546,10 +550,15 @@ public class ImageDebruitee {
 	 * @return
 	 */
 	
-	public static double VisuShrink(double sigma) {
+	public static double seuilV(double sigma) {
 	    // VisuShrink threshold: sigma * sqrt(2*log(N))
 	    // N = taille patch squared
 	    return sigma * Math.sqrt(2 * Math.log(64)); // 64 = 8x8 patch (adapter si taille différente)
+	}
+	
+	public static double variance(double ecartT) {
+		double var = ecartT * ecartT;
+		return var;
 	}
 	
 	/** Renvoie un 
@@ -559,22 +568,65 @@ public class ImageDebruitee {
 	 */
 
 
-	public static double BayesShrink(List<Vector<Float>> projections, double sigma) {
-	    // Calcul de la variance du signal
-	    int n = projections.size();
-	    int p = projections.get(0).size();
+	public static double seuilB(List<Vector<Float>> projections, double sigma) {
+	    double sigmaImageBruitee = ecartType(projections);
+	    
+	    double varBruit = sigma * sigma;
+	    double varImage = sigmaImageBruitee * sigmaImageBruitee;
 
-	    double varianceSignal = 0.0;
-	    for (Vector<Float> v : projections) {
-	        for (int i = 0; i < p; i++) {
-	            varianceSignal += v.get(i) * v.get(i);
-	        }
-	    }
-	    varianceSignal /= (n * p);
+	    double varSignal = Math.max(varImage - varBruit, 0);
+	    double sigmaSignal = (double) Math.sqrt(varSignal);
 
-	    double seuil = sigma * sigma / Math.sqrt(varianceSignal);
-	    return seuil;
+	    if (sigmaSignal == 0f) return 0f;
+
+	    return varBruit / sigmaSignal;
 	}
+
+	
+	public static double ecartType(List<Vector<Float>> projections) {
+	    List<Float> tousLesCoeffs = new ArrayList<>();
+
+	    
+	    for (Vector<Float> vecteur : projections) {
+	        tousLesCoeffs.addAll(vecteur);
+	    }
+
+	    
+	    double somme = 0f;
+	    for (double val : tousLesCoeffs) {
+	        somme += val;
+	    }
+	    double moyenne = somme / tousLesCoeffs.size();
+
+	    
+	    double variance = 0f;
+	    for (double val : tousLesCoeffs) {
+	        variance += (val - moyenne) * (val - moyenne);
+	    }
+	    variance /= tousLesCoeffs.size();
+
+	  
+	    return (double) Math.sqrt(variance);
+	}
+	/** Renvoie un 
+	 * @author Pierre
+	 * @param 
+	 * @return
+	 */
+
+	
+	public static TypeSeuillage choisirType(double variance) {
+	   
+	    double seuilDecision = 50.0;
+
+	    if (variance > seuilDecision) {
+	        return TypeSeuillage.DUR;
+	    } else {
+	        return TypeSeuillage.DOUX;
+	    }
+	}
+
+	
 	
 	/** Renvoie un 
 	 * @author Pierre
