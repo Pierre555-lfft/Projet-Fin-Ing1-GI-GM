@@ -162,6 +162,47 @@ public class ImageDebruitee {
 	    return listePatchs;
 	}
 	
+	/**
+	 * Extrait les patchs de manière locale (ACP locale) en réutilisant extractPatchs
+	 * @author Adrien
+	 * @param imageBruitee image d'entrée
+	 * @param taillePatch taille des patchs (s)
+	 * @param tailleImagette taille des imagettes (W), W > s
+	 * @return liste de tous les patchs extraits localement avec coordonnées globales
+	 */
+	public List<Patch> extractLocalPatchs(Image imageBruitee, int taillePatch, int tailleImagette) {
+	    List<Patch> patchsTotaux = new ArrayList<>();
+	    PixelReader lecteur = imageBruitee.getPixelReader();
+	    int largeur = (int) imageBruitee.getWidth();
+	    int hauteur = (int) imageBruitee.getHeight();
+
+	    for (int y = 0; y < hauteur; y += tailleImagette) {
+	        for (int x = 0; x < largeur; x += tailleImagette) {
+
+	            // Déterminer la taille réelle de l’imagette (en bordure)
+	            int w = Math.min(tailleImagette, largeur - x);
+	            int h = Math.min(tailleImagette, hauteur - y);
+
+	            // Créer une imagette locale
+	            WritableImage imagette = new WritableImage(lecteur, x, y, w, h);
+
+	            // Extraire les patchs de l’imagette
+	            List<Patch> patchsLocaux = extractPatchs(imagette, taillePatch);
+
+	            // Ajuster les coordonnées globales
+	            for (Patch p : patchsLocaux) {
+	                p.setX(p.getX() + x);
+	                p.setY(p.getY() + y);
+	            }
+
+	            // Ajouter à la liste globale
+	            patchsTotaux.addAll(patchsLocaux);
+	        }
+	    }
+
+	    return patchsTotaux;
+	}
+	
 	/** Transforme une liste de patchs en une liste de vecteurs
 	 * @author Adrien
 	 * @param patchs
@@ -484,6 +525,7 @@ public class ImageDebruitee {
        // Application du seuillage
         List<Vector<Float>> projectionsSeuillage;
 
+
         if (typeSeuillage == TypeSeuillage.AUTO) {
             double varSignal = estimerVarianceSignal(projections, sigma * sigma);
             if (choisirType(varSignal, seuil) == TypeSeuillage.DUR) {
@@ -566,6 +608,7 @@ public class ImageDebruitee {
 	 * @return
 	 */
 	
+
 	// ======= Seuil VisuShrink =======
     public static double seuilVisuShrink(double sigma,double tailleVecteur) {
         // VisuShrink : seuil universel basé sur l'énergie du bruit
@@ -614,6 +657,9 @@ public class ImageDebruitee {
                 throw new IllegalArgumentException("Type de seuillage inconnu : " + type);
         }
     }
+
+
+
 
 
     public static double estimerVarianceSignal(List<Vector<Float>> projections, double varianceBruit) {

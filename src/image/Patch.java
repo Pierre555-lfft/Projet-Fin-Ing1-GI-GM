@@ -58,6 +58,14 @@ public class Patch {
 		return y;
 	}
 	
+	public void setX(Integer x) {
+		this.x = x;
+	}
+
+	public void setY(Integer y) {
+		this.y = y;
+	}
+	
 	//Etienne
 	@Override
 	public String toString() {
