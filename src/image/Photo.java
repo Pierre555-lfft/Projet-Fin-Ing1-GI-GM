@@ -71,13 +71,8 @@ public class Photo {
 		return image;
 	}
 	
-<<<<<<< Updated upstream
-	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil) {
-		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage, typeSeuil);
-=======
 	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, boolean locale, Integer tailleImagette) {
 		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage, locale, tailleImagette);
->>>>>>> Stashed changes
 		image = imageDebruitee.getImage();
 		return imageDebruitee.getImage();
 	}
