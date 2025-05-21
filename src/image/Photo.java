@@ -73,8 +73,8 @@ public class Photo {
 	
 
 
-	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil, boolean locale, Integer tailleImagette) {
-		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage, locale, tailleImagette);
+	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil, boolean locale) {
+		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage,typeSeuil, locale);
 
 
 		image = imageDebruitee.getImage();

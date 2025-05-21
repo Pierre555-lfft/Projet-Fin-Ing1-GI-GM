@@ -43,8 +43,8 @@ public class ImageDebruitee {
 	private Image imageDebruitee;
 
 
-	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,boolean locale, Integer tailleImagette) {
-		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil, locale, tailleImagette);
+	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,boolean locale) {
+		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil, locale);
 
 
 	}
@@ -500,7 +500,7 @@ public class ImageDebruitee {
 
 
 
-	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil, boolean locale, Integer tailleImagette) {
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil, boolean locale) {
 
 
 

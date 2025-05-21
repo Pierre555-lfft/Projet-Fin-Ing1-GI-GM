@@ -54,7 +54,7 @@ public class Visionneuse extends Application {
 	private BorderPane window;
 	private Label labelEvaluateur;
 	private ImageDebruitee.TypeSeuil typeSeuil = ImageDebruitee.TypeSeuil.BAYES;
-	
+	private boolean local; //0 si global et 1 si local en 4 imagette
 	
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Album Photo");
@@ -186,6 +186,17 @@ public class Visionneuse extends Application {
 		
 		
 		// débruiter
+		local = false;
+		ToggleButton btnGlobale = new ToggleButton("Globale");
+		ToggleButton btnLocale = new ToggleButton("Locale");
+		btnGlobale.setOnAction(arg0 -> local = false);
+		btnLocale.setOnAction(arg0 -> local = true);
+		btnGlobale.setSelected(true);
+		ToggleGroup groupeLocale = new ToggleGroup();
+		btnGlobale.setToggleGroup(groupeLocale);
+		btnLocale.setToggleGroup(groupeLocale);
+		VBox vboxLocale= new VBox(new Label("Analyse"),btnGlobale,btnLocale);
+		vboxLocale.setAlignment(Pos.CENTER);
 		HBox debruiter = new HBox();
 		debruiter.setAlignment(Pos.CENTER);
 		
@@ -198,7 +209,7 @@ public class Visionneuse extends Application {
 		sliderTaillePatch.setShowTickLabels(true);
 		sliderTaillePatch.setMajorTickUnit(10);
 		btnDebruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage, typeSeuil));
+			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage, typeSeuil, local));
 			Image originale = album.getPhotoCourante().getImageOriginelleGrisee();
 	        Image actuelle = album.getPhotoCourante().getImage();
 	        
@@ -237,7 +248,7 @@ public class Visionneuse extends Application {
 		VBox vboxTypeSeuil = new VBox();
 		vboxTypeSeuil.getChildren().addAll(new Label("Seuil"),btnSeuilBayes,btnSeuilVisu);
 		vboxTypeSeuil.setAlignment(Pos.CENTER);
-		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage,vboxTypeSeuil, btnDebruiter);
+		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage,vboxTypeSeuil,vboxLocale, btnDebruiter);
 		
 		// Bouton évaluation qualité
 
