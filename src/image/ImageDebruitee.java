@@ -512,6 +512,40 @@ public class ImageDebruitee {
 	    int nbre_patch = vecteurs.size();              // nombre de patchs (n)
 	    int taille_patch = vecteurs.get(0).size();
 
+<<<<<<< HEAD
+	    Integer nbPixel = (int) (imageBruitee.getWidth() * (int)imageBruitee.getHeight());
+	    double seuil = seuilV(sigma,nbPixel);
+	    seuil = 30;
+	    
+	    // Definir le seuil Bayes ou Visu???
+	    
+	    // Choix du type de seuillage
+	    
+	    
+	   // variance : Pierre
+	    double variance = variance(sigma);
+	    
+	    List<Vector<Float>> projectionsSeuillage;
+
+	    
+	    if(typeSeuillage == TypeSeuillage.AUTO) {
+	    	if (choisirType(variance, seuil) == TypeSeuillage.DUR) {
+		    	
+		    	projectionsSeuillage =  seuillageDur(projections, seuil);
+		    	
+		    } else {
+		    	projectionsSeuillage =  seuillageDoux(projections, seuil);
+		    }
+	    }
+	    else {
+	    	if(typeSeuillage == TypeSeuillage.DUR) {
+	    		projectionsSeuillage =  seuillageDur(projections, seuil);
+	    	}
+	    	else {
+	    		projectionsSeuillage =  seuillageDoux(projections, seuil);
+	    	}
+	    }
+=======
 	    // Choix du seuil (VisuShrink ou BayesShrink)
 	    double seuil;
 	    if (typeSeuil == TypeSeuil.VISU) {
@@ -542,6 +576,7 @@ public class ImageDebruitee {
         }
         
     
+>>>>>>> refs/remotes/origin/main
 	    
 	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
 
@@ -608,6 +643,24 @@ public class ImageDebruitee {
 	 * @return
 	 */
 	
+<<<<<<< HEAD
+	public static double seuilV(double sigma,Integer nbPixel) {
+	    // VisuShrink threshold: sigma * sqrt(2*log(N))
+	    // N = taille patch squared
+	    return sigma * Math.sqrt(2 * Math.log(nbPixel)); // 64 = 8x8 patch (adapter si taille différente)
+	}
+	
+	public static double variance(double sigma) {
+		double var = sigma * sigma;
+		return var;
+	}
+	
+	/** Renvoie un 
+	 * @author Pierre
+	 * @param 
+	 * @return
+	 */
+=======
 
 	// ======= Seuil VisuShrink =======
     public static double seuilVisuShrink(double sigma,double tailleVecteur) {
@@ -657,6 +710,7 @@ public class ImageDebruitee {
                 throw new IllegalArgumentException("Type de seuillage inconnu : " + type);
         }
     }
+>>>>>>> refs/remotes/origin/main
 
 
 
@@ -702,11 +756,18 @@ public class ImageDebruitee {
             sD.add(seuilVector);
         }
 
+<<<<<<< HEAD
+	
+	public static TypeSeuillage choisirType(double variance, double seuil) {
+	   
+	    double seuilDecision = seuil;
+=======
         return sD;
     }
     	
         
   
+>>>>>>> refs/remotes/origin/main
 
     
     public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> proj, double seuil) {
