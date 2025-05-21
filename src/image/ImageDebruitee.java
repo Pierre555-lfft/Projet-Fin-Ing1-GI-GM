@@ -42,8 +42,13 @@ public class ImageDebruitee {
 		    
 	private Image imageDebruitee;
 
+<<<<<<< Updated upstream
 	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
 		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
+=======
+	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, boolean locale, Integer tailleImagette) {
+		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage, locale, tailleImagette);
+>>>>>>> Stashed changes
 	}
 	
 	public Image getImage() {
@@ -495,10 +500,20 @@ public class ImageDebruitee {
 
 
 
+<<<<<<< Updated upstream
 	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
+=======
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, boolean locale, Integer tailleImagette) {
+>>>>>>> Stashed changes
 
 	    // Patch
-	    List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
+		List<Patch> patchs;
+		if (locale) {
+		    patchs = extractLocalPatchs(imageBruitee, taillePatch, tailleImagette);
+		} else {
+		    patchs = extractPatchs(imageBruitee, taillePatch);
+		}
+
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
 
@@ -513,8 +528,24 @@ public class ImageDebruitee {
 	    int taille_patch = vecteurs.get(0).size();
 	    
 
+<<<<<<< Updated upstream
 	    // Choix du seuil (VisuShrink ou BayesShrink)
 	    double seuil;
+=======
+	    Integer nbPixel = (int) (imageBruitee.getWidth() * (int)imageBruitee.getHeight());
+	    double seuil = seuilV(sigma,nbPixel);
+	    seuil = 50;
+	    
+	    // Definir le seuil Bayes ou Visu???
+	    
+	    // Choix du type de seuillage
+	    
+	    
+	   // variance : Pierr
+	    double variance = variance(sigma);
+	    
+	    List<Vector<Float>> projectionsSeuillage;
+>>>>>>> Stashed changes
 
 	    if (typeSeuil == TypeSeuil.VISU) {
 	        seuil = seuilVisuShrink(sigma, taille_patch);
