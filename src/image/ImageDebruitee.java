@@ -42,13 +42,9 @@ public class ImageDebruitee {
 		    
 	private Image imageDebruitee;
 
-<<<<<<< Updated upstream
-	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
-		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
-=======
+
 	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, boolean locale, Integer tailleImagette) {
 		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage, locale, tailleImagette);
->>>>>>> Stashed changes
 	}
 	
 	public Image getImage() {
@@ -498,13 +494,7 @@ public class ImageDebruitee {
 	    return imageReconstruite;
 	}
 
-
-
-<<<<<<< Updated upstream
-	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
-=======
 	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, boolean locale, Integer tailleImagette) {
->>>>>>> Stashed changes
 
 	    // Patch
 		List<Patch> patchs;
