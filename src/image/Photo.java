@@ -71,8 +71,8 @@ public class Photo {
 		return image;
 	}
 	
-	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
-		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage);
+	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil) {
+		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage, typeSeuil);
 		image = imageDebruitee.getImage();
 		return imageDebruitee.getImage();
 	}
@@ -150,6 +150,7 @@ public class Photo {
 		int largeur = (int) (this.largeurInit * this.zoom);
 		int hauteur = (int) (this.hauteurInit * this.zoom);
 		image = new Image(this.filename, largeur, hauteur, false, false);
+
 	}
 	public Image nb() {
        		int width = (int) image.getWidth();
