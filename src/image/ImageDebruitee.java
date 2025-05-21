@@ -511,6 +511,7 @@ public class ImageDebruitee {
 	    double sigma = ecartType(projections); // estimation de σ
 	    int nbre_patch = vecteurs.size();              // nombre de patchs (n)
 	    int taille_patch = vecteurs.get(0).size();
+	    
 
 	    // Choix du seuil (VisuShrink ou BayesShrink)
 	    double seuil;
@@ -541,7 +542,7 @@ public class ImageDebruitee {
             throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
         }
         
-    
+
 	    
 	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
 
@@ -609,6 +610,8 @@ public class ImageDebruitee {
 	 */
 	
 
+
+
 	// ======= Seuil VisuShrink =======
     public static double seuilVisuShrink(double sigma,double tailleVecteur) {
         // VisuShrink : seuil universel basé sur l'énergie du bruit
@@ -646,6 +649,7 @@ public class ImageDebruitee {
 
         return Math.sqrt(variance);
     }
+
 
     public static double estimerVarianceSignal(List<Vector<Float>> projections, double varianceBruit) {
         double sum = 0;
@@ -686,12 +690,11 @@ public class ImageDebruitee {
             }
             sD.add(seuilVector);
         }
-
+        
         return sD;
     }
-    	
-        
-  
+
+
 
     
     public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> proj, double seuil) {
