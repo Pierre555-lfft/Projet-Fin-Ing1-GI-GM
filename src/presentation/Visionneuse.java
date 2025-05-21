@@ -53,6 +53,7 @@ public class Visionneuse extends Application {
 	private Stage primaryStage;
 	private BorderPane window;
 	private Label labelEvaluateur;
+	private ImageDebruitee.TypeSeuil typeSeuil = ImageDebruitee.TypeSeuil.BAYES;
 	
 	
 	public void start(Stage primaryStage) {
@@ -67,8 +68,8 @@ public class Visionneuse extends Application {
 		
 		ScrollPane centre = creerCentre();
 		window.setCenter(centre);
-		slider = creerSlider();
-		window.setRight(slider);
+		//slider = creerSlider();
+		//window.setRight(slider);
 		creerListe = creerListe();
 		window.setLeft(creerListe);
 		
@@ -197,7 +198,7 @@ public class Visionneuse extends Application {
 		sliderTaillePatch.setShowTickLabels(true);
 		sliderTaillePatch.setMajorTickUnit(10);
 		btnDebruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage));
+			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage, typeSeuil));
 			Image originale = album.getPhotoCourante().getImageOriginelleGrisee();
 	        Image actuelle = album.getPhotoCourante().getImage();
 	        
@@ -214,7 +215,7 @@ public class Visionneuse extends Application {
 		ToggleButton btnSeuillageDur = new ToggleButton("Dur");
 		ToggleButton btnSeuillageDoux = new ToggleButton("Doux");
 		ToggleButton btnSeuillageAuto = new ToggleButton("Auto");
-		
+		btnSeuillageAuto.setSelected(true);
 		ToggleGroup btnSeuillage = new ToggleGroup();
 		btnSeuillageDur.setToggleGroup(btnSeuillage);
 		btnSeuillageDoux.setToggleGroup(btnSeuillage);
@@ -224,7 +225,19 @@ public class Visionneuse extends Application {
 		btnSeuillageAuto.setOnAction(arg0 ->  typeSeuillage = ImageDebruitee.TypeSeuillage.AUTO);
 		VBox hBoxSeuillage = new VBox();
 		hBoxSeuillage.getChildren().addAll(new Label("Seuillage"),btnSeuillageDur, btnSeuillageDoux, btnSeuillageAuto);
-		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage, btnDebruiter);
+		
+		ToggleButton btnSeuilBayes = new ToggleButton("Bayes");
+		btnSeuilBayes.setSelected(true);
+		ToggleButton btnSeuilVisu = new ToggleButton("Visu");
+		ToggleGroup btnSeuil = new ToggleGroup();
+		btnSeuilBayes.setToggleGroup(btnSeuil);
+		btnSeuilVisu.setToggleGroup(btnSeuil);
+		btnSeuilBayes.setOnAction(arg0 ->  typeSeuil = ImageDebruitee.TypeSeuil.BAYES);
+		btnSeuilVisu.setOnAction(arg0 ->  typeSeuil = ImageDebruitee.TypeSeuil.VISU);
+		VBox vboxTypeSeuil = new VBox();
+		vboxTypeSeuil.getChildren().addAll(new Label("Seuil"),btnSeuilBayes,btnSeuilVisu);
+		vboxTypeSeuil.setAlignment(Pos.CENTER);
+		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage,vboxTypeSeuil, btnDebruiter);
 		
 		// Bouton évaluation qualité
 

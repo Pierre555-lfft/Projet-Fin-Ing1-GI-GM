@@ -42,8 +42,8 @@ public class ImageDebruitee {
 		    
 	private Image imageDebruitee;
 
-	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
-		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage);
+	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
+		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
 	}
 	
 	public Image getImage() {
@@ -495,7 +495,7 @@ public class ImageDebruitee {
 
 
 
-	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage) {
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
 
 	    // Patch
 	    List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
@@ -515,13 +515,14 @@ public class ImageDebruitee {
 
 	    // Choix du seuil (VisuShrink ou BayesShrink)
 	    double seuil;
-	    //if (typeSeuil == TypeSeuil.VISU) {
+
+	    if (typeSeuil == TypeSeuil.VISU) {
 	        seuil = seuilVisuShrink(sigma, taille_patch);
-	    //} else if (typeSeuil == TypeSeuil.BAYES) {
-	        //seuil = seuilBayesShrink(sigma, projections);
-	    //} else {
-	        //throw new IllegalArgumentException("Type de seuil inconnu : " + typeSeuil);
-	    //}
+	    } else if (typeSeuil == TypeSeuil.BAYES) {
+	        seuil = seuilBayesShrink(sigma, projections);
+	    } else {
+	        throw new IllegalArgumentException("Type de seuil inconnu : " + typeSeuil);
+	    }
 
        // Application du seuillage
         List<Vector<Float>> projectionsSeuillage;
