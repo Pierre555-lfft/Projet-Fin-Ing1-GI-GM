@@ -46,6 +46,7 @@ public class ImageDebruitee {
 	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,boolean locale, Integer tailleImagette) {
 		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil, locale, tailleImagette);
 
+
 	}
 	
 	public Image getImage() {
@@ -498,7 +499,9 @@ public class ImageDebruitee {
 
 
 
+
 	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil, boolean locale, Integer tailleImagette) {
+
 
 
 	    // Patch
