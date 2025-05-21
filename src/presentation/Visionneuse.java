@@ -15,6 +15,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
@@ -25,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ public class Visionneuse extends Application {
 	private BorderPane window;
 	private Label labelEvaluateur;
 	private ImageDebruitee.TypeSeuil typeSeuil = ImageDebruitee.TypeSeuil.BAYES;
+	private TableView console;
 	
 	
 	public void start(Stage primaryStage) {
@@ -73,6 +76,8 @@ public class Visionneuse extends Application {
 		creerListe = creerListe();
 		window.setLeft(creerListe);
 		
+		BorderPane creerBottom = creerBottom();
+		window.setBottom(creerBottom);
 		
 		HBox bandeauHaut = creerBandeauHaut();
 		window.setTop(bandeauHaut);
@@ -288,4 +293,12 @@ public class Visionneuse extends Application {
 	}
 	
 
+	public BorderPane creerBottom() {
+		BorderPane bPconsole = new BorderPane();
+		console = new TextArea("");
+		
+		bPconsole.setCenter(console);
+		
+	}
+	
 }
