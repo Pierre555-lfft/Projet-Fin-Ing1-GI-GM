@@ -42,8 +42,13 @@ public class ImageDebruitee {
 		    
 	private Image imageDebruitee;
 
+<<<<<<< Updated upstream
 	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
 		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
+=======
+	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, boolean locale, Integer tailleImagette) {
+		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage, locale, tailleImagette);
+>>>>>>> Stashed changes
 	}
 	
 	public Image getImage() {
@@ -495,10 +500,20 @@ public class ImageDebruitee {
 
 
 
+<<<<<<< Updated upstream
 	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
+=======
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, boolean locale, Integer tailleImagette) {
+>>>>>>> Stashed changes
 
 	    // Patch
-	    List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
+		List<Patch> patchs;
+		if (locale) {
+		    patchs = extractLocalPatchs(imageBruitee, taillePatch, tailleImagette);
+		} else {
+		    patchs = extractPatchs(imageBruitee, taillePatch);
+		}
+
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
 
@@ -511,43 +526,27 @@ public class ImageDebruitee {
 	    double sigma = ecartType(projections); // estimation de σ
 	    int nbre_patch = vecteurs.size();              // nombre de patchs (n)
 	    int taille_patch = vecteurs.get(0).size();
+	    
 
-<<<<<<< HEAD
+<<<<<<< Updated upstream
+	    // Choix du seuil (VisuShrink ou BayesShrink)
+	    double seuil;
+=======
 	    Integer nbPixel = (int) (imageBruitee.getWidth() * (int)imageBruitee.getHeight());
 	    double seuil = seuilV(sigma,nbPixel);
-	    seuil = 30;
+	    seuil = 50;
 	    
 	    // Definir le seuil Bayes ou Visu???
 	    
 	    // Choix du type de seuillage
 	    
 	    
-	   // variance : Pierre
+	   // variance : Pierr
 	    double variance = variance(sigma);
 	    
 	    List<Vector<Float>> projectionsSeuillage;
+>>>>>>> Stashed changes
 
-	    
-	    if(typeSeuillage == TypeSeuillage.AUTO) {
-	    	if (choisirType(variance, seuil) == TypeSeuillage.DUR) {
-		    	
-		    	projectionsSeuillage =  seuillageDur(projections, seuil);
-		    	
-		    } else {
-		    	projectionsSeuillage =  seuillageDoux(projections, seuil);
-		    }
-	    }
-	    else {
-	    	if(typeSeuillage == TypeSeuillage.DUR) {
-	    		projectionsSeuillage =  seuillageDur(projections, seuil);
-	    	}
-	    	else {
-	    		projectionsSeuillage =  seuillageDoux(projections, seuil);
-	    	}
-	    }
-=======
-	    // Choix du seuil (VisuShrink ou BayesShrink)
-	    double seuil;
 	    if (typeSeuil == TypeSeuil.VISU) {
 	        seuil = seuilVisuShrink(sigma, taille_patch);
 	    } else if (typeSeuil == TypeSeuil.BAYES) {
@@ -575,8 +574,7 @@ public class ImageDebruitee {
             throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
         }
         
-    
->>>>>>> refs/remotes/origin/main
+
 	    
 	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
 
@@ -643,24 +641,8 @@ public class ImageDebruitee {
 	 * @return
 	 */
 	
-<<<<<<< HEAD
-	public static double seuilV(double sigma,Integer nbPixel) {
-	    // VisuShrink threshold: sigma * sqrt(2*log(N))
-	    // N = taille patch squared
-	    return sigma * Math.sqrt(2 * Math.log(nbPixel)); // 64 = 8x8 patch (adapter si taille différente)
-	}
-	
-	public static double variance(double sigma) {
-		double var = sigma * sigma;
-		return var;
-	}
-	
-	/** Renvoie un 
-	 * @author Pierre
-	 * @param 
-	 * @return
-	 */
-=======
+
+
 
 	// ======= Seuil VisuShrink =======
     public static double seuilVisuShrink(double sigma,double tailleVecteur) {
@@ -678,7 +660,6 @@ public class ImageDebruitee {
         return sigma2 / Math.sqrt(varianceSignal);
     }
 
-    // ======= Calcul de l’écart-type =======
     public static double ecartType(List<Vector<Float>> projections) {
         List<Float> tousLesCoeffs = new ArrayList<>();
         for (Vector<Float> vecteur : projections) {
@@ -686,34 +667,20 @@ public class ImageDebruitee {
         }
 
         double somme = 0.0;
-        for (double val : tousLesCoeffs) {
-            somme += val;
+        for (Float val : tousLesCoeffs) {
+            somme += val.doubleValue();
         }
         double moyenne = somme / tousLesCoeffs.size();
 
         double variance = 0.0;
-        for (double val : tousLesCoeffs) {
-            variance += (val - moyenne) * (val - moyenne);
+        for (Float val : tousLesCoeffs) {
+            double diff = val.doubleValue() - moyenne;
+            variance += diff * diff;
         }
         variance /= tousLesCoeffs.size();
 
         return Math.sqrt(variance);
     }
-    
-    public static double calculSeuil(String type, double sigma, int tailleVecteur, List<Vector<Float>> projections) {
-        switch (type.toLowerCase()) {
-            case "visu":
-                return seuilVisuShrink(sigma, tailleVecteur);
-            case "bayes":
-                return seuilBayesShrink(sigma, projections);
-            default:
-                throw new IllegalArgumentException("Type de seuillage inconnu : " + type);
-        }
-    }
->>>>>>> refs/remotes/origin/main
-
-
-
 
 
     public static double estimerVarianceSignal(List<Vector<Float>> projections, double varianceBruit) {
@@ -731,7 +698,7 @@ public class ImageDebruitee {
         return Math.max(varianceBrute - varianceBruit, 0);
     }
 
-    // ======= Choix automatique du type de seuillage =======
+   
     public static TypeSeuillage choisirType(double variance, double seuilVi) {
         if (variance > seuilVi) {
             return TypeSeuillage.DUR;
@@ -755,19 +722,11 @@ public class ImageDebruitee {
             }
             sD.add(seuilVector);
         }
-
-<<<<<<< HEAD
-	
-	public static TypeSeuillage choisirType(double variance, double seuil) {
-	   
-	    double seuilDecision = seuil;
-=======
+        
         return sD;
     }
-    	
-        
-  
->>>>>>> refs/remotes/origin/main
+
+
 
     
     public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> proj, double seuil) {

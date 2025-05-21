@@ -144,60 +144,17 @@ public class Visionneuse extends Application {
 	}
 		
 	public HBox creerBandeauHaut() {
+	    labelEvaluateur = new Label("Pas d'image débruitée");
 
-		labelEvaluateur = new Label("Pas d'image débruitée");
-		
-		HBox bandeauHaut = new HBox();
-		
-		Button btnReset = new Button("Reset");
-		btnReset.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().reset());
-			labelEvaluateur.setText("Pas d'image débruitée");
-		});
-		
-		
-		
-		//bruiter
-		HBox bruiter = new HBox();
-		bruiter.setAlignment(Pos.CENTER);
-	
-		Button btnBruiter = new Button("Bruiter");
-		
-		
-		VBox bruitage = new VBox();
-		Button btnDebruiter = new Button("Débruiter");
-		
-		
-		Label textBruitage = new Label("Bruitage");
-		Slider sliderBruitage = new Slider(0,100,50);
+	    HBox bandeauHaut = new HBox();
 
-		sliderBruitage.setOrientation(Orientation.HORIZONTAL);
-		sliderBruitage.setShowTickMarks(true);
-		sliderBruitage.setShowTickLabels(true);
-		sliderBruitage.setMajorTickUnit(10);
-		
-		
-		bruitage.getChildren().addAll(textBruitage, sliderBruitage);
-		
-		
-		btnBruiter.setOnAction(arg0 -> {
-			
-			imageView.setImage(album.getPhotoCourante().bruiter(sliderBruitage.getValue()));
-			labelEvaluateur.setText("Pas d'image débruitée");
-			
-		});
-		bruiter.getChildren().addAll(bruitage,btnBruiter);
-		
-		
-		
-		// débruiter
-		HBox debruiter = new HBox();
-		debruiter.setAlignment(Pos.CENTER);
-		
-		VBox choixTaillePatch = new VBox();
-		
-		Slider sliderTaillePatch = new Slider(0,25,5);
+	    Button btnReset = new Button("Reset");
+	    btnReset.setOnAction(arg0 -> {
+	        imageView.setImage(album.getPhotoCourante().reset());
+	        labelEvaluateur.setText("Pas d'image débruitée");
+	    });
 
+<<<<<<< Updated upstream
 		sliderTaillePatch.setOrientation(Orientation.HORIZONTAL);
 		sliderTaillePatch.setShowTickMarks(true);
 		sliderTaillePatch.setShowTickLabels(true);
@@ -205,9 +162,125 @@ public class Visionneuse extends Application {
 		btnDebruiter.setOnAction(arg0 -> {
 			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage, typeSeuil));
 			Image originale = album.getPhotoCourante().getImageOriginelleGrisee();
+=======
+	    // Bruitage
+	    HBox bruiter = new HBox();
+	    bruiter.setAlignment(Pos.CENTER);
+	    Button btnBruiter = new Button("Bruiter");
+
+	    VBox bruitage = new VBox();
+	    Button btnDebruiter = new Button("Débruiter");
+	    Label textBruitage = new Label("Bruitage");
+	    Slider sliderBruitage = new Slider(0, 100, 50);
+	    sliderBruitage.setOrientation(Orientation.HORIZONTAL);
+	    sliderBruitage.setShowTickMarks(true);
+	    sliderBruitage.setShowTickLabels(true);
+	    sliderBruitage.setMajorTickUnit(10);
+	    bruitage.getChildren().addAll(textBruitage, sliderBruitage);
+	    btnBruiter.setOnAction(arg0 -> {
+	        imageView.setImage(album.getPhotoCourante().bruiter(sliderBruitage.getValue()));
+	        labelEvaluateur.setText("Pas d'image débruitée");
+	    });
+	    bruiter.getChildren().addAll(bruitage, btnBruiter);
+
+	    // Débruitage
+	    HBox debruiter = new HBox();
+	    debruiter.setAlignment(Pos.CENTER);
+
+	    VBox choixTaillePatch = new VBox();
+	    Slider sliderTaillePatch = new Slider(2, 25, 5);
+	    sliderTaillePatch.setOrientation(Orientation.HORIZONTAL);
+	    sliderTaillePatch.setShowTickMarks(true);
+	    sliderTaillePatch.setShowTickLabels(true);
+	    sliderTaillePatch.setMajorTickUnit(5);
+	    sliderTaillePatch.setSnapToTicks(true);
+	    choixTaillePatch.getChildren().addAll(new Label("Taille patch"), sliderTaillePatch);
+
+	    // Type de seuillage
+	    ToggleButton btnSeuillageDur = new ToggleButton("Dur");
+	    ToggleButton btnSeuillageDoux = new ToggleButton("Doux");
+	    ToggleButton btnSeuillageAuto = new ToggleButton("Auto");
+	    ToggleGroup btnSeuillage = new ToggleGroup();
+	    btnSeuillageDur.setToggleGroup(btnSeuillage);
+	    btnSeuillageDoux.setToggleGroup(btnSeuillage);
+	    btnSeuillageAuto.setToggleGroup(btnSeuillage);
+	    btnSeuillageDur.setOnAction(arg0 -> typeSeuillage = ImageDebruitee.TypeSeuillage.DUR);
+	    btnSeuillageDoux.setOnAction(arg0 -> typeSeuillage = ImageDebruitee.TypeSeuillage.DOUX);
+	    btnSeuillageAuto.setOnAction(arg0 -> typeSeuillage = ImageDebruitee.TypeSeuillage.AUTO);
+	    VBox hBoxSeuillage = new VBox();
+	    hBoxSeuillage.getChildren().addAll(new Label("Seuillage"), btnSeuillageDur, btnSeuillageDoux, btnSeuillageAuto);
+
+	    // Choix extraction globale / locale
+	    VBox modeExtractionBox = new VBox();
+	    ToggleGroup modeExtractionGroup = new ToggleGroup();
+	    RadioButton rbGlobal = new RadioButton("Globale");
+	    RadioButton rbLocale = new RadioButton("Locale");
+	    rbGlobal.setToggleGroup(modeExtractionGroup);
+	    rbLocale.setToggleGroup(modeExtractionGroup);
+	    rbGlobal.setSelected(true);
+	    modeExtractionBox.getChildren().addAll(new Label("Extraction"), rbGlobal, rbLocale);
+
+	    // Taille imagette (slider entier)
+	    VBox boxTailleImagette = new VBox();
+	    Label labelTailleImagette = new Label("Taille imagette");
+	    Slider sliderTailleImagette = new Slider(10, 100, 32);
+	    sliderTailleImagette.setOrientation(Orientation.HORIZONTAL);
+	    sliderTailleImagette.setShowTickMarks(true);
+	    sliderTailleImagette.setShowTickLabels(true);
+	    sliderTailleImagette.setMajorTickUnit(10);
+	    sliderTailleImagette.setMinorTickCount(0);
+	    sliderTailleImagette.setSnapToTicks(true);
+	    boxTailleImagette.getChildren().addAll(labelTailleImagette, sliderTailleImagette);
+	    boxTailleImagette.setVisible(false); // caché si extraction globale
+
+	    // 🔁 Synchronisation taillePatch ≤ tailleImagette
+	    sliderTailleImagette.valueProperty().addListener((obs, oldVal, newVal) -> {
+	        if (rbLocale.isSelected()) {
+	            int nouvelleTailleImagette = newVal.intValue();
+	            sliderTaillePatch.setMax(nouvelleTailleImagette);
+	            if (sliderTaillePatch.getValue() > nouvelleTailleImagette) {
+	                sliderTaillePatch.setValue(nouvelleTailleImagette);
+	            }
+	        }
+	    });
+
+	    // ➕ Réactivation de la contrainte quand on passe en "locale"
+	    rbLocale.setOnAction(e -> {
+	        boxTailleImagette.setVisible(true);
+	        int tailleImagette = (int) sliderTailleImagette.getValue();
+	        sliderTaillePatch.setMax(tailleImagette);
+	        if (sliderTaillePatch.getValue() > tailleImagette) {
+	            sliderTaillePatch.setValue(tailleImagette);
+	        }
+	    });
+
+	    rbGlobal.setOnAction(e -> {
+	        boxTailleImagette.setVisible(false);
+	        sliderTaillePatch.setMax(25); // valeur maximale par défaut
+	    });
+
+	    // ➤ Action bouton débruiter
+	    btnDebruiter.setOnAction(arg0 -> {
+	        boolean locale = rbLocale.isSelected();
+	        int tailleImagette = (int) sliderTailleImagette.getValue();
+	        int taillePatch = (int) sliderTaillePatch.getValue();
+
+	        if (locale) {
+	            int largeur = (int) album.getPhotoCourante().getImage().getWidth();
+	            int hauteur = (int) album.getPhotoCourante().getImage().getHeight();
+	            if (tailleImagette > largeur || tailleImagette > hauteur) {
+	                labelEvaluateur.setText("Erreur : taille imagette > taille image");
+	                return;
+	            }
+	        }
+
+	        imageView.setImage(album.getPhotoCourante().debruiter(taillePatch, typeSeuillage, locale, tailleImagette));
+
+	        Image originale = album.getPhotoCourante().getImageOriginelleGrisee();
+>>>>>>> Stashed changes
 	        Image actuelle = album.getPhotoCourante().getImage();
-	        
 	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle);
+<<<<<<< Updated upstream
 	        //evaluateur.resultatsQualite();
 	        Double mseEval = (Double)evaluateur.calculerMSE();
 	        Double psnrEval = (Double)evaluateur.calculerPSNR();
@@ -245,24 +318,31 @@ public class Visionneuse extends Application {
 		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage,vboxTypeSeuil, btnDebruiter);
 		
 		// Bouton évaluation qualité
+=======
+	        Double mseEval = evaluateur.calculerMSE();
+	        Double psnrEval = evaluateur.calculerPSNR();
+	        labelEvaluateur.setText("MSE : " + mseEval + "\nPSNR : " + psnrEval + " dB");
+	    });
+>>>>>>> Stashed changes
 
-	    
+	    debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage, modeExtractionBox, boxTailleImagette, btnDebruiter);
+
+	    // Évaluation
 	    VBox vboxEvaluerQualite = new VBox();
-	    vboxEvaluerQualite.getChildren().addAll(new Label("Evaluateur"),labelEvaluateur);
-	    
+	    vboxEvaluerQualite.getChildren().addAll(new Label("Évaluateur"), labelEvaluateur);
 
-	    
-		Separator sep1 = new Separator();
-		sep1.setOrientation(Orientation.VERTICAL);
-		Separator sep2 = new Separator();
-		sep2.setOrientation(Orientation.VERTICAL);
-		Separator sep3 = new Separator();
-		sep3.setOrientation(Orientation.VERTICAL);
-		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset,sep3,vboxEvaluerQualite);
-		bandeauHaut.setAlignment(Pos.CENTER);
-		
-		return bandeauHaut;
+	    // Séparateurs
+	    Separator sep1 = new Separator(Orientation.VERTICAL);
+	    Separator sep2 = new Separator(Orientation.VERTICAL);
+	    Separator sep3 = new Separator(Orientation.VERTICAL);
+
+	    bandeauHaut.getChildren().addAll(bruiter, sep1, debruiter, sep2, btnReset, sep3, vboxEvaluerQualite);
+	    bandeauHaut.setAlignment(Pos.CENTER);
+
+	    return bandeauHaut;
 	}
+
+
 	
 	public MenuBar creerMenu() {
 		MenuBar menuBar = new MenuBar();
