@@ -14,9 +14,7 @@ public class ImageBruitee {
     public ImageBruitee(Image image, double ecartType) {
         this.imageBruitee = ajouterBruit(image, ecartType);
     }
-    public ImageBruitee(Image image, double ecartType, String wb) {
-    	this.imageBruitee = ajouterBruit_wb(image, ecartType);
-    }
+
 
 
     private Image ajouterBruit(Image original, double ecartType) {
