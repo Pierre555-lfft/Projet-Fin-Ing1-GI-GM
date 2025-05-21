@@ -472,14 +472,14 @@ public class ImageDebruitee {
 	    // Choix du type de seuillage
 	    
 	    
-	   // variance : Pierr
+	   // variance : Pierre
 	    double variance = variance(sigma);
 	    
 	    List<Vector<Float>> projectionsSeuillage;
 
 	    
 	    if(typeSeuillage == TypeSeuillage.AUTO) {
-	    	if (choisirType(variance,sigma) == TypeSeuillage.DUR) {
+	    	if (choisirType(variance, seuil) == TypeSeuillage.DUR) {
 		    	
 		    	projectionsSeuillage =  seuillageDur(projections, seuil);
 		    	
@@ -567,8 +567,8 @@ public class ImageDebruitee {
 	    return sigma * Math.sqrt(2 * Math.log(64)); // 64 = 8x8 patch (adapter si taille différente)
 	}
 	
-	public static double variance(double ecartT) {
-		double var = ecartT * ecartT;
+	public static double variance(double sigma) {
+		double var = sigma * sigma;
 		return var;
 	}
 	
@@ -626,9 +626,9 @@ public class ImageDebruitee {
 	 */
 
 	
-	public static TypeSeuillage choisirType(double variance, double seuilVi) {
+	public static TypeSeuillage choisirType(double variance, double seuil) {
 	   
-	    double seuilDecision = seuilVi;
+	    double seuilDecision = seuil;
 
 	    if (variance > seuilDecision) {
 	        return TypeSeuillage.DUR;
