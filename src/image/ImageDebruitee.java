@@ -514,11 +514,11 @@ public class ImageDebruitee {
 
 	    // Choix du seuil (VisuShrink ou BayesShrink)
 	    double seuil;
-	   // if (typeSeuil == TypeSeuil.VISU) {
+	    //if (typeSeuil == TypeSeuil.VISU) {
 	        seuil = seuilVisuShrink(sigma, taille_patch);
 	    //} else if (typeSeuil == TypeSeuil.BAYES) {
 	        //seuil = seuilBayesShrink(sigma, projections);
-	   // } else {
+	    //} else {
 	        //throw new IllegalArgumentException("Type de seuil inconnu : " + typeSeuil);
 	    //}
 
@@ -625,7 +625,6 @@ public class ImageDebruitee {
         return sigma2 / Math.sqrt(varianceSignal);
     }
 
-    // ======= Calcul de l’écart-type =======
     public static double ecartType(List<Vector<Float>> projections) {
         List<Float> tousLesCoeffs = new ArrayList<>();
         for (Vector<Float> vecteur : projections) {
@@ -633,34 +632,20 @@ public class ImageDebruitee {
         }
 
         double somme = 0.0;
-        for (double val : tousLesCoeffs) {
-            somme += val;
+        for (Float val : tousLesCoeffs) {
+            somme += val.doubleValue();
         }
         double moyenne = somme / tousLesCoeffs.size();
 
         double variance = 0.0;
-        for (double val : tousLesCoeffs) {
-            variance += (val - moyenne) * (val - moyenne);
+        for (Float val : tousLesCoeffs) {
+            double diff = val.doubleValue() - moyenne;
+            variance += diff * diff;
         }
         variance /= tousLesCoeffs.size();
 
         return Math.sqrt(variance);
     }
-    
-    public static double calculSeuil(String type, double sigma, int tailleVecteur, List<Vector<Float>> projections) {
-        switch (type.toLowerCase()) {
-            case "visu":
-                return seuilVisuShrink(sigma, tailleVecteur);
-            case "bayes":
-                return seuilBayesShrink(sigma, projections);
-            default:
-                throw new IllegalArgumentException("Type de seuillage inconnu : " + type);
-        }
-    }
-
-
-
-
 
     public static double estimerVarianceSignal(List<Vector<Float>> projections, double varianceBruit) {
         double sum = 0;
@@ -677,7 +662,7 @@ public class ImageDebruitee {
         return Math.max(varianceBrute - varianceBruit, 0);
     }
 
-    // ======= Choix automatique du type de seuillage =======
+   
     public static TypeSeuillage choisirType(double variance, double seuilVi) {
         if (variance > seuilVi) {
             return TypeSeuillage.DUR;
