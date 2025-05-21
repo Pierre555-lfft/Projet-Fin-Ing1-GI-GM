@@ -25,6 +25,7 @@ public class Photo {
     private String filename;
     private Image image;
     private Image imageOriginelle;
+    private Image imageOriginelleGrisee;
     private ImageDebruitee imageDebruitee;
     private ImageBruitee imageBruitee;
 
@@ -48,6 +49,7 @@ public class Photo {
 		this.filename = filename;
 		this.image = new Image(filename);
 		this.imageOriginelle = this.image;
+		this.imageOriginelleGrisee = nb();
 		this.largeurInit = this.getLargeur();
 		this.hauteurInit = this.getHauteur();
 		this.zoom = 1.0f;
@@ -75,8 +77,8 @@ public class Photo {
 		return imageDebruitee.getImage();
 	}
 	
-	public Image getImageOriginelle() {
-	    return this.imageOriginelle;
+	public Image getImageOriginelleGrisee() {
+	    return this.imageOriginelleGrisee;
 	}	
 
 	/**
@@ -166,6 +168,8 @@ public class Photo {
             	}
         }
 
+        this.imageOriginelleGrisee = result;
+        	
         return result;
     }
 }
