@@ -526,11 +526,7 @@ public class ImageDebruitee {
 
 
 	    // Patch
-<<<<<<< HEAD
-		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
-		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
-		List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
-=======
+
 		List<Patch> patchs;
 		if (locale) {
 		    patchs = extractLocalPatchs(imageBruitee, taillePatch);
@@ -540,7 +536,7 @@ public class ImageDebruitee {
 
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
->>>>>>> 5b73853d84dca6f6c2f2db79b1b45e9bb53e1165
+
 
 		// Projection
 		List<Vector<Float>> vecteursCentres = vecteur_centre_methode(vecteurs);
@@ -551,11 +547,11 @@ public class ImageDebruitee {
 		float[][] image2D = listVectorToArray(vecteurs); // à implémenter si besoin
 		double sigma = estimerSigma(image2D);
 
-<<<<<<< HEAD
+
         // estimation de σ
 		int nbre_patch = vecteurs.size();      // nombre de patchs (n)
 		int taille_patch = vecteurs.get(0).size();
-=======
+
 
 	    Integer nbPixel = (int) (imageBruitee.getWidth() * (int)imageBruitee.getHeight());
 	    double seuil = seuilV(sigma,nbPixel);
@@ -571,7 +567,7 @@ public class ImageDebruitee {
 	    
 	    List<Vector<Float>> projectionsSeuillage;
 
->>>>>>> 5b73853d84dca6f6c2f2db79b1b45e9bb53e1165
+
 
 		// Application du seuillage
 		List<Vector<Float>> projectionsSeuillage;
