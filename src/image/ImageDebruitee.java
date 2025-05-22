@@ -785,32 +785,7 @@ public class ImageDebruitee {
     
 
 
-    /**
-     * 
-     * @param projections
-     * @return
-     */
-    public static double ecartType(List<Vector<Float>> projections) {
-        List<Float> tousLesCoeffs = new ArrayList<>();
-        for (Vector<Float> vecteur : projections) {
-            tousLesCoeffs.addAll(vecteur);
-        }
-
-        double somme = 0.0;
-        for (Float val : tousLesCoeffs) {
-            somme += val.doubleValue();
-        }
-        double moyenne = somme / tousLesCoeffs.size();
-
-        double variance = 0.0;
-        for (Float val : tousLesCoeffs) {
-            double diff = val.doubleValue() - moyenne;
-            variance += diff * diff;
-        }
-        variance /= tousLesCoeffs.size();
-
-        return Math.sqrt(variance);
-    }
+   
     
     /**
      * 
