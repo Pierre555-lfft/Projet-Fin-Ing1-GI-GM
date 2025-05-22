@@ -661,10 +661,10 @@ public class ImageDebruitee {
 	    return patchs;
 	}
 
-	/** Renvoie un 
+	/** Retourne l'écart-type estimer 
 	 * @author Pierre
-	 * @param 
-	 * @return
+	 * @param float[][]
+	 * @return double
 	 */
 	
 	public static double estimerSigma(float[][] image) {
@@ -686,11 +686,23 @@ public class ImageDebruitee {
 	    return 1.4826 * mediane;
 	}
  
+	/** Retourne le seuil par la méthode de VisuShrink
+	 * @author Pierre
+	 * @param double sigma, double tailleVecteur
+	 * @return double
+	 */
+	
     public static double seuilVisuShrink(double sigma,double tailleVecteur) {
    
         return sigma * Math.sqrt(2 * Math.log(tailleVecteur))*0.5; 
     }
 
+    /** Retourne le seuil par la méthode de BayesShrink
+	 * @author Pierre
+	 * @param float[][]
+	 * @return double
+	 */
+    
     public static List<Vector<Float>> seuilBayesShrinkParColonne(List<Vector<Float>> projections, double sigma) {
         double sigma2 = sigma * sigma;
         int nbPatches = projections.size();
@@ -721,7 +733,7 @@ public class ImageDebruitee {
             sigmaY2 /= nbPatches;
 
             double sigmaX2 = Math.max(sigmaY2 - sigma2, 0);
-            double seuil = (sigmaX2 == 0) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2);
+            double seuil = (sigmaX2 == 0) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2)*0.5;
 
             // Appliquer le seuillage doux
             for (int i = 0; i < nbPatches; i++) {
