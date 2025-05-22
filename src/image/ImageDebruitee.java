@@ -44,9 +44,12 @@ public class ImageDebruitee {
 
 
 	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,boolean locale) {
-		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil, locale);
-
-
+		if (locale) {
+			imageDebruitee = imageDenLocale(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
+		} else {
+			imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
+		}
+		
 	}
 	
 	public Image getImage() {
@@ -166,65 +169,69 @@ public class ImageDebruitee {
 	}
 	
 	/**
-	 * Extrait les patchs de manière locale (ACP locale) en réutilisant extractPatchs
+	 * Effectue un débruitage par ACP de manière locale :
+	 * l'image est divisée en 4 sous-images (quadrants),
+	 * chacune est débruitée séparément via la méthode imageDen().
+	 * Les 4 parties sont ensuite recomposées pour obtenir l'image finale.
+	 *
 	 * @author Adrien
-	 * @param imageBruitee image d'entrée
-	 * @param taillePatch taille des patchs (s)
-	 * @return liste de tous les patchs extraits localement avec coordonnées globales
+	 * @param imageBruitee l'image à débruiter
+	 * @param taillePatch la taille des patchs utilisés pour l'ACP
+	 * @param typeSeuillage le type de seuillage à appliquer (DUR, DOUX, AUTO)
+	 * @param typeSeuil la méthode de calcul du seuil (VISU, BAYES)
+	 * @return une image complète débruitée reconstruite à partir des 4 zones locales
 	 */
-	public List<Patch> extractLocalPatchs(Image imageBruitee, int taillePatch) {
-	    List<Patch> patchsTotaux = new ArrayList<>();
-	    PixelReader lecteur = imageBruitee.getPixelReader();
+
+	public Image imageDenLocale(Image imageBruitee, int taillePatch, TypeSeuillage typeSeuillage, TypeSeuil typeSeuil) {
 	    int largeur = (int) imageBruitee.getWidth();
 	    int hauteur = (int) imageBruitee.getHeight();
+	    PixelReader lecteur = imageBruitee.getPixelReader();
 
-	    int nbLignes = 2;
-	    int nbColonnes = 2;
-	    int largeurBloc = largeur / nbColonnes;
-	    int hauteurBloc = hauteur / nbLignes;
-	    int w,h;
+	    int demiLargeur = largeur / 2;
+	    int demiHauteur = hauteur / 2;
 
-	    for (int i = 0; i < nbLignes; i++) {
-	        for (int j = 0; j < nbColonnes; j++) {
-	            int x = j * largeurBloc;
-	            int y = i * hauteurBloc;
+	    // Définir les 4 blocs : {x, y, w, h}
+	    int[][] zones = {
+	        {0, 0, demiLargeur, demiHauteur},                                // Haut-gauche
+	        {demiLargeur, 0, largeur - demiLargeur, demiHauteur},            // Haut-droit
+	        {0, demiHauteur, demiLargeur, hauteur - demiHauteur},           // Bas-gauche
+	        {demiLargeur, demiHauteur, largeur - demiLargeur, hauteur - demiHauteur} // Bas-droit
+	    };
 
-		         // Calcul largeur de l'imagette
-		         if (j < nbColonnes - 1) {
-		             // Cas standard : pas le dernier bloc à droite
-		             w = largeur / nbColonnes;
-		         } else {
-		             // Dernier bloc à droite : prend tout ce qui reste
-		             w = largeur - (nbColonnes - 1) * (largeur / nbColonnes);
-		         }
-	
-		         // Calcul hauteur de l'imagette
-		         if (i < nbLignes - 1) {
-		             // Cas standard : pas le dernier bloc en bas
-		             h = hauteur / nbLignes;
-		         } else {
-		             // Dernier bloc en bas : prend tout ce qui reste
-		             h = hauteur - (nbLignes - 1) * (hauteur / nbLignes);
-		         }
+	    // Images débruitées des 4 blocs
+	    Image[] imagesDebruitees = new Image[4];
 
+	    for (int i = 0; i < 4; i++) {
+	        int x = zones[i][0];
+	        int y = zones[i][1];
+	        int w = zones[i][2];
+	        int h = zones[i][3];
 
-	            // Vérifie que le bloc peut contenir au moins un patch
-	            if (w < taillePatch || h < taillePatch) continue;
+	        WritableImage sousImage = new WritableImage(lecteur, x, y, w, h);
+	        imagesDebruitees[i] = imageDen(sousImage, taillePatch, typeSeuillage, typeSeuil);
+	    }
 
-	            WritableImage imagette = new WritableImage(lecteur, x, y, w, h);
-	            List<Patch> patchsLocaux = extractPatchs(imagette, taillePatch);
+	    // Recomposer l'image finale
+	    WritableImage imageFinale = new WritableImage(largeur, hauteur);
+	    PixelWriter writer = imageFinale.getPixelWriter();
 
-	            for (Patch p : patchsLocaux) {
-	                p.setX(p.getX() + x);
-	                p.setY(p.getY() + y);
+	    for (int i = 0; i < 4; i++) {
+	        int xOffset = zones[i][0];
+	        int yOffset = zones[i][1];
+	        int w = (int) imagesDebruitees[i].getWidth();
+	        int h = (int) imagesDebruitees[i].getHeight();
+
+	        PixelReader pr = imagesDebruitees[i].getPixelReader();
+	        for (int y = 0; y < h; y++) {
+	            for (int x = 0; x < w; x++) {
+	                writer.setArgb(xOffset + x, yOffset + y, pr.getArgb(x, y));
 	            }
-
-	            patchsTotaux.addAll(patchsLocaux);
 	        }
 	    }
 
-	    return patchsTotaux;
+	    return imageFinale;
 	}
+
 
 	
 	/** Transforme une liste de patchs en une liste de vecteurs
@@ -269,9 +276,7 @@ public class ImageDebruitee {
 			for(int j =0; j<n; j ++) { // On parcour les vecteurs
 							
 				res += V.get(j).get(i); // on fait la somme de chaque composante de tout les vecteurs
-							
-						
-						
+												
 			}
 			mv.add((float)(res / n)); // Puis on fait la moyenne pour avoir
 		}
@@ -521,18 +526,13 @@ public class ImageDebruitee {
 
 
 
-	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil, boolean locale) {
-
-
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
 
 	    // Patch
 
 		List<Patch> patchs;
-		if (locale) {
-		    patchs = extractLocalPatchs(imageBruitee, taillePatch);
-		} else {
-		    patchs = extractPatchs(imageBruitee, taillePatch);
-		}
+		patchs = extractPatchs(imageBruitee, taillePatch);
+		
 
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
