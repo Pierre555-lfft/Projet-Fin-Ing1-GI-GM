@@ -44,9 +44,12 @@ public class ImageDebruitee {
 
 
 	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,boolean locale) {
-		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil, locale);
-
-
+		if (locale) {
+			imageDebruitee = imageDenLocale(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
+		} else {
+			imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
+		}
+		
 	}
 	
 	public Image getImage() {
@@ -166,65 +169,69 @@ public class ImageDebruitee {
 	}
 	
 	/**
-	 * Extrait les patchs de manière locale (ACP locale) en réutilisant extractPatchs
+	 * Effectue un débruitage par ACP de manière locale :
+	 * l'image est divisée en 4 sous-images (quadrants),
+	 * chacune est débruitée séparément via la méthode imageDen().
+	 * Les 4 parties sont ensuite recomposées pour obtenir l'image finale.
+	 *
 	 * @author Adrien
-	 * @param imageBruitee image d'entrée
-	 * @param taillePatch taille des patchs (s)
-	 * @return liste de tous les patchs extraits localement avec coordonnées globales
+	 * @param imageBruitee l'image à débruiter
+	 * @param taillePatch la taille des patchs utilisés pour l'ACP
+	 * @param typeSeuillage le type de seuillage à appliquer (DUR, DOUX, AUTO)
+	 * @param typeSeuil la méthode de calcul du seuil (VISU, BAYES)
+	 * @return une image complète débruitée reconstruite à partir des 4 zones locales
 	 */
-	public List<Patch> extractLocalPatchs(Image imageBruitee, int taillePatch) {
-	    List<Patch> patchsTotaux = new ArrayList<>();
-	    PixelReader lecteur = imageBruitee.getPixelReader();
+
+	public Image imageDenLocale(Image imageBruitee, int taillePatch, TypeSeuillage typeSeuillage, TypeSeuil typeSeuil) {
 	    int largeur = (int) imageBruitee.getWidth();
 	    int hauteur = (int) imageBruitee.getHeight();
+	    PixelReader lecteur = imageBruitee.getPixelReader();
 
-	    int nbLignes = 2;
-	    int nbColonnes = 2;
-	    int largeurBloc = largeur / nbColonnes;
-	    int hauteurBloc = hauteur / nbLignes;
-	    int w,h;
+	    int demiLargeur = largeur / 2;
+	    int demiHauteur = hauteur / 2;
 
-	    for (int i = 0; i < nbLignes; i++) {
-	        for (int j = 0; j < nbColonnes; j++) {
-	            int x = j * largeurBloc;
-	            int y = i * hauteurBloc;
+	    // Définir les 4 blocs : {x, y, w, h}
+	    int[][] zones = {
+	        {0, 0, demiLargeur, demiHauteur},                                // Haut-gauche
+	        {demiLargeur, 0, largeur - demiLargeur, demiHauteur},            // Haut-droit
+	        {0, demiHauteur, demiLargeur, hauteur - demiHauteur},           // Bas-gauche
+	        {demiLargeur, demiHauteur, largeur - demiLargeur, hauteur - demiHauteur} // Bas-droit
+	    };
 
-		         // Calcul largeur de l'imagette
-		         if (j < nbColonnes - 1) {
-		             // Cas standard : pas le dernier bloc à droite
-		             w = largeur / nbColonnes;
-		         } else {
-		             // Dernier bloc à droite : prend tout ce qui reste
-		             w = largeur - (nbColonnes - 1) * (largeur / nbColonnes);
-		         }
-	
-		         // Calcul hauteur de l'imagette
-		         if (i < nbLignes - 1) {
-		             // Cas standard : pas le dernier bloc en bas
-		             h = hauteur / nbLignes;
-		         } else {
-		             // Dernier bloc en bas : prend tout ce qui reste
-		             h = hauteur - (nbLignes - 1) * (hauteur / nbLignes);
-		         }
+	    // Images débruitées des 4 blocs
+	    Image[] imagesDebruitees = new Image[4];
 
+	    for (int i = 0; i < 4; i++) {
+	        int x = zones[i][0];
+	        int y = zones[i][1];
+	        int w = zones[i][2];
+	        int h = zones[i][3];
 
-	            // Vérifie que le bloc peut contenir au moins un patch
-	            if (w < taillePatch || h < taillePatch) continue;
+	        WritableImage sousImage = new WritableImage(lecteur, x, y, w, h);
+	        imagesDebruitees[i] = imageDen(sousImage, taillePatch, typeSeuillage, typeSeuil);
+	    }
 
-	            WritableImage imagette = new WritableImage(lecteur, x, y, w, h);
-	            List<Patch> patchsLocaux = extractPatchs(imagette, taillePatch);
+	    // Recomposer l'image finale
+	    WritableImage imageFinale = new WritableImage(largeur, hauteur);
+	    PixelWriter writer = imageFinale.getPixelWriter();
 
-	            for (Patch p : patchsLocaux) {
-	                p.setX(p.getX() + x);
-	                p.setY(p.getY() + y);
+	    for (int i = 0; i < 4; i++) {
+	        int xOffset = zones[i][0];
+	        int yOffset = zones[i][1];
+	        int w = (int) imagesDebruitees[i].getWidth();
+	        int h = (int) imagesDebruitees[i].getHeight();
+
+	        PixelReader pr = imagesDebruitees[i].getPixelReader();
+	        for (int y = 0; y < h; y++) {
+	            for (int x = 0; x < w; x++) {
+	                writer.setArgb(xOffset + x, yOffset + y, pr.getArgb(x, y));
 	            }
-
-	            patchsTotaux.addAll(patchsLocaux);
 	        }
 	    }
 
-	    return patchsTotaux;
+	    return imageFinale;
 	}
+
 
 	
 	/** Transforme une liste de patchs en une liste de vecteurs
@@ -269,9 +276,7 @@ public class ImageDebruitee {
 			for(int j =0; j<n; j ++) { // On parcour les vecteurs
 							
 				res += V.get(j).get(i); // on fait la somme de chaque composante de tout les vecteurs
-							
-						
-						
+												
 			}
 			mv.add((float)(res / n)); // Puis on fait la moyenne pour avoir
 		}
@@ -521,18 +526,13 @@ public class ImageDebruitee {
 
 
 
-	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil, boolean locale) {
-
-
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
 
 	    // Patch
 
 		List<Patch> patchs;
-		if (locale) {
-		    patchs = extractLocalPatchs(imageBruitee, taillePatch);
-		} else {
-		    patchs = extractPatchs(imageBruitee, taillePatch);
-		}
+		patchs = extractPatchs(imageBruitee, taillePatch);
+		
 
 	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
@@ -543,14 +543,19 @@ public class ImageDebruitee {
 		RealMatrix U = ACP(vecteurs);
 		List<Vector<Float>> projections = proj(U, vecteursCentres);
 
-		// Estimation bruit et tailles
-		float[][] image2D = listVectorToArray(vecteurs); // à implémenter si besoin
-		double sigma = estimerSigma(image2D);
+		/// Estimation bruit et tailles
+		float[][] image2D = listVectorToArray(vecteurs); 
 
-
-        // estimation de σ
-		int nbre_patch = vecteurs.size();      // nombre de patchs (n)
+		// estimation de sigma
+		int nbre_patch = vecteurs.size();      
 		int taille_patch = vecteurs.get(0).size();
+
+		double sigma;
+		if (typeSeuil == TypeSeuil.BAYES) {
+		    sigma = estimerSigmaB(projections); 
+		} else {
+		    sigma = estimerSigma(image2D);      
+		}
 
 		// Application du seuillage
 		List<Vector<Float>> projectionsSeuillage;
@@ -584,8 +589,8 @@ public class ImageDebruitee {
 		        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
 		    }
 		}
-	    
-	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
+
+	   
 
 	    // Reconstruction des vecteurs centrés débruités
 	    List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillage);
@@ -607,13 +612,18 @@ public class ImageDebruitee {
 	        p.fromVector(vecteursDebruites.get(i));
 	    }
 
-	    // 10. Reconstruction de l'image à partir des patchs débruités
+	    // Reconstruction de l'image à partir des patchs débruités
 	    Image imageReconstruite = reconstructPatchs(arrayListPatches);
 
 	    return imageReconstruite;
 	}
 
-
+	/**
+	 * @autor Bohain Mathis
+	 * @param listVecteurs
+	 * @return tableau
+	 */
+	
 	public static float[][] listVectorToArray(List<Vector<Float>> listVecteurs) {
 	    int rows = listVecteurs.size();
 	    int cols = listVecteurs.get(0).size();
@@ -661,13 +671,33 @@ public class ImageDebruitee {
 	    return patchs;
 	}
 
-	/** Retourne l'écart-type estimer 
+
+	/** Renvoie l'estiamtion de sigma dans le cas Bayes
+	 * @author Mathis Bohain
+	 * @param projection
+	 * @return sigma
+	 */
+	
+	public static double estimerSigmaB(List<Vector<Float>> projections) { // à partir de proj
+	    // dernieère composante
+	    int j = projections.get(0).size() - 1;
+	    double[] valeurs = new double[projections.size()];
+	    for (int i = 0; i < projections.size(); i++) {
+	        valeurs[i] = projections.get(i).get(j);
+	    }
+
+	    Arrays.sort(valeurs);
+	    double mediane = valeurs[valeurs.length / 2];
+	    return mediane ;  
+	}
+
+	/** Renvoie un 
 	 * @author Pierre
 	 * @param float[][]
 	 * @return double
 	 */
 	
-	public static double estimerSigma(float[][] image) {
+	public static double estimerSigma(float[][] image) { // à partir des pixels
 	    List<Float> valeurs = new ArrayList<>();
 	    int height = image.length;
 	    int width = image[0].length;
@@ -685,6 +715,7 @@ public class ImageDebruitee {
 	    float mediane = valeurs.get(valeurs.size() / 2);
 	    return 1.4826 * mediane;
 	}
+
  
 	/** Retourne le seuil par la méthode de VisuShrink
 	 * @author Pierre
@@ -696,6 +727,12 @@ public class ImageDebruitee {
    
         return sigma * Math.sqrt(2 * Math.log(tailleVecteur))*0.5; 
     }
+    
+    /** Renvoie un 
+	 * @author Pierre
+	 * @param 
+	 * @return
+	 */
 
     /** Retourne le seuil par la méthode de BayesShrink
 	 * @author Pierre
@@ -708,45 +745,60 @@ public class ImageDebruitee {
         int nbPatches = projections.size();
         int nbComposantes = projections.get(0).size();
 
-        // On prépare la structure pour stocker les projections seuillées
-        List<Vector<Float>> projectionsSeuillees = new ArrayList<>();
-
-        // Initialiser avec des vecteurs vides
+        List<Vector<Float>> projectionsSeuillees = new ArrayList<>(nbPatches);
         for (int i = 0; i < nbPatches; i++) {
-            projectionsSeuillees.add(new Vector<>());
+            projectionsSeuillees.add(new Vector<>(nbComposantes));
         }
 
-        // Pour chaque composante principale j
+        double epsilon = 1e-8; 
+
+        // Pour chaque composante principale
         for (int j = 0; j < nbComposantes; j++) {
-            // Extraire les coefficients de la composante j
-            double[] colonne = new double[nbPatches];
+            // Extraire la colonne j
+            float[] colonne = new float[nbPatches];
             for (int i = 0; i < nbPatches; i++) {
                 colonne[i] = projections.get(i).get(j);
             }
 
-            // Calcul de la variance du signal
-            double moyenne = moyenne(colonne);
+            // Moyenne de la colonne
+            double somme = 0.0;
+            for (float v : colonne) somme += v;
+            double moyenne = somme / nbPatches;
+
+            // Variance observée sigma_Y^2
             double sigmaY2 = 0.0;
-            for (int i = 0; i < nbPatches; i++) {
-                sigmaY2 += Math.pow(colonne[i] - moyenne, 2);
+            for (float v : colonne) {
+                double diff = v - moyenne;
+                sigmaY2 += diff * diff;
             }
             sigmaY2 /= nbPatches;
 
+            // Estimation de la variance du signal : sigma_X^2
             double sigmaX2 = Math.max(sigmaY2 - sigma2, 0);
-            double seuil = (sigmaX2 == 0) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2)*0.5;
 
-            // Appliquer le seuillage doux
+
+            // Calcul du seuil BayesShrink (stabilisé)
+            double seuil = (sigmaX2 < epsilon) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2 + epsilon);
+
+            // Appliquer le seuillage doux (soft thresholding)
             for (int i = 0; i < nbPatches; i++) {
                 double coeff = colonne[i];
-                double coeffSeuille = Math.signum(coeff) * Math.max(Math.abs(coeff) - seuil, 0);
+                double valeur = Math.abs(coeff) - seuil;
+                double coeffSeuille = (valeur > 0) ? Math.signum(coeff) * valeur : 0.0;
                 projectionsSeuillees.get(i).add((float) coeffSeuille);
             }
         }
 
         return projectionsSeuillees;
     }
+    
 
 
+    /**
+     * 
+     * @param projections
+     * @return
+     */
     public static double ecartType(List<Vector<Float>> projections) {
         List<Float> tousLesCoeffs = new ArrayList<>();
         for (Vector<Float> vecteur : projections) {
@@ -768,7 +820,13 @@ public class ImageDebruitee {
 
         return Math.sqrt(variance);
     }
-
+    
+    /**
+     * 
+     * @param projections
+     * @param varianceBruit
+     * @return
+     */
 
     public static double estimerVarianceSignal(List<Vector<Float>> projections, double varianceBruit) {
         double sumSquares = 0;
@@ -787,8 +845,12 @@ public class ImageDebruitee {
         return varianceSignal > 0 ? varianceSignal : 0;
     }
 
-
-   
+    /**
+     * 
+     * @param variance
+     * @param seuilVi
+     * @return
+     */
     public static TypeSeuillage choisirType(double variance, double seuilVi) {
         if (variance > seuilVi) {
             return TypeSeuillage.DUR;
@@ -796,8 +858,15 @@ public class ImageDebruitee {
             return TypeSeuillage.DOUX;
         }
     }
-
     
+    
+    
+    /**
+     * 
+     * @param proj
+     * @param val
+     * @return
+     */
     public static List<Vector<Float>> seuillageDur(List<Vector<Float>> proj, double val) {
         List<Vector<Float>> sD = new ArrayList<>();
 
@@ -818,7 +887,12 @@ public class ImageDebruitee {
 
 
 
-    
+    /**
+     * 
+     * @param proj
+     * @param seuil
+     * @return
+     */
     public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> proj, double seuil) {
         List<Vector<Float>> sD = new ArrayList<>();
 
@@ -838,7 +912,12 @@ public class ImageDebruitee {
 
         return sD;
     }
-
+    
+    /**
+     * @author Mathis Bohain
+     * @param v
+     * @return moyenne de v
+     */
     public static double moyenne(double[] v) {
         double somme = 0.0;
         for (double val : v) somme += val;
