@@ -552,25 +552,6 @@ public class ImageDebruitee {
 		int nbre_patch = vecteurs.size();      // nombre de patchs (n)
 		int taille_patch = vecteurs.get(0).size();
 
-
-
-	    Integer nbPixel = (int) (imageBruitee.getWidth() * (int)imageBruitee.getHeight());
-	    double seuil = seuilV(sigma,nbPixel);
-	    seuil = 50;
-	    
-	    // Definir le seuil Bayes ou Visu???
-	    
-	    // Choix du type de seuillage
-	    
-	    
-	   // variance : Pierr
-	    double variance = variance(sigma);
-	    
-	    List<Vector<Float>> projectionsSeuillage;
-
-
-
-
 		// Application du seuillage
 		List<Vector<Float>> projectionsSeuillage;
 
