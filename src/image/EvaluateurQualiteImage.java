@@ -1,19 +1,129 @@
 package image;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 
 public class EvaluateurQualiteImage {
 	private Image imageOriginale;
 	private Image imageDebruitee;
+	private DoubleProperty bruitageValue = new SimpleDoubleProperty();
+	private DoubleProperty mse = new SimpleDoubleProperty();
+	private DoubleProperty psnr = new SimpleDoubleProperty();
+	private IntegerProperty taillePatch = new SimpleIntegerProperty();
+	private StringProperty seuillage = new SimpleStringProperty();
+	private StringProperty seuil = new SimpleStringProperty();
+	private StringProperty analyse = new SimpleStringProperty();
+	
+	public double getBruitageValue() {
+        return mse.get();
+    }
+
+    public void setBruitageValue(double bruitageValue) {
+        this.bruitageValue.set(bruitageValue);
+    }
+
+    public DoubleProperty bruitageValueProperty() {
+        return bruitageValue;
+    }
+    
+	public double getMse() {
+        return mse.get();
+    }
+
+    public void setMse(double mse) {
+        this.mse.set(mse);
+    }
+
+    public DoubleProperty mseProperty() {
+        return mse;
+    }
+	
+    public double getPsnr() {
+        return psnr.get();
+    }
+
+    public void setPsnr(double psnr) {
+        this.psnr.set(psnr);
+    }
+    
+	public DoubleProperty psnrProperty() {
+		return psnr;
+	}
+	
+	
+	public int getTaillePatch() {
+	    return taillePatch.get();
+	}
+
+	public void setTaillePatch(int value) {
+	    taillePatch.set(value);
+	}
+
+	public IntegerProperty taillePatchProperty() {
+	    return taillePatch;
+	}
+
+	
+	public String getSeuillage() {
+	    return seuillage.get();
+	}
+
+	public void setSeuillage(String value) {
+	    seuillage.set(value);
+	}
+
+	public StringProperty seuillageProperty() {
+	    return seuillage;
+	}
+
+
+	public String getSeuil() {
+	    return seuil.get();
+	}
+
+	public void setSeuil(String value) {
+	    seuil.set(value);
+	}
+
+	public StringProperty seuilProperty() {
+	    return seuil;
+	}
+
+	
+	public String getAnalyse() {
+	    return analyse.get();
+	}
+
+	public void setAnalyse(String value) {
+	    analyse.set(value);
+	}
+
+	public StringProperty analyseProperty() {
+	    return analyse;
+	}
+
+	
+	
 	
 	/** Constructeur de la classe
 	 * @author Adrien
 	 * @return
 	 */
-	public EvaluateurQualiteImage (Image imageOriginale, Image imageDebruitee) {
+	public EvaluateurQualiteImage (Image imageOriginale, Image imageDebruitee,double bruitageValue, Integer taillePatch, String seuillaString, String seuil, String analyse) {
 		this.imageOriginale = imageOriginale;
 		this.imageDebruitee = imageDebruitee;
+		this.bruitageValue.set(bruitageValue);
+		this.taillePatch.set(taillePatch);
+		this.seuillage.set(seuillaString);
+		this.seuil.set(seuil);
+		this.analyse.set(analyse);
+		
 	}
 	
 	/** Effectue le calcul de l'Erreur quadratique moyenne
@@ -21,7 +131,7 @@ public class EvaluateurQualiteImage {
 	 * @return l'erreur quadratique moyenne
 	 */
 	public double calculerMSE() {
-
+		double mse;
 	    PixelReader lecteurOriginal = imageOriginale.getPixelReader();
 	    PixelReader lecteurDebruite = imageDebruitee.getPixelReader();
 	    
@@ -42,9 +152,10 @@ public class EvaluateurQualiteImage {
 	            sommeErreursCarrees += difference * difference;
 	        }
 	    }
-
+	    mse = sommeErreursCarrees / nombrePixels;
+	    this.mse.set(mse);
 	    // Calcul de la moyenne
-	    return sommeErreursCarrees / nombrePixels;
+	    return mse;
 	}
 	
 	/** Effectue le rapport du signal sur le bruit
@@ -60,7 +171,7 @@ public class EvaluateurQualiteImage {
 	    
 	    // 4. Calcul du PSNR selon la formule standard
 	    double psnr = 10 * Math.log10((valeurMaxPixel * valeurMaxPixel) / mse);
-	    
+	    this.psnr.set(psnr);
 	    return psnr;
 	}
 	
