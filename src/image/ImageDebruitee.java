@@ -42,8 +42,11 @@ public class ImageDebruitee {
 		    
 	private Image imageDebruitee;
 
-	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
-		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
+
+	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,boolean locale) {
+		imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil, locale);
+
+
 	}
 	
 	public Image getImage() {
@@ -167,41 +170,62 @@ public class ImageDebruitee {
 	 * @author Adrien
 	 * @param imageBruitee image d'entrée
 	 * @param taillePatch taille des patchs (s)
-	 * @param tailleImagette taille des imagettes (W), W > s
 	 * @return liste de tous les patchs extraits localement avec coordonnées globales
 	 */
-	public List<Patch> extractLocalPatchs(Image imageBruitee, int taillePatch, int tailleImagette) {
+	public List<Patch> extractLocalPatchs(Image imageBruitee, int taillePatch) {
 	    List<Patch> patchsTotaux = new ArrayList<>();
 	    PixelReader lecteur = imageBruitee.getPixelReader();
 	    int largeur = (int) imageBruitee.getWidth();
 	    int hauteur = (int) imageBruitee.getHeight();
 
-	    for (int y = 0; y < hauteur; y += tailleImagette) {
-	        for (int x = 0; x < largeur; x += tailleImagette) {
+	    int nbLignes = 2;
+	    int nbColonnes = 2;
+	    int largeurBloc = largeur / nbColonnes;
+	    int hauteurBloc = hauteur / nbLignes;
+	    int w,h;
 
-	            // Déterminer la taille réelle de l’imagette (en bordure)
-	            int w = Math.min(tailleImagette, largeur - x);
-	            int h = Math.min(tailleImagette, hauteur - y);
+	    for (int i = 0; i < nbLignes; i++) {
+	        for (int j = 0; j < nbColonnes; j++) {
+	            int x = j * largeurBloc;
+	            int y = i * hauteurBloc;
 
-	            // Créer une imagette locale
+		         // Calcul largeur de l'imagette
+		         if (j < nbColonnes - 1) {
+		             // Cas standard : pas le dernier bloc à droite
+		             w = largeur / nbColonnes;
+		         } else {
+		             // Dernier bloc à droite : prend tout ce qui reste
+		             w = largeur - (nbColonnes - 1) * (largeur / nbColonnes);
+		         }
+	
+		         // Calcul hauteur de l'imagette
+		         if (i < nbLignes - 1) {
+		             // Cas standard : pas le dernier bloc en bas
+		             h = hauteur / nbLignes;
+		         } else {
+		             // Dernier bloc en bas : prend tout ce qui reste
+		             h = hauteur - (nbLignes - 1) * (hauteur / nbLignes);
+		         }
+
+
+	            // Vérifie que le bloc peut contenir au moins un patch
+	            if (w < taillePatch || h < taillePatch) continue;
+
 	            WritableImage imagette = new WritableImage(lecteur, x, y, w, h);
-
-	            // Extraire les patchs de l’imagette
 	            List<Patch> patchsLocaux = extractPatchs(imagette, taillePatch);
 
-	            // Ajuster les coordonnées globales
 	            for (Patch p : patchsLocaux) {
 	                p.setX(p.getX() + x);
 	                p.setY(p.getY() + y);
 	            }
 
-	            // Ajouter à la liste globale
 	            patchsTotaux.addAll(patchsLocaux);
 	        }
 	    }
 
 	    return patchsTotaux;
 	}
+
 	
 	/** Transforme une liste de patchs en une liste de vecteurs
 	 * @author Adrien
@@ -495,12 +519,28 @@ public class ImageDebruitee {
 
 
 
-	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
+
+
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil, boolean locale) {
+
+
 
 	    // Patch
+<<<<<<< HEAD
 		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
 		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 		List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
+=======
+		List<Patch> patchs;
+		if (locale) {
+		    patchs = extractLocalPatchs(imageBruitee, taillePatch);
+		} else {
+		    patchs = extractPatchs(imageBruitee, taillePatch);
+		}
+
+	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
+	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
+>>>>>>> 5b73853d84dca6f6c2f2db79b1b45e9bb53e1165
 
 		// Projection
 		List<Vector<Float>> vecteursCentres = vecteur_centre_methode(vecteurs);
@@ -511,9 +551,27 @@ public class ImageDebruitee {
 		float[][] image2D = listVectorToArray(vecteurs); // à implémenter si besoin
 		double sigma = estimerSigma(image2D);
 
+<<<<<<< HEAD
         // estimation de σ
 		int nbre_patch = vecteurs.size();      // nombre de patchs (n)
 		int taille_patch = vecteurs.get(0).size();
+=======
+
+	    Integer nbPixel = (int) (imageBruitee.getWidth() * (int)imageBruitee.getHeight());
+	    double seuil = seuilV(sigma,nbPixel);
+	    seuil = 50;
+	    
+	    // Definir le seuil Bayes ou Visu???
+	    
+	    // Choix du type de seuillage
+	    
+	    
+	   // variance : Pierr
+	    double variance = variance(sigma);
+	    
+	    List<Vector<Float>> projectionsSeuillage;
+
+>>>>>>> 5b73853d84dca6f6c2f2db79b1b45e9bb53e1165
 
 		// Application du seuillage
 		List<Vector<Float>> projectionsSeuillage;
