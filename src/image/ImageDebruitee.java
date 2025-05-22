@@ -553,6 +553,7 @@ public class ImageDebruitee {
 		int taille_patch = vecteurs.get(0).size();
 
 
+
 	    Integer nbPixel = (int) (imageBruitee.getWidth() * (int)imageBruitee.getHeight());
 	    double seuil = seuilV(sigma,nbPixel);
 	    seuil = 50;
@@ -566,6 +567,7 @@ public class ImageDebruitee {
 	    double variance = variance(sigma);
 	    
 	    List<Vector<Float>> projectionsSeuillage;
+
 
 
 
@@ -737,7 +739,7 @@ public class ImageDebruitee {
             }
             sigmaY2 /= nbPatches;
 
-            double sigmaX2 = Math.max(sigmaY2 - sigma2, 0)*0.5;
+            double sigmaX2 = Math.max(sigmaY2 - sigma2, 0);
             double seuil = (sigmaX2 == 0) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2);
 
             // Appliquer le seuillage doux
