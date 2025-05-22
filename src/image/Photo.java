@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -116,6 +119,9 @@ public class Photo {
 	public int getZoom() {
 		return ((int) (this.zoom * 100));
 	}
+	
+	
+ 
 
 	/**
 	 * Retourne le nom de la photo
