@@ -15,8 +15,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -55,11 +58,14 @@ public class Visionneuse extends Application {
 	private Label labelEvaluateur;
 	private ImageDebruitee.TypeSeuil typeSeuil = ImageDebruitee.TypeSeuil.BAYES;
 	private boolean local; //0 si global et 1 si local en 4 imagette
+	private ObservableList<EvaluateurQualiteImage> historique =  FXCollections.observableArrayList();;
+	private double bruitageValue;
+	
 	
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Album Photo");
 	
-
+		
 		album = new Album("images");
 		 
 		VBox vbox = new VBox();
@@ -73,6 +79,8 @@ public class Visionneuse extends Application {
 		creerListe = creerListe();
 		window.setLeft(creerListe);
 		
+		BorderPane creerHistorique = creerHistorique();
+		window.setBottom(creerHistorique);
 		
 		HBox bandeauHaut = creerBandeauHaut();
 		window.setTop(bandeauHaut);
@@ -133,7 +141,7 @@ public class Visionneuse extends Application {
 		 listView.setOnMouseClicked(arg0 -> {
 			 album.setIndexCourant(listView.getSelectionModel().getSelectedIndex());
 			 imageView.setImage(album.getPhotoCourante().getImage());
-			 slider.setValue(album.getPhotoCourante().getZoom());
+			 //slider.setValue(album.getPhotoCourante().getZoom());
 			 });
 		 return listView;
 	}
@@ -176,8 +184,8 @@ public class Visionneuse extends Application {
 		
 		
 		btnBruiter.setOnAction(arg0 -> {
-			
-			imageView.setImage(album.getPhotoCourante().bruiter(sliderBruitage.getValue()));
+			bruitageValue = sliderBruitage.getValue();
+			imageView.setImage(album.getPhotoCourante().bruiter(bruitageValue));
 			labelEvaluateur.setText("Pas d'image débruitée");
 			
 		});
@@ -203,7 +211,9 @@ public class Visionneuse extends Application {
 		VBox choixTaillePatch = new VBox();
 		
 		Slider sliderTaillePatch = new Slider(0,25,5);
-
+		
+		
+		
 		sliderTaillePatch.setOrientation(Orientation.HORIZONTAL);
 		sliderTaillePatch.setShowTickMarks(true);
 		sliderTaillePatch.setShowTickLabels(true);
@@ -213,8 +223,8 @@ public class Visionneuse extends Application {
 			Image originale = album.getPhotoCourante().getImageOriginelleGrisee();
 	        Image actuelle = album.getPhotoCourante().getImage();
 	        
-	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle);
-	        //evaluateur.resultatsQualite();
+	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle,bruitageValue, (int)sliderTaillePatch.getValue(),  typeSeuillage.toString(), typeSeuil.toString(), ((Boolean)local).toString());
+	        historique.add(evaluateur);
 	        Double mseEval = (Double)evaluateur.calculerMSE();
 	        Double psnrEval = (Double)evaluateur.calculerPSNR();
 	        labelEvaluateur.setText("MSE : " + mseEval.toString() + "\nPSNR : " + psnrEval.toString() + " dB");
@@ -250,11 +260,8 @@ public class Visionneuse extends Application {
 		vboxTypeSeuil.setAlignment(Pos.CENTER);
 		debruiter.getChildren().addAll(choixTaillePatch, hBoxSeuillage,vboxTypeSeuil,vboxLocale, btnDebruiter);
 		
-		// Bouton évaluation qualité
-
+		
 	    
-	    VBox vboxEvaluerQualite = new VBox();
-	    vboxEvaluerQualite.getChildren().addAll(new Label("Evaluateur"),labelEvaluateur);
 	    
 
 	    
@@ -264,7 +271,7 @@ public class Visionneuse extends Application {
 		sep2.setOrientation(Orientation.VERTICAL);
 		Separator sep3 = new Separator();
 		sep3.setOrientation(Orientation.VERTICAL);
-		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset,sep3,vboxEvaluerQualite);
+		bandeauHaut.getChildren().addAll(bruiter,sep1,debruiter,sep2,btnReset);
 		bandeauHaut.setAlignment(Pos.CENTER);
 		
 		return bandeauHaut;
@@ -298,5 +305,46 @@ public class Visionneuse extends Application {
 		return menuBar;
 	}
 	
+	
+	public BorderPane creerHistorique() {
+		
+		// Historique
+		TableView<EvaluateurQualiteImage> table = new TableView();
+		table.setItems(historique);
+		
+		
+		
+		TableColumn<EvaluateurQualiteImage,Double> bruitageValueCol = new TableColumn<EvaluateurQualiteImage,Double>("Bruitage");
+		bruitageValueCol.setCellValueFactory(new PropertyValueFactory<>("bruitageValue"));
+		
+		TableColumn<EvaluateurQualiteImage,Double> mseCol = new TableColumn<EvaluateurQualiteImage,Double>("MSE");
+		mseCol.setCellValueFactory(new PropertyValueFactory<>("mse"));
+		
+		TableColumn<EvaluateurQualiteImage,Double> psnrCol = new TableColumn<EvaluateurQualiteImage,Double>("PSNR");
+		psnrCol.setCellValueFactory(new PropertyValueFactory<>("psnr"));
+		
+		TableColumn<EvaluateurQualiteImage, Integer> taillePatchCol = new TableColumn<>("Taille Patch");
+		taillePatchCol.setCellValueFactory(new PropertyValueFactory<>("taillePatch"));
+
+		TableColumn<EvaluateurQualiteImage, String> seuillageCol = new TableColumn<>("Seuillage");
+		seuillageCol.setCellValueFactory(new PropertyValueFactory<>("seuillage"));
+
+		TableColumn<EvaluateurQualiteImage, String> seuilCol = new TableColumn<>("Seuil");
+		seuilCol.setCellValueFactory(new PropertyValueFactory<>("seuil"));
+
+		TableColumn<EvaluateurQualiteImage, String> analyseCol = new TableColumn<>("Analyse");
+		analyseCol.setCellValueFactory(new PropertyValueFactory<>("analyse"));
+
+		
+		table.getColumns().addAll(bruitageValueCol,taillePatchCol, seuillageCol, seuilCol, analyseCol,mseCol,psnrCol);
+		
+		
+		
+		table.setMaxHeight(200);
+		BorderPane bpHistorique = new BorderPane(table);
+		return bpHistorique;
+	}
 
 }
+
+

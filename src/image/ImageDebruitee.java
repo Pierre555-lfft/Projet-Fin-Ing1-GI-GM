@@ -671,6 +671,7 @@ public class ImageDebruitee {
 	    return patchs;
 	}
 
+
 	/** Renvoie l'estiamtion de sigma dans le cas Bayes
 	 * @author Mathis Bohain
 	 * @param projection
@@ -692,8 +693,8 @@ public class ImageDebruitee {
 
 	/** Renvoie un 
 	 * @author Pierre
-	 * @param 
-	 * @return
+	 * @param float[][]
+	 * @return double
 	 */
 	
 	public static double estimerSigma(float[][] image) { // à partir des pixels
@@ -714,11 +715,12 @@ public class ImageDebruitee {
 	    float mediane = valeurs.get(valeurs.size() / 2);
 	    return 1.4826 * mediane;
 	}
-	
-	/** Renvoie un 
+
+ 
+	/** Retourne le seuil par la méthode de VisuShrink
 	 * @author Pierre
-	 * @param 
-	 * @return
+	 * @param double sigma, double tailleVecteur
+	 * @return double
 	 */
 	
     public static double seuilVisuShrink(double sigma,double tailleVecteur) {
@@ -732,6 +734,12 @@ public class ImageDebruitee {
 	 * @return
 	 */
 
+    /** Retourne le seuil par la méthode de BayesShrink
+	 * @author Pierre
+	 * @param float[][]
+	 * @return double
+	 */
+    
     public static List<Vector<Float>> seuilBayesShrinkParColonne(List<Vector<Float>> projections, double sigma) {
         double sigma2 = sigma * sigma;
         int nbPatches = projections.size();
@@ -767,6 +775,7 @@ public class ImageDebruitee {
 
             // Estimation de la variance du signal : sigma_X^2
             double sigmaX2 = Math.max(sigmaY2 - sigma2, 0);
+
 
             // Calcul du seuil BayesShrink (stabilisé)
             double seuil = (sigmaX2 < epsilon) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2 + epsilon);
