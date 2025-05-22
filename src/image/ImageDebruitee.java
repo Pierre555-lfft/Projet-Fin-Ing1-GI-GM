@@ -543,14 +543,19 @@ public class ImageDebruitee {
 		RealMatrix U = ACP(vecteurs);
 		List<Vector<Float>> projections = proj(U, vecteursCentres);
 
-		// Estimation bruit et tailles
-		float[][] image2D = listVectorToArray(vecteurs); // à implémenter si besoin
-		double sigma = estimerSigma(image2D);
+		/// Estimation bruit et tailles
+		float[][] image2D = listVectorToArray(vecteurs); 
 
-
-        // estimation de σ
-		int nbre_patch = vecteurs.size();      // nombre de patchs (n)
+		// estimation de sigma
+		int nbre_patch = vecteurs.size();      
 		int taille_patch = vecteurs.get(0).size();
+
+		double sigma;
+		if (typeSeuil == TypeSeuil.BAYES) {
+		    sigma = estimerSigmaB(projections); 
+		} else {
+		    sigma = estimerSigma(image2D);      
+		}
 
 		// Application du seuillage
 		List<Vector<Float>> projectionsSeuillage;
@@ -584,8 +589,8 @@ public class ImageDebruitee {
 		        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
 		    }
 		}
-	    
-	   // List<Vector<Float>> projectionsSeuillage =  DOux ou dur??(projections, seuil, type);
+
+	   
 
 	    // Reconstruction des vecteurs centrés débruités
 	    List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillage);
@@ -607,13 +612,18 @@ public class ImageDebruitee {
 	        p.fromVector(vecteursDebruites.get(i));
 	    }
 
-	    // 10. Reconstruction de l'image à partir des patchs débruités
+	    // Reconstruction de l'image à partir des patchs débruités
 	    Image imageReconstruite = reconstructPatchs(arrayListPatches);
 
 	    return imageReconstruite;
 	}
 
-
+	/**
+	 * @autor Bohain Mathis
+	 * @param listVecteurs
+	 * @return tableau
+	 */
+	
 	public static float[][] listVectorToArray(List<Vector<Float>> listVecteurs) {
 	    int rows = listVecteurs.size();
 	    int cols = listVecteurs.get(0).size();
@@ -661,13 +671,32 @@ public class ImageDebruitee {
 	    return patchs;
 	}
 
+	/** Renvoie l'estiamtion de sigma dans le cas Bayes
+	 * @author Mathis Bohain
+	 * @param projection
+	 * @return sigma
+	 */
+	
+	public static double estimerSigmaB(List<Vector<Float>> projections) { // à partir de proj
+	    // dernieère composante
+	    int j = projections.get(0).size() - 1;
+	    double[] valeurs = new double[projections.size()];
+	    for (int i = 0; i < projections.size(); i++) {
+	        valeurs[i] = projections.get(i).get(j);
+	    }
+
+	    Arrays.sort(valeurs);
+	    double mediane = valeurs[valeurs.length / 2];
+	    return mediane ;  
+	}
+
 	/** Renvoie un 
 	 * @author Pierre
 	 * @param 
 	 * @return
 	 */
 	
-	public static double estimerSigma(float[][] image) {
+	public static double estimerSigma(float[][] image) { // à partir des pixels
 	    List<Float> valeurs = new ArrayList<>();
 	    int height = image.length;
 	    int width = image[0].length;
@@ -685,56 +714,82 @@ public class ImageDebruitee {
 	    float mediane = valeurs.get(valeurs.size() / 2);
 	    return 1.4826 * mediane;
 	}
- 
+	
+	/** Renvoie un 
+	 * @author Pierre
+	 * @param 
+	 * @return
+	 */
+	
     public static double seuilVisuShrink(double sigma,double tailleVecteur) {
    
         return sigma * Math.sqrt(2 * Math.log(tailleVecteur))*0.5; 
     }
+    
+    /** Renvoie un 
+	 * @author Pierre
+	 * @param 
+	 * @return
+	 */
 
     public static List<Vector<Float>> seuilBayesShrinkParColonne(List<Vector<Float>> projections, double sigma) {
         double sigma2 = sigma * sigma;
         int nbPatches = projections.size();
         int nbComposantes = projections.get(0).size();
 
-        // On prépare la structure pour stocker les projections seuillées
-        List<Vector<Float>> projectionsSeuillees = new ArrayList<>();
-
-        // Initialiser avec des vecteurs vides
+        List<Vector<Float>> projectionsSeuillees = new ArrayList<>(nbPatches);
         for (int i = 0; i < nbPatches; i++) {
-            projectionsSeuillees.add(new Vector<>());
+            projectionsSeuillees.add(new Vector<>(nbComposantes));
         }
 
-        // Pour chaque composante principale j
+        double epsilon = 1e-8; 
+
+        // Pour chaque composante principale
         for (int j = 0; j < nbComposantes; j++) {
-            // Extraire les coefficients de la composante j
-            double[] colonne = new double[nbPatches];
+            // Extraire la colonne j
+            float[] colonne = new float[nbPatches];
             for (int i = 0; i < nbPatches; i++) {
                 colonne[i] = projections.get(i).get(j);
             }
 
-            // Calcul de la variance du signal
-            double moyenne = moyenne(colonne);
+            // Moyenne de la colonne
+            double somme = 0.0;
+            for (float v : colonne) somme += v;
+            double moyenne = somme / nbPatches;
+
+            // Variance observée sigma_Y^2
             double sigmaY2 = 0.0;
-            for (int i = 0; i < nbPatches; i++) {
-                sigmaY2 += Math.pow(colonne[i] - moyenne, 2);
+            for (float v : colonne) {
+                double diff = v - moyenne;
+                sigmaY2 += diff * diff;
             }
             sigmaY2 /= nbPatches;
 
+            // Estimation de la variance du signal : sigma_X^2
             double sigmaX2 = Math.max(sigmaY2 - sigma2, 0);
-            double seuil = (sigmaX2 == 0) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2);
 
-            // Appliquer le seuillage doux
+            // Calcul du seuil BayesShrink (stabilisé)
+            double seuil = (sigmaX2 < epsilon) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2 + epsilon);
+
+            // Appliquer le seuillage doux (soft thresholding)
             for (int i = 0; i < nbPatches; i++) {
                 double coeff = colonne[i];
-                double coeffSeuille = Math.signum(coeff) * Math.max(Math.abs(coeff) - seuil, 0);
+                double valeur = Math.abs(coeff) - seuil;
+                double coeffSeuille = (valeur > 0) ? Math.signum(coeff) * valeur : 0.0;
                 projectionsSeuillees.get(i).add((float) coeffSeuille);
             }
         }
 
         return projectionsSeuillees;
     }
+    
 
 
+    /**
+     * 
+     * @param projections
+     * @return
+     */
     public static double ecartType(List<Vector<Float>> projections) {
         List<Float> tousLesCoeffs = new ArrayList<>();
         for (Vector<Float> vecteur : projections) {
@@ -756,7 +811,13 @@ public class ImageDebruitee {
 
         return Math.sqrt(variance);
     }
-
+    
+    /**
+     * 
+     * @param projections
+     * @param varianceBruit
+     * @return
+     */
 
     public static double estimerVarianceSignal(List<Vector<Float>> projections, double varianceBruit) {
         double sumSquares = 0;
@@ -775,8 +836,12 @@ public class ImageDebruitee {
         return varianceSignal > 0 ? varianceSignal : 0;
     }
 
-
-   
+    /**
+     * 
+     * @param variance
+     * @param seuilVi
+     * @return
+     */
     public static TypeSeuillage choisirType(double variance, double seuilVi) {
         if (variance > seuilVi) {
             return TypeSeuillage.DUR;
@@ -784,8 +849,15 @@ public class ImageDebruitee {
             return TypeSeuillage.DOUX;
         }
     }
-
     
+    
+    
+    /**
+     * 
+     * @param proj
+     * @param val
+     * @return
+     */
     public static List<Vector<Float>> seuillageDur(List<Vector<Float>> proj, double val) {
         List<Vector<Float>> sD = new ArrayList<>();
 
@@ -806,7 +878,12 @@ public class ImageDebruitee {
 
 
 
-    
+    /**
+     * 
+     * @param proj
+     * @param seuil
+     * @return
+     */
     public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> proj, double seuil) {
         List<Vector<Float>> sD = new ArrayList<>();
 
@@ -826,7 +903,12 @@ public class ImageDebruitee {
 
         return sD;
     }
-
+    
+    /**
+     * @author Mathis Bohain
+     * @param v
+     * @return moyenne de v
+     */
     public static double moyenne(double[] v) {
         double somme = 0.0;
         for (double val : v) somme += val;
