@@ -9,6 +9,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 
+/**
+ * Permet d'évaluer l'efficacité d'un débruitage et de stocké les différent paramètre de débruitage
+ */
 public class EvaluateurQualiteImage {
 	private Image imageOriginale;
 	private Image imageDebruitee;
@@ -111,11 +114,11 @@ public class EvaluateurQualiteImage {
 	
 	
 	
-	/** Constructeur de la classe
-	 * @author Adrien
+	/** Stock toute les variable de bruitage/débruitage d'une image
+	 * @author Etienne Angé
 	 * @return
 	 */
-	public EvaluateurQualiteImage (Image imageOriginale, Image imageDebruitee,double bruitageValue, Integer taillePatch, String seuillaString, String seuil, String analyse) {
+	public EvaluateurQualiteImage (Image imageOriginale, Image imageDebruitee,double bruitageValue, Integer taillePatch, String seuillaString, String seuil,String analyse) {
 		this.imageOriginale = imageOriginale;
 		this.imageDebruitee = imageDebruitee;
 		this.bruitageValue.set(bruitageValue);

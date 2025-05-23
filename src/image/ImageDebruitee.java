@@ -24,27 +24,50 @@ import java.util.Vector;
 	
 /**
  * Permet de gérer le débruitage d'une image
+ * @author Pierre Laforest
  */
 public class ImageDebruitee {
 	
-	//Pierre Laforest : permet de définir un type de seuillage 
+	/**
+	 * Permet de définir un type de seuillage 
+	 */
 	public enum TypeSeuillage {
 		    DUR,
 		    DOUX,
 		    AUTO
 	}
 	
+	/**
+	 * Permet de définir le type de seuil
+	 * @author Etienne Angé
+	 */
 	public enum TypeSeuil {
 	    VISU,
 	    BAYES
 	    
-}
+	}
+	
+	/**
+	 * Permet de définir le typoe d'analyse
+	 * @author Etienne Angé
+	 */
+	public enum Analyse{
+		GLOBALE,
+		LOCALE
+	}
 		    
 	private Image imageDebruitee;
 
-
-	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,boolean locale) {
-		if (locale) {
+	/**
+	 * 
+	 * @param imageBruitee
+	 * @param taillePatch
+	 * @param typeSeuillage
+	 * @param typeSeuil
+	 * @param analyse
+	 */
+	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,ImageDebruitee.Analyse analyse) {
+		if (analyse == ImageDebruitee.Analyse.LOCALE) {
 			imageDebruitee = imageDenLocale(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
 		} else {
 			imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
@@ -525,7 +548,14 @@ public class ImageDebruitee {
 
 
 
-
+/**
+ * Methode principale du débruitage d'imagette
+ * @param imageBruitee Image débruitée
+ * @param taillePatch La taille des patch (carré)
+ * @param typeSeuillage Type de seuillage
+ * @param typeSeuil Type de seuil
+ * @return L'imagette débruitée
+ */
 	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
 
 	    // Patch
@@ -661,6 +691,13 @@ public class ImageDebruitee {
 		return patchPosition;
 	}
 	
+	/** Convertie Une liste de vecteur en une liste de patch
+	 * @author Etienne Angé
+	 * @param vecteurs
+	 * @param taillePatch
+	 * @param patchPosition
+	 * @return
+	 */
 	public List<Patch> patchsVector(List<Vector<Float>> vecteurs, int taillePatch, List<int[]> patchPosition) {
 	    List<Patch> patchs = new ArrayList<>();
 	    for (int i = 0; i < vecteurs.size(); i++) {

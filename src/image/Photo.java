@@ -36,7 +36,7 @@ public class Photo {
 	
 	private int largeurInit;
 	private int hauteurInit;
-	private float zoom;
+
 	private String nom;
 	
 		
@@ -55,13 +55,17 @@ public class Photo {
 		this.imageOriginelleGrisee = nb();
 		this.largeurInit = this.getLargeur();
 		this.hauteurInit = this.getHauteur();
-		this.zoom = 1.0f;
+
 		this.nom = (new File(filename)).getName();
 		this.nom = this.nom.substring(0, this.nom.length() - 4);
 	}
 	
 	
-	
+	/** Permet de bruitée l'image originelle
+	 * @author Etienne Angé
+	 * @param ecartType
+	 * @return
+	 */
 	public Image bruiter(double ecartType) {
         	imageBruitee = new ImageBruitee(imageOriginelle, ecartType);
         	image = imageBruitee.getImage();
@@ -75,9 +79,16 @@ public class Photo {
 	}
 	
 
-
-	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil, boolean locale) {
-		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage,typeSeuil, locale);
+/** Permet de débruitée l'image bruitée
+ * @author Etienne Angé
+ * @param taillePatch
+ * @param typeSeuillage
+ * @param typeSeuil
+ * @param analyse
+ * @return
+ */
+	public Image debruiter(double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil, ImageDebruitee.Analyse analyse) {
+		imageDebruitee = new ImageDebruitee(imageBruitee.getImage(), taillePatch, typeSeuillage,typeSeuil, analyse);
 
 
 		image = imageDebruitee.getImage();
@@ -115,14 +126,7 @@ public class Photo {
 		return (int) this.image.getHeight();
 	}
 
-	/**
-	 * Retourne le facteur de zoom
-	 * 
-	 * @return le facteur de zoom
-	 */
-	public int getZoom() {
-		return ((int) (this.zoom * 100));
-	}
+
 	
 	
  
@@ -148,20 +152,7 @@ public class Photo {
 		return new Image(this.filename, largeur, hauteur, false, false);
 	}
 
-	/**
-	 * Redimensionne la photo en lui appliquant le facteur de zoom passe en
-	 * parametre.
-	 * 
-	 * @param zoom
-	 *            facteur de zoom du redimensionnement.
-	 */
-	public void redimensionner(float zoom) {
-		this.zoom = Math.min(Math.max(zoom / 100, ZOOM_MIN), ZOOM_MAX);
-		int largeur = (int) (this.largeurInit * this.zoom);
-		int hauteur = (int) (this.hauteurInit * this.zoom);
-		image = new Image(this.filename, largeur, hauteur, false, false);
 
-	}
 	public Image nb() {
        		int width = (int) image.getWidth();
         	int height = (int) image.getHeight();
