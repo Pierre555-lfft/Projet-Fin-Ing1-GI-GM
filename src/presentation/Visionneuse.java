@@ -43,6 +43,7 @@ import image.EvaluateurQualiteImage;
 import javafx.scene.image.Image;
 
 /**
+ * @author Etienne Angé
  * Interface utilisateur permettant de tester les differente fonction de bruitage et débruitage
  *@author Etienne Angé
  */
@@ -56,8 +57,8 @@ public class Visionneuse extends Application {
 	private Stage primaryStage;
 	private BorderPane window;
 	private Label labelEvaluateur;
-	private ImageDebruitee.TypeSeuil typeSeuil = ImageDebruitee.TypeSeuil.BAYES;
-	private boolean local; //0 si global et 1 si local en 4 imagette
+	private ImageDebruitee.TypeSeuil typeSeuil = ImageDebruitee.TypeSeuil.VISU;
+	private ImageDebruitee.Analyse analyse = ImageDebruitee.Analyse.GLOBALE;
 	private ObservableList<EvaluateurQualiteImage> historique =  FXCollections.observableArrayList();;
 	private double bruitageValue;
 	
@@ -161,7 +162,7 @@ public class Visionneuse extends Application {
 		
 		
 		//bruiter
-		HBox bruiter = new HBox();
+		HBox bruiter = new HBox(20);
 		bruiter.setAlignment(Pos.CENTER);
 	
 		Button btnBruiter = new Button("Bruiter");
@@ -179,8 +180,15 @@ public class Visionneuse extends Application {
 		sliderBruitage.setShowTickLabels(true);
 		sliderBruitage.setMajorTickUnit(10);
 		
+		Label valeurBruitage = new Label(String.format("%.0f", sliderBruitage.getValue())); // afficher valeur
+
+		// Lier dynamiquement la valeur du slider au label
+		sliderBruitage.valueProperty().addListener((obs, oldVal, newVal) -> {
+			int intValue = (int)newVal.doubleValue();
+			valeurBruitage.setText(String.format("%.0f", (double)intValue));
+		});
 		
-		bruitage.getChildren().addAll(textBruitage, sliderBruitage);
+		bruitage.getChildren().addAll(textBruitage, new HBox(sliderBruitage, valeurBruitage));
 		
 		
 		btnBruiter.setOnAction(arg0 -> {
@@ -194,18 +202,18 @@ public class Visionneuse extends Application {
 		
 		
 		// débruiter
-		local = false;
+		
 		ToggleButton btnGlobale = new ToggleButton("Globale");
 		ToggleButton btnLocale = new ToggleButton("Locale");
-		btnGlobale.setOnAction(arg0 -> local = false);
-		btnLocale.setOnAction(arg0 -> local = true);
+		btnGlobale.setOnAction(arg0 -> analyse = ImageDebruitee.Analyse.GLOBALE);
+		btnLocale.setOnAction(arg0 -> analyse = ImageDebruitee.Analyse.LOCALE);
 		btnGlobale.setSelected(true);
 		ToggleGroup groupeLocale = new ToggleGroup();
 		btnGlobale.setToggleGroup(groupeLocale);
 		btnLocale.setToggleGroup(groupeLocale);
 		VBox vboxLocale= new VBox(new Label("Analyse"),btnGlobale,btnLocale);
 		vboxLocale.setAlignment(Pos.CENTER);
-		HBox debruiter = new HBox();
+		HBox debruiter = new HBox(20);
 		debruiter.setAlignment(Pos.CENTER);
 		
 		VBox choixTaillePatch = new VBox();
@@ -218,12 +226,22 @@ public class Visionneuse extends Application {
 		sliderTaillePatch.setShowTickMarks(true);
 		sliderTaillePatch.setShowTickLabels(true);
 		sliderTaillePatch.setMajorTickUnit(10);
+		
+		Label valeurTaillePatch = new Label(String.format("%.0f", sliderTaillePatch.getValue())); // afficher valeur
+
+		// Lier dynamiquement la valeur du slider au label
+		sliderTaillePatch.valueProperty().addListener((obs, oldVal, newVal) -> {
+			int intValue = (int)newVal.doubleValue();
+			valeurTaillePatch.setText(String.format("%.0f", (double)intValue));
+		});
+		
+		
 		btnDebruiter.setOnAction(arg0 -> {
-			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage, typeSeuil, local));
+			imageView.setImage(album.getPhotoCourante().debruiter(sliderTaillePatch.getValue(), typeSeuillage, typeSeuil, analyse));
 			Image originale = album.getPhotoCourante().getImageOriginelleGrisee();
 	        Image actuelle = album.getPhotoCourante().getImage();
 	        
-	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle,bruitageValue, (int)sliderTaillePatch.getValue(),  typeSeuillage.toString(), typeSeuil.toString(), ((Boolean)local).toString());
+	        EvaluateurQualiteImage evaluateur = new EvaluateurQualiteImage(originale, actuelle,(double)((int)bruitageValue), (int)sliderTaillePatch.getValue(),  typeSeuillage.toString(), typeSeuil.toString(), analyse.toString());
 	        historique.add(evaluateur);
 	        Double mseEval = (Double)evaluateur.calculerMSE();
 	        Double psnrEval = (Double)evaluateur.calculerPSNR();
@@ -231,7 +249,7 @@ public class Visionneuse extends Application {
 	        
 			
 		});
-		choixTaillePatch.getChildren().addAll(new Label("Taille patch"),sliderTaillePatch);
+		choixTaillePatch.getChildren().addAll(new Label("Taille patch"),new HBox(sliderTaillePatch,valeurTaillePatch));
 		
 		ToggleButton btnSeuillageDur = new ToggleButton("Dur");
 		ToggleButton btnSeuillageDoux = new ToggleButton("Doux");
@@ -248,8 +266,9 @@ public class Visionneuse extends Application {
 		hBoxSeuillage.getChildren().addAll(new Label("Seuillage"),btnSeuillageDur, btnSeuillageDoux, btnSeuillageAuto);
 		
 		ToggleButton btnSeuilBayes = new ToggleButton("Bayes");
-		btnSeuilBayes.setSelected(true);
+		
 		ToggleButton btnSeuilVisu = new ToggleButton("Visu");
+		btnSeuilVisu.setSelected(true);
 		ToggleGroup btnSeuil = new ToggleGroup();
 		btnSeuilBayes.setToggleGroup(btnSeuil);
 		btnSeuilVisu.setToggleGroup(btnSeuil);
@@ -341,10 +360,10 @@ public class Visionneuse extends Application {
 		
 		
 		table.setMaxHeight(200);
+		table.setPlaceholder(new Label("Aucune donnée disponible"));
 		BorderPane bpHistorique = new BorderPane(table);
 		return bpHistorique;
 	}
 
 }
-
 

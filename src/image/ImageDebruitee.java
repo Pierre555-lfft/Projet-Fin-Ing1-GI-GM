@@ -24,27 +24,50 @@ import java.util.Vector;
 	
 /**
  * Permet de gérer le débruitage d'une image
+ * @author Pierre Laforest
  */
 public class ImageDebruitee {
 	
-	//Pierre Laforest : permet de définir un type de seuillage 
+	/**
+	 * Permet de définir un type de seuillage 
+	 */
 	public enum TypeSeuillage {
 		    DUR,
 		    DOUX,
 		    AUTO
 	}
 	
+	/**
+	 * Permet de définir le type de seuil
+	 * @author Etienne Angé
+	 */
 	public enum TypeSeuil {
 	    VISU,
 	    BAYES
 	    
-}
+	}
+	
+	/**
+	 * Permet de définir le typoe d'analyse
+	 * @author Etienne Angé
+	 */
+	public enum Analyse{
+		GLOBALE,
+		LOCALE
+	}
 		    
 	private Image imageDebruitee;
 
-
-	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,boolean locale) {
-		if (locale) {
+	/**
+	 * 
+	 * @param imageBruitee
+	 * @param taillePatch
+	 * @param typeSeuillage
+	 * @param typeSeuil
+	 * @param analyse
+	 */
+	public ImageDebruitee(Image imageBruitee, double taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage, ImageDebruitee.TypeSeuil typeSeuil,ImageDebruitee.Analyse analyse) {
+		if (analyse == ImageDebruitee.Analyse.LOCALE) {
 			imageDebruitee = imageDenLocale(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
 		} else {
 			imageDebruitee = imageDen(imageBruitee, (int)taillePatch, typeSeuillage,typeSeuil);
@@ -78,94 +101,99 @@ public class ImageDebruitee {
 	 */
 	
 	public List<Patch> extractPatchs(Image image, int taillePatch) {
-	    List<Patch> listePatchs = new ArrayList<>();
-	    PixelReader lecteurPixel = image.getPixelReader();
-	    int largeur = (int) image.getWidth();
-	    int hauteur = (int) image.getHeight();
+		if (image == null || taillePatch <= 0) {
+			throw new IllegalArgumentException("Image invalide ou taille de patch invalide");
+		}
 
-	    // Calculer le nombre de patchs qui peuvent être extraits sans chevauchement
-	    int nbPatchsX = largeur / taillePatch;
-	    int nbPatchsY = hauteur / taillePatch;
+		List<Patch> listePatchs = new ArrayList<>();
+		PixelReader lecteurPixel = image.getPixelReader();
+		int largeur = (int) image.getWidth();
+		int hauteur = (int) image.getHeight();
 
-	    // Extraire les patchs non superposés
-	    for (int y = 0; y < nbPatchsY; y++) {
-	        for (int x = 0; x < nbPatchsX; x++) {
-	            int debutX = x * taillePatch;
-	            int debutY = y * taillePatch;
-	            Float[][] matricePatch = new Float[taillePatch][taillePatch];
+		// Calculer le nombre de patchs qui peuvent être extraits sans chevauchement
+		int nbPatchsX = largeur / taillePatch;
+		int nbPatchsY = hauteur / taillePatch;
 
-	            for (int dy = 0; dy < taillePatch; dy++) {
-	                for (int dx = 0; dx < taillePatch; dx++) {
-	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
-	                    // Utilisation de la méthode obtenirValeurGris pour la luminance
-	                    float luminance = obtenirValeurGris(argb);
-	                    matricePatch[dy][dx] = luminance;
-	                }
-	            }
-	            listePatchs.add(new Patch(matricePatch, debutX, debutY));
-	        }
-	    }
+		// Extraire les patchs non superposés
+		for (int y = 0; y < nbPatchsY; y++) {
+			for (int x = 0; x < nbPatchsX; x++) {
+				int debutX = x * taillePatch;
+				int debutY = y * taillePatch;
+				Float[][] matricePatch = new Float[taillePatch][taillePatch];
 
-	    // Gérer les bords droit et inférieur si nécessaire
-	    boolean resteX = (largeur % taillePatch) != 0;
-	    boolean resteY = (hauteur % taillePatch) != 0;
+				for (int dy = 0; dy < taillePatch; dy++) {
+					for (int dx = 0; dx < taillePatch; dx++) {
+						int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
+						float luminance = obtenirValeurGris(argb);
+						matricePatch[dy][dx] = luminance;
+					}
+				}
+				listePatchs.add(new Patch(matricePatch, debutX, debutY));
+			}
+		}
 
-	    // Bord droit
-	    if (resteX) {
-	        for (int y = 0; y < nbPatchsY; y++) {
-	            int debutX = largeur - taillePatch;
-	            int debutY = y * taillePatch;
-	            Float[][] matricePatch = new Float[taillePatch][taillePatch];
+		// Gérer les bords droit et inférieur si nécessaire
+		boolean resteX = (largeur % taillePatch) != 0;
+		boolean resteY = (hauteur % taillePatch) != 0;
 
-	            for (int dy = 0; dy < taillePatch; dy++) {
-	                for (int dx = 0; dx < taillePatch; dx++) {
-	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
-	                    // Utilisation de la méthode obtenirValeurGris pour la luminance
-	                    float luminance = obtenirValeurGris(argb);
-	                    matricePatch[dy][dx] = luminance;
-	                }
-	            }
-	            listePatchs.add(new Patch(matricePatch, debutX, debutY));
-	        }
-	    }
+		// Bord droit
+		if (resteX) {
+			for (int y = 0; y < nbPatchsY; y++) {
+				int debutX = largeur - taillePatch;
+				int debutY = y * taillePatch;
+				Float[][] matricePatch = new Float[taillePatch][taillePatch];
 
-	    // Bord inférieur
-	    if (resteY) {
-	        for (int x = 0; x < nbPatchsX; x++) {
-	            int debutX = x * taillePatch;
-	            int debutY = hauteur - taillePatch;
-	            Float[][] matricePatch = new Float[taillePatch][taillePatch];
+				for (int dy = 0; dy < taillePatch; dy++) {
+					for (int dx = 0; dx < taillePatch; dx++) {
+						int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
+						float luminance = obtenirValeurGris(argb);
+						matricePatch[dy][dx] = luminance;
+					}
+				}
+				listePatchs.add(new Patch(matricePatch, debutX, debutY));
+			}
+		}
 
-	            for (int dy = 0; dy < taillePatch; dy++) {
-	                for (int dx = 0; dx < taillePatch; dx++) {
-	                    int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
-	                    // Utilisation de la méthode obtenirValeurGris pour la luminance
-	                    float luminance = obtenirValeurGris(argb);
-	                    matricePatch[dy][dx] = luminance;
-	                }
-	            }
-	            listePatchs.add(new Patch(matricePatch, debutX, debutY));
-	        }
-	    }
+		// Bord inférieur
+		if (resteY) {
+			for (int x = 0; x < nbPatchsX; x++) {
+				int debutX = x * taillePatch;
+				int debutY = hauteur - taillePatch;
+				Float[][] matricePatch = new Float[taillePatch][taillePatch];
 
-	    // Coin inférieur droit (si nécessaire)
-	    if (resteX && resteY) {
-	        int debutX = largeur - taillePatch;
-	        int debutY = hauteur - taillePatch;
-	        Float[][] matricePatch = new Float[taillePatch][taillePatch];
+				for (int dy = 0; dy < taillePatch; dy++) {
+					for (int dx = 0; dx < taillePatch; dx++) {
+						int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
+						float luminance = obtenirValeurGris(argb);
+						matricePatch[dy][dx] = luminance;
+					}
+				}
+				listePatchs.add(new Patch(matricePatch, debutX, debutY));
+			}
+		}
 
-	        for (int dy = 0; dy < taillePatch; dy++) {
-	            for (int dx = 0; dx < taillePatch; dx++) {
-	                int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
-	                // Utilisation de la méthode obtenirValeurGris pour la luminance
-	                float luminance = obtenirValeurGris(argb);
-	                matricePatch[dy][dx] = luminance;
-	            }
-	        }
-	        listePatchs.add(new Patch(matricePatch, debutX, debutY));
-	    }
+		// Coin inférieur droit (si nécessaire)
+		if (resteX && resteY) {
+			int debutX = largeur - taillePatch;
+			int debutY = hauteur - taillePatch;
+			Float[][] matricePatch = new Float[taillePatch][taillePatch];
 
-	    return listePatchs;
+			for (int dy = 0; dy < taillePatch; dy++) {
+				for (int dx = 0; dx < taillePatch; dx++) {
+					int argb = lecteurPixel.getArgb(debutX + dx, debutY + dy);
+					float luminance = obtenirValeurGris(argb);
+					matricePatch[dy][dx] = luminance;
+				}
+			}
+			listePatchs.add(new Patch(matricePatch, debutX, debutY));
+		}
+
+		// Vérifier qu'on a au moins un patch
+		if (listePatchs.isEmpty()) {
+			throw new IllegalStateException("Aucun patch valide n'a pu être extrait de l'image");
+		}
+
+		return listePatchs;
 	}
 	
 	/**
@@ -466,26 +494,26 @@ public class ImageDebruitee {
 	 */
 	public Image reconstructPatchs(List<Patch> patchsDebruitee) {
 	    if (patchsDebruitee == null || patchsDebruitee.isEmpty()) {
-	        return null;
+	        throw new IllegalArgumentException("La liste des patchs ne peut pas être vide");
 	    }
 
 	    // 1. Déterminer la taille de l'image à reconstruire
 	    int largeurMax = 0;
 	    int hauteurMax = 0;
-	    int taillePatch = patchsDebruitee.get(0).getTab().length; // On suppose que les patchs sont carrés
+	    int taillePatch = patchsDebruitee.get(0).getTab().length;
 
 	    for (Patch patch : patchsDebruitee) {
 	        int finX = patch.getX() + taillePatch;
 	        int finY = patch.getY() + taillePatch;
-	        if (finX > largeurMax) largeurMax = finX;
-	        if (finY > hauteurMax) hauteurMax = finY;
+	        largeurMax = Math.max(largeurMax, finX);
+	        hauteurMax = Math.max(hauteurMax, finY);
 	    }
 
-	    // 2. Créer les tableaux pour stocker la somme des luminances et le nombre de contributions par pixel
+	    // 2. Créer les tableaux pour stocker la somme des luminances et le nombre de contributions
 	    float[][] sommeLuminance = new float[hauteurMax][largeurMax];
 	    int[][] compteur = new int[hauteurMax][largeurMax];
 
-	    // 3. Ajouter les valeurs des patchs
+	    // 3. Ajouter les valeurs des patchs avec vérification des limites
 	    for (Patch patch : patchsDebruitee) {
 	        Float[][] tab = patch.getTab();
 	        int debutX = patch.getX();
@@ -495,13 +523,19 @@ public class ImageDebruitee {
 	            for (int dx = 0; dx < tab[0].length; dx++) {
 	                int x = debutX + dx;
 	                int y = debutY + dy;
-	                sommeLuminance[y][x] += tab[dy][dx];
-	                compteur[y][x]++;
+	                
+	                if (x >= 0 && x < largeurMax && y >= 0 && y < hauteurMax) {
+	                    float valeur = tab[dy][dx];
+	                    if (!Float.isNaN(valeur) && !Float.isInfinite(valeur)) {
+	                        sommeLuminance[y][x] += valeur;
+	                        compteur[y][x]++;
+	                    }
+	                }
 	            }
 	        }
 	    }
 
-	    // 4. Créer l’image avec lissage (moyenne des patchs)
+	    // 4. Créer l'image avec lissage et gestion des valeurs extrêmes
 	    WritableImage imageReconstruite = new WritableImage(largeurMax, hauteurMax);
 	    PixelWriter ecrivain = imageReconstruite.getPixelWriter();
 
@@ -509,12 +543,34 @@ public class ImageDebruitee {
 	        for (int x = 0; x < largeurMax; x++) {
 	            if (compteur[y][x] > 0) {
 	                float moyenne = sommeLuminance[y][x] / compteur[y][x];
+	                // Limiter les valeurs entre 0 et 255
 	                int niveauGris = Math.min(255, Math.max(0, Math.round(moyenne)));
 	                int argb = (0xFF << 24) | (niveauGris << 16) | (niveauGris << 8) | niveauGris;
 	                ecrivain.setArgb(x, y, argb);
 	            } else {
-	                // Remplir les pixels non couverts avec noir (optionnel)
-	                ecrivain.setArgb(x, y, 0xFF000000);
+	                // Pour les pixels non couverts, utiliser la moyenne des pixels voisins
+	                float sommeVoisins = 0;
+	                int nbVoisins = 0;
+	                
+	                for (int dy = -1; dy <= 1; dy++) {
+	                    for (int dx = -1; dx <= 1; dx++) {
+	                        int nx = x + dx;
+	                        int ny = y + dy;
+	                        if (nx >= 0 && nx < largeurMax && ny >= 0 && ny < hauteurMax && compteur[ny][nx] > 0) {
+	                            sommeVoisins += sommeLuminance[ny][nx] / compteur[ny][nx];
+	                            nbVoisins++;
+	                        }
+	                    }
+	                }
+	                
+	                if (nbVoisins > 0) {
+	                    int niveauGris = Math.min(255, Math.max(0, Math.round(sommeVoisins / nbVoisins)));
+	                    int argb = (0xFF << 24) | (niveauGris << 16) | (niveauGris << 8) | niveauGris;
+	                    ecrivain.setArgb(x, y, argb);
+	                } else {
+	                    // Si aucun voisin n'est disponible, utiliser noir
+	                    ecrivain.setArgb(x, y, 0xFF000000);
+	                }
 	            }
 	        }
 	    }
@@ -525,97 +581,133 @@ public class ImageDebruitee {
 
 
 
-
-	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
-
-	    // Patch
-
-		List<Patch> patchs;
-		patchs = extractPatchs(imageBruitee, taillePatch);
+/**
+ * Méthode principale du débruitage d'image
+ * @param imageBruitee Image à débruiter
+ * @param taillePatch Taille des patchs (carré)
+ * @param typeSeuillage Type de seuillage (DUR, DOUX, AUTO)
+ * @param typeSeuil Type de seuil (VISU, BAYES)
+ * @return Image débruitée
+ */
+	public Image imageDen(Image imageBruitee, Integer taillePatch, TypeSeuillage typeSeuillage, TypeSeuil typeSeuil) {
 		
 
-	    ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
-	    List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
+		// Patch
+		
+		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
+		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
+		List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
+		
+		// ACP et projection
 
-
-		// Projection
 		List<Vector<Float>> vecteursCentres = vecteur_centre_methode(vecteurs);
-		RealMatrix U = ACP(vecteurs);
+		RealMatrix U = ACP(vecteursCentres);
 		List<Vector<Float>> projections = proj(U, vecteursCentres);
 
-		/// Estimation bruit et tailles
-		float[][] image2D = listVectorToArray(vecteurs); 
-
-		// estimation de sigma
-		int nbre_patch = vecteurs.size();      
-		int taille_patch = vecteurs.get(0).size();
-
+		//Estimation du bruit
 		double sigma;
 		if (typeSeuil == TypeSeuil.BAYES) {
-		    sigma = estimerSigmaB(projections); 
+			sigma = estimerSigmaB(projections);
 		} else {
-		    sigma = estimerSigma(image2D);      
+			float[][] image2D = listVectorToArray(vecteurs);
+			sigma = estimerSigma(image2D);
 		}
 
-		// Application du seuillage
-		List<Vector<Float>> projectionsSeuillage;
-
+		// 7. Application du seuillage
+		List<Vector<Float>> projectionsSeuillees;
 		if (typeSeuil == TypeSeuil.BAYES) {
-		    // BayesShrink → seuil par composante, donc seuillage spécifique intégré
-		    if (typeSeuillage == TypeSeuillage.AUTO || typeSeuillage == TypeSeuillage.DOUX) {
-		        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
-		    } else if (typeSeuillage == TypeSeuillage.DUR) {
-		        System.err.println("⚠️ BayesShrink ne s’utilise normalement qu’avec le seuillage doux. Utilisation par défaut du doux.");
-		        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
-		    } else {
-		        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
-		    }
+			projectionsSeuillees = seuilBayesShrinkParColonne(projections, sigma);
 		} else {
-		    // VISU → seuil global
-		    double seuil = seuilVisuShrink(sigma, taille_patch);
-
-		    if (typeSeuillage == TypeSeuillage.AUTO) {
-		        double varSignal = estimerVarianceSignal(projections, sigma * sigma);
-		        if (choisirType(varSignal, seuil) == TypeSeuillage.DUR) {
-		            projectionsSeuillage = seuillageDur(projections, seuil);
-		        } else {
-		            projectionsSeuillage = seuillageDoux(projections, seuil);
-		        }
-		    } else if (typeSeuillage == TypeSeuillage.DUR) {
-		        projectionsSeuillage = seuillageDur(projections, seuil);
-		    } else if (typeSeuillage == TypeSeuillage.DOUX) {
-		        projectionsSeuillage = seuillageDoux(projections, seuil);
-		    } else {
-		        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
-		    }
+			double seuil = seuilVisuShrink(sigma, vecteurs.size());
+			if (typeSeuillage == TypeSeuillage.AUTO) {
+				double varSignal = estimerVarianceSignal(projections, sigma * sigma);
+				typeSeuillage = choisirType(varSignal, seuil);
+			}
+			projectionsSeuillees = (typeSeuillage == TypeSeuillage.DUR) ? 
+				seuillageDur(projections, seuil) : 
+				seuillageDoux(projections, seuil);
 		}
 
-	   
 
-	    // Reconstruction des vecteurs centrés débruités
-	    List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillage);
+		// 8. Reconstruction
+		List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillees);
 
-	    // Ajout du vecteur moyen
-	    List<Vector<Float>> vecteursDebruites = new ArrayList<>();
-	    Vector<Float> mv = mv_methode(vecteurs);
-	    for (Vector<Float> v : vecteursCentresDebruites) {
-	        Vector<Float> vDebruite = new Vector<>();
-	        for (int i = 0; i < v.size(); i++) {
-	            vDebruite.add(v.get(i) + mv.get(i));
-	        }
-	        vecteursDebruites.add(vDebruite);
-	    }
+		List<Vector<Float>> vecteursDebruites = new ArrayList<>();
+		Vector<Float> mv = mv_methode(vecteurs);
 
-	    // Reconstruction des patchs à partir des vecteurs débruités
-	    for (int i = 0; i < arrayListPatches.size(); i++) {
-	        Patch p = arrayListPatches.get(i);
-	        p.fromVector(vecteursDebruites.get(i));
-	    }
+		for (Vector<Float> v : vecteursCentresDebruites) {
+			Vector<Float> vDebruite = new Vector<>();
+			for (int i = 0; i < v.size(); i++) {
+				vDebruite.add(v.get(i) + mv.get(i));
+			}
+			vecteursDebruites.add(vDebruite);
+		}
 
-	    // Reconstruction de l'image à partir des patchs débruités
-	    Image imageReconstruite = reconstructPatchs(arrayListPatches);
+		// 9. Reconstruction des patchs
+		for (int i = 0; i < arrayListPatches.size(); i++) {
+			Patch p = arrayListPatches.get(i);
+			p.fromVector(vecteursDebruites.get(i));
+		}
 
-	    return imageReconstruite;
+		// 10. Reconstruction de l'image
+		Image imageReconstruite = reconstructPatchs(arrayListPatches);
+
+		return imageReconstruite;
+	}
+
+	/**
+	 * 
+	 * @param projections
+	 * @return
+	 */
+	public static double estimerSigmaB(List<Vector<Float>> projections) {
+
+		int tailleVecteur = projections.get(0).size();
+		// Utiliser les 10 dernières composantes pour l'estimation du bruit
+		int nbComposantes = Math.min(10, tailleVecteur);
+		List<Double> valeurs = new ArrayList<>();
+		
+		for (Vector<Float> proj : projections) {
+			int debut = Math.max(0, tailleVecteur - nbComposantes);
+			for (int j = debut; j < tailleVecteur; j++) {
+				valeurs.add(Double.valueOf(Math.abs(proj.get(j))));
+			}
+		}
+
+		Collections.sort(valeurs);
+		int medianIndex = valeurs.size() / 2;
+		double mediane = (valeurs.size() % 2 == 0) ?
+			(valeurs.get(medianIndex - 1) + valeurs.get(medianIndex)) / 2 :
+			valeurs.get(medianIndex);
+
+		return mediane / 0.6745;
+	}
+
+	/**
+	 * 
+	 * @param proj
+	 * @param seuil
+	 * @return
+	 */
+	public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> proj, double seuil) {
+		List<Vector<Float>> sD = new ArrayList<>();
+
+		for (Vector<Float> vecteur : proj) {
+			Vector<Float> seuilVector = new Vector<>();
+			for (float alpha : vecteur) {
+				// Seuillage doux selon la formule du cours
+				if (Math.abs(alpha) <= seuil) {
+					seuilVector.add(0.0f);
+				} else if (alpha > seuil) {
+					seuilVector.add(alpha - (float)seuil);
+				} else { // alpha <= -seuil
+					seuilVector.add(alpha + (float)seuil);
+				}
+			}
+			sD.add(seuilVector);
+		}
+
+		return sD;
 	}
 
 	/**
@@ -661,6 +753,13 @@ public class ImageDebruitee {
 		return patchPosition;
 	}
 	
+	/** Convertie Une liste de vecteur en une liste de patch
+	 * @author Etienne Angé
+	 * @param vecteurs
+	 * @param taillePatch
+	 * @param patchPosition
+	 * @return
+	 */
 	public List<Patch> patchsVector(List<Vector<Float>> vecteurs, int taillePatch, List<int[]> patchPosition) {
 	    List<Patch> patchs = new ArrayList<>();
 	    for (int i = 0; i < vecteurs.size(); i++) {
@@ -671,25 +770,6 @@ public class ImageDebruitee {
 	    return patchs;
 	}
 
-
-	/** Renvoie l'estiamtion de sigma dans le cas Bayes
-	 * @author Mathis Bohain
-	 * @param projection
-	 * @return sigma
-	 */
-	
-	public static double estimerSigmaB(List<Vector<Float>> projections) { // à partir de proj
-	    // dernieère composante
-	    int j = projections.get(0).size() - 1;
-	    double[] valeurs = new double[projections.size()];
-	    for (int i = 0; i < projections.size(); i++) {
-	        valeurs[i] = projections.get(i).get(j);
-	    }
-
-	    Arrays.sort(valeurs);
-	    double mediane = valeurs[valeurs.length / 2];
-	    return mediane ;  
-	}
 
 	/** Renvoie un 
 	 * @author Pierre
@@ -723,17 +803,11 @@ public class ImageDebruitee {
 	 * @return double
 	 */
 	
-    public static double seuilVisuShrink(double sigma,double tailleVecteur) {
-   
-        return sigma * Math.sqrt(2 * Math.log(tailleVecteur))*0.5; 
+    public static double seuilVisuShrink(double sigma, double L) {
+        return sigma * Math.sqrt(2 * Math.log(L))*0.3;
     }
     
-    /** Renvoie un 
-	 * @author Pierre
-	 * @param 
-	 * @return
-	 */
-
+    
     /** Retourne le seuil par la méthode de BayesShrink
 	 * @author Pierre
 	 * @param float[][]
@@ -741,6 +815,7 @@ public class ImageDebruitee {
 	 */
     
     public static List<Vector<Float>> seuilBayesShrinkParColonne(List<Vector<Float>> projections, double sigma) {
+
         double sigma2 = sigma * sigma;
         int nbPatches = projections.size();
         int nbComposantes = projections.get(0).size();
@@ -749,8 +824,6 @@ public class ImageDebruitee {
         for (int i = 0; i < nbPatches; i++) {
             projectionsSeuillees.add(new Vector<>(nbComposantes));
         }
-
-        double epsilon = 1e-8; 
 
         // Pour chaque composante principale
         for (int j = 0; j < nbComposantes; j++) {
@@ -761,31 +834,42 @@ public class ImageDebruitee {
             }
 
             // Moyenne de la colonne
-            double somme = 0.0;
+            float somme = 0.0f;
             for (float v : colonne) somme += v;
-            double moyenne = somme / nbPatches;
+            float moyenne = somme / nbPatches;
 
             // Variance observée sigma_Y^2
-            double sigmaY2 = 0.0;
+            float sigmaY2 = 0.0f;
             for (float v : colonne) {
-                double diff = v - moyenne;
+                float diff = v - moyenne;
                 sigmaY2 += diff * diff;
             }
             sigmaY2 /= nbPatches;
 
-            // Estimation de la variance du signal : sigma_X^2
-            double sigmaX2 = Math.max(sigmaY2 - sigma2, 0);
+            // Estimation de la variance du signal 
+            float sigmaX2 = Math.max(sigmaY2 - (float)sigma2, 0.0f);
+            float sigmaX = (float)Math.sqrt(sigmaX2);
 
+            // Calcul du seuil BayesShrink
+            float seuil;
+            if (sigmaX2 < 1e-10) {
+                seuil = Float.POSITIVE_INFINITY;
+            } else {
+                seuil = (float)(sigma2 / sigmaX);
+            }
 
-            // Calcul du seuil BayesShrink (stabilisé)
-            double seuil = (sigmaX2 < epsilon) ? Double.POSITIVE_INFINITY : sigma2 / Math.sqrt(sigmaX2 + epsilon);
-
-            // Appliquer le seuillage doux (soft thresholding)
+            // Appliquer le seuillage doux
             for (int i = 0; i < nbPatches; i++) {
-                double coeff = colonne[i];
-                double valeur = Math.abs(coeff) - seuil;
-                double coeffSeuille = (valeur > 0) ? Math.signum(coeff) * valeur : 0.0;
-                projectionsSeuillees.get(i).add((float) coeffSeuille);
+                float alpha = colonne[i];
+                float absAlpha = Math.abs(alpha);
+                
+                if (absAlpha <= seuil) {
+                    projectionsSeuillees.get(i).add(0.0f);
+                } else if (alpha > seuil) {
+                    projectionsSeuillees.get(i).add(alpha - seuil);
+                } else { // alpha <= -seuil
+                    projectionsSeuillees.get(i).add(alpha + seuil);
+                }
             }
         }
 
@@ -804,20 +888,41 @@ public class ImageDebruitee {
      */
 
     public static double estimerVarianceSignal(List<Vector<Float>> projections, double varianceBruit) {
-        double sumSquares = 0;
-        int count = 0;
 
-        for (Vector<Float> vect : projections) {
-            for (float val : vect) {
-                sumSquares += val * val;
-                count++;
+
+        int nbPatches = projections.size();
+        int nbComposantes = projections.get(0).size();
+        double varianceSignal = 0.0;
+
+        // Pour chaque composante principale
+        for (int j = 0; j < nbComposantes; j++) {
+            // Extraire la colonne j
+            float[] colonne = new float[nbPatches];
+            for (int i = 0; i < nbPatches; i++) {
+                colonne[i] = projections.get(i).get(j);
             }
+
+            // Moyenne de la colonne
+            float somme = 0.0f;
+            for (float v : colonne) somme += v;
+            float moyenne = somme / nbPatches;
+
+            // Variance observée sigma_Y^2
+            float sigmaY2 = 0.0f;
+            for (float v : colonne) {
+                float diff = v - moyenne;
+                sigmaY2 += diff * diff;
+            }
+            sigmaY2 /= nbPatches;
+
+            // Variance du signal = max(0, variance_observée - variance_bruit)
+            varianceSignal += Math.max(sigmaY2 - varianceBruit, 0.0);
         }
 
-        double varianceBrute = sumSquares / count;
-        double varianceSignal = varianceBrute - varianceBruit;
+        // Moyenne de la variance du signal sur toutes les composantes
+        varianceSignal /= nbComposantes;
 
-        return varianceSignal > 0 ? varianceSignal : 0;
+        return varianceSignal;
     }
 
     /**
@@ -847,11 +952,12 @@ public class ImageDebruitee {
 
         for (Vector<Float> vecteur : proj) {
             Vector<Float> seuilVector = new Vector<>();
-            for (float x : vecteur) {
-                if (Math.abs(x) <= val) {
+            for (float alpha : vecteur) {
+                // Seuillage dur selon la formule du cours
+                if (Math.abs(alpha) <= val) {
                     seuilVector.add(0.0f);
                 } else {
-                    seuilVector.add(x);
+                    seuilVector.add(alpha);
                 }
             }
             sD.add(seuilVector);
@@ -862,32 +968,6 @@ public class ImageDebruitee {
 
 
 
-    /**
-     * 
-     * @param proj
-     * @param seuil
-     * @return
-     */
-    public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> proj, double seuil) {
-        List<Vector<Float>> sD = new ArrayList<>();
-
-        for (Vector<Float> vecteur : proj) {
-            Vector<Float> seuilVector = new Vector<>();
-            for (float x : vecteur) {
-                if (Math.abs(x) <= seuil) {
-                    seuilVector.add(0.0f);
-                } else if (x > 0) {
-                    seuilVector.add(x - (float) seuil);
-                } else {
-                    seuilVector.add(x + (float) seuil);
-                }
-            }
-            sD.add(seuilVector);
-        }
-
-        return sD;
-    }
-    
     /**
      * @author Mathis Bohain
      * @param v
@@ -903,5 +983,6 @@ public class ImageDebruitee {
     
 
    
+
 
 }
