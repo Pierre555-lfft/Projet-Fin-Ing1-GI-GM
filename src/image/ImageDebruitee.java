@@ -29,7 +29,8 @@ import java.util.Vector;
 public class ImageDebruitee {
 	
 	/**
-	 * Permet de définir un type de seuillage 
+	 * Permet de définir un type de seuillage
+	 * @author Pierre Laforest$
 	 */
 	public enum TypeSeuillage {
 		    DUR,
@@ -314,7 +315,7 @@ public class ImageDebruitee {
 	/** Renvoie la matrice de covariance de V en format List de Vecteurs
 	 * @author Mathis Bohain
 	 * @param V
-	 * @return
+	 * @return Cov
 	 */
 				
 	public static List<Vector<Float>> cov_methode (List<Vector<Float>> V ){// V collection de patch vectorisé
@@ -370,7 +371,7 @@ public class ImageDebruitee {
 	/** Renvoie la liste des vecteurs centrées de V
 	 * @author Mathis Bohain
 	 * @param V
-	 * @return
+	 * @return Vc
 	 */
 				
 	public static List<Vector<Float>> vecteur_centre_methode (List<Vector<Float>> V){
@@ -451,7 +452,7 @@ public class ImageDebruitee {
 	 * @author Mathis Bohain
 	 * @param U
 	 * @param Vc
-	 * @return
+	 * @return V_contrib
 	 */
 				
 	public static List<Vector<Float>> proj (RealMatrix U, List<Vector<Float>> Vc ){
@@ -616,7 +617,7 @@ public class ImageDebruitee {
 
 
 		if (typeSeuil == TypeSeuil.BAYES) {
-		    // BayesShrink → seuil par composante, donc seuillage spécifique intégré
+		    // BayesShrink : seuil par composante, donc seuillage spécifique intégré
 		    if (typeSeuillage == TypeSeuillage.AUTO || typeSeuillage == TypeSeuillage.DOUX) {
 		        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
 		    } else if (typeSeuillage == TypeSeuillage.DUR) {
@@ -626,7 +627,7 @@ public class ImageDebruitee {
 		        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
 		    }
 		} else {
-		    // VISU → seuil global
+		    // VISU : seuil global
 		    double seuil = seuilVisuShrink(sigma, taillePatch);
 
 				    if (typeSeuillage == TypeSeuillage.AUTO) {
@@ -646,7 +647,7 @@ public class ImageDebruitee {
 				}
 
 
-		// 8. Reconstruction
+		// Reconstruction
 		List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillage);
 
 		List<Vector<Float>> vecteursDebruites = new ArrayList<>();
@@ -660,22 +661,22 @@ public class ImageDebruitee {
 			vecteursDebruites.add(vDebruite);
 		}
 
-		// 9. Reconstruction des patchs
+		// Reconstruction des patchs
 		for (int i = 0; i < arrayListPatches.size(); i++) {
 			Patch p = arrayListPatches.get(i);
 			p.fromVector(vecteursDebruites.get(i));
 		}
-
-		// 10. Reconstruction de l'image
+		sigma
+		// Reconstruction de l'image
 		Image imageReconstruite = reconstructPatchs(arrayListPatches);
 
 		return imageReconstruite;
 	}
 
 	/**
-	 * 
+	 * @author Pierre Laforest, Mathis Bohain
 	 * @param projections
-	 * @return
+	 * @return sigmaB
 	 */
 	public static double estimerSigmaB(List<Vector<Float>> projections) {
 
@@ -701,10 +702,10 @@ public class ImageDebruitee {
 	}
 
 	/**
-	 * 
+	 * @author Pierre Laforest, Mathis Bohain
 	 * @param proj
 	 * @param seuil
-	 * @return
+	 * @return sD
 	 */
 	public static List<Vector<Float>> seuillageDoux(List<Vector<Float>> proj, double seuil) {
 		List<Vector<Float>> sD = new ArrayList<>();
@@ -790,8 +791,8 @@ public class ImageDebruitee {
 
 	/** Renvoie un 
 	 * @author Pierre
-	 * @param float[][]
-	 * @return double
+	 * @param image
+	 * @return sigma
 	 */
 	
 	public static double estimerSigma(float[][] image) { // à partir des pixels
@@ -816,7 +817,8 @@ public class ImageDebruitee {
  
 	/** Retourne le seuil par la méthode de VisuShrink
 	 * @author Pierre
-	 * @param double sigma, double tailleVecteur
+	 * @param  sigma
+	 * @param  L
 	 * @return double
 	 */
 	
@@ -827,8 +829,9 @@ public class ImageDebruitee {
     
     /** Retourne le seuil par la méthode de BayesShrink
 	 * @author Pierre
-	 * @param float[][]
-	 * @return double
+	 * @param projections
+	 * @param sigma
+	 * @return projectionsSeuillees
 	 */
     
     public static List<Vector<Float>> seuilBayesShrinkParColonne(List<Vector<Float>> projections, double sigma) {
@@ -901,7 +904,7 @@ public class ImageDebruitee {
      * 
      * @param projections
      * @param varianceBruit
-     * @return
+     * @return varianceSignal
      */
 
     public static double estimerVarianceSignal(List<Vector<Float>> projections, double varianceBruit) {
@@ -943,10 +946,10 @@ public class ImageDebruitee {
     }
 
     /**
-     * 
+     * @author Pierre Laforest
      * @param variance
      * @param seuilVi
-     * @return
+     * @return TypeSeuillage
      */
     public static TypeSeuillage choisirType(double variance, double seuilVi) {
         if (variance > seuilVi) {
@@ -959,10 +962,10 @@ public class ImageDebruitee {
     
     
     /**
-     * 
+     * @author Pierre Laforest, Mathis Bohain
      * @param proj
      * @param val
-     * @return
+     * @return sD 
      */
     public static List<Vector<Float>> seuillageDur(List<Vector<Float>> proj, double val) {
         List<Vector<Float>> sD = new ArrayList<>();
