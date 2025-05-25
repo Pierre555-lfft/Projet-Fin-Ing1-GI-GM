@@ -64,7 +64,7 @@ public class Visionneuse extends Application {
 	
 	
 	public void start(Stage primaryStage) {
-		primaryStage.setTitle("Album Photo");
+		primaryStage.setTitle("Débruiteur d'image");
 	
 		
 		album = new Album("images");

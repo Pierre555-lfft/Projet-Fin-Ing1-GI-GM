@@ -52,8 +52,8 @@ public class ImageDebruitee {
 	 * @author Etienne Angé
 	 */
 	public enum Analyse{
-		GLOBALE,
-		LOCALE
+			GLOBALE,
+			LOCALE
 	}
 		    
 	private Image imageDebruitee;
@@ -595,7 +595,7 @@ public class ImageDebruitee {
 		    if (typeSeuillage == TypeSeuillage.AUTO || typeSeuillage == TypeSeuillage.DOUX) {
 		        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
 		    } else if (typeSeuillage == TypeSeuillage.DUR) {
-		        System.err.println("⚠️ BayesShrink ne s’utilise normalement qu’avec le seuillage doux. Utilisation par défaut du doux.");
+		        System.err.println("BayesShrink ne s’utilise normalement qu’avec le seuillage doux. Utilisation par défaut du doux.");
 		        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
 		    } else {
 		        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
