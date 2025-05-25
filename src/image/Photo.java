@@ -1,4 +1,3 @@
-
 package image;
 
 
@@ -176,4 +175,3 @@ public class Photo {
         return result;
     }
 }
-

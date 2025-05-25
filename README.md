@@ -1,4 +1,4 @@
-# Projet-Fin-Ing1-GI-GM
+# Débruitage d’images par analyse en composantes principales
 
 ## Importer le porjet dans un IDE
 
@@ -8,7 +8,7 @@ Télécharger la librairie javaFX : [ici](https://gluonhq.com/products/javafx/)
 
 Importer le projet avec un IDE java et ajouter la librairie ```javafx``` au modulepath et ajoutez ```commons-math3``` au classpath.
 
-Ajoutez au VM arguments ```java --module-path {le chemin vers la librairie}/lib --add-modules javafx.controls,javafx.fxml,javafx.media -jar exec.jar```
+Ajoutez au VM arguments ```--module-path {le chemin vers la librairie javaFX}/lib --add-modules javafx.controls,javafx.fxml,javafx.media```
 
 ## Exécuter le projet via un jar exécutable
 

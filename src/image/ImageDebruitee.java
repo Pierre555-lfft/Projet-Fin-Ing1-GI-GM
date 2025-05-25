@@ -666,7 +666,7 @@ public class ImageDebruitee {
 			Patch p = arrayListPatches.get(i);
 			p.fromVector(vecteursDebruites.get(i));
 		}
-		sigma
+		
 		// Reconstruction de l'image
 		Image imageReconstruite = reconstructPatchs(arrayListPatches);
 
