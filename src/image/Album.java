@@ -96,14 +96,6 @@ public class Album {
 		return this.lesPhotos.get(indexCourant);
 	}
 
-	/**
-	 * redimensionne la photo courante de l'album avec zoom pour facteur de zoom.
-	 * 
-	 * @param zoom
-	 *            le facteur de zoom a appliquer a la photo courante
-	 */
-	public void redimensionnerPhotoCourante(Float zoom) {
-		this.getPhotoCourante().redimensionner(zoom);
-	}
+	
 
 }

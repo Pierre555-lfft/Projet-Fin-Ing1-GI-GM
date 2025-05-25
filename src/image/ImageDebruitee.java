@@ -52,8 +52,8 @@ public class ImageDebruitee {
 	 * @author Etienne Angé
 	 */
 	public enum Analyse{
-		GLOBALE,
-		LOCALE
+			GLOBALE,
+			LOCALE
 	}
 		    
 	private Image imageDebruitee;
@@ -614,19 +614,20 @@ public class ImageDebruitee {
 		// Application du seuillage
 				List<Vector<Float>> projectionsSeuillage;
 
-				if (typeSeuil == TypeSeuil.BAYES) {
-				    // BayesShrink → seuil par composante, donc seuillage spécifique intégré
-				    if (typeSeuillage == TypeSeuillage.AUTO || typeSeuillage == TypeSeuillage.DOUX) {
-				        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
-				    } else if (typeSeuillage == TypeSeuillage.DUR) {
-				        System.err.println("⚠️ BayesShrink ne s’utilise normalement qu’avec le seuillage doux. Utilisation par défaut du doux.");
-				        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
-				    } else {
-				        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
-				    }
-				} else {
-				    // VISU → seuil global
-				    double seuil = seuilVisuShrink(sigma, taillePatch);
+
+		if (typeSeuil == TypeSeuil.BAYES) {
+		    // BayesShrink → seuil par composante, donc seuillage spécifique intégré
+		    if (typeSeuillage == TypeSeuillage.AUTO || typeSeuillage == TypeSeuillage.DOUX) {
+		        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
+		    } else if (typeSeuillage == TypeSeuillage.DUR) {
+		        System.err.println("BayesShrink ne s’utilise normalement qu’avec le seuillage doux. Utilisation par défaut du doux.");
+		        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
+		    } else {
+		        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
+		    }
+		} else {
+		    // VISU → seuil global
+		    double seuil = seuilVisuShrink(sigma, taillePatch);
 
 				    if (typeSeuillage == TypeSeuillage.AUTO) {
 				        double varSignal = estimerVarianceSignal(projections, sigma * sigma);

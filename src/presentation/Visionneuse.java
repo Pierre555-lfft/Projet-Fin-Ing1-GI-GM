@@ -64,7 +64,7 @@ public class Visionneuse extends Application {
 	
 	
 	public void start(Stage primaryStage) {
-		primaryStage.setTitle("Album Photo");
+		primaryStage.setTitle("Débruiteur d'image");
 	
 		
 		album = new Album("images");
@@ -124,7 +124,6 @@ public class Visionneuse extends Application {
 		slider.setMinorTickCount(9);
 		
 		slider.valueProperty().addListener (arg0 -> {
-			album.redimensionnerPhotoCourante((float)slider.getValue());
 			imageView.setImage(album.getPhotoCourante().getImage());
 			
 		});
