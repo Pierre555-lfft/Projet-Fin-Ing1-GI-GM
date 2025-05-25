@@ -67,7 +67,11 @@ public class Visionneuse extends Application {
 		primaryStage.setTitle("Débruiteur d'image");
 	
 		
-		album = new Album("images");
+		try {
+			album = new Album("images");
+		} catch (Exception e) {
+			System.err.println("Pas de dossier images/");
+		}
 		 
 		VBox vbox = new VBox();
 		
