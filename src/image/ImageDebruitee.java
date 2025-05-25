@@ -579,22 +579,20 @@ public class ImageDebruitee {
 	}
 
 
-
-
 /**
- * Méthode principale du débruitage d'image
- * @param imageBruitee Image à débruiter
- * @param taillePatch Taille des patchs (carré)
- * @param typeSeuillage Type de seuillage (DUR, DOUX, AUTO)
- * @param typeSeuil Type de seuil (VISU, BAYES)
- * @return Image débruitée
+ * Methode principale du débruitage d'imagette
+ * @param imageBruitee Image débruitée
+ * @param taillePatch La taille des patch (carré)
+ * @param typeSeuillage Type de seuillage
+ * @param typeSeuil Type de seuil
+ * @return L'imagette débruitée
  */
-	public Image imageDen(Image imageBruitee, Integer taillePatch, TypeSeuillage typeSeuillage, TypeSeuil typeSeuil) {
-		
+	public Image imageDen(Image imageBruitee, Integer taillePatch, ImageDebruitee.TypeSeuillage typeSeuillage,ImageDebruitee.TypeSeuil typeSeuil) {
 
-		// Patch
-		
-		List<Patch> patchs = extractPatchs(imageBruitee, taillePatch);
+	    // Patch
+
+		List<Patch> patchs;
+		patchs = extractPatchs(imageBruitee, taillePatch);
 		ArrayList<Patch> arrayListPatches = new ArrayList<>(patchs);
 		List<Vector<Float>> vecteurs = vectorPatchs(arrayListPatches);
 		
@@ -613,24 +611,42 @@ public class ImageDebruitee {
 			sigma = estimerSigma(image2D);
 		}
 
-		// 7. Application du seuillage
-		List<Vector<Float>> projectionsSeuillees;
-		if (typeSeuil == TypeSeuil.BAYES) {
-			projectionsSeuillees = seuilBayesShrinkParColonne(projections, sigma);
-		} else {
-			double seuil = seuilVisuShrink(sigma, vecteurs.size());
-			if (typeSeuillage == TypeSeuillage.AUTO) {
-				double varSignal = estimerVarianceSignal(projections, sigma * sigma);
-				typeSeuillage = choisirType(varSignal, seuil);
-			}
-			projectionsSeuillees = (typeSeuillage == TypeSeuillage.DUR) ? 
-				seuillageDur(projections, seuil) : 
-				seuillageDoux(projections, seuil);
-		}
+		// Application du seuillage
+				List<Vector<Float>> projectionsSeuillage;
+
+				if (typeSeuil == TypeSeuil.BAYES) {
+				    // BayesShrink → seuil par composante, donc seuillage spécifique intégré
+				    if (typeSeuillage == TypeSeuillage.AUTO || typeSeuillage == TypeSeuillage.DOUX) {
+				        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
+				    } else if (typeSeuillage == TypeSeuillage.DUR) {
+				        System.err.println("⚠️ BayesShrink ne s’utilise normalement qu’avec le seuillage doux. Utilisation par défaut du doux.");
+				        projectionsSeuillage = seuilBayesShrinkParColonne(projections, sigma);
+				    } else {
+				        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
+				    }
+				} else {
+				    // VISU → seuil global
+				    double seuil = seuilVisuShrink(sigma, taillePatch);
+
+				    if (typeSeuillage == TypeSeuillage.AUTO) {
+				        double varSignal = estimerVarianceSignal(projections, sigma * sigma);
+				        if (choisirType(varSignal, seuil) == TypeSeuillage.DUR) {
+				            projectionsSeuillage = seuillageDur(projections, seuil);
+				        } else {
+				            projectionsSeuillage = seuillageDoux(projections, seuil);
+				        }
+				    } else if (typeSeuillage == TypeSeuillage.DUR) {
+				        projectionsSeuillage = seuillageDur(projections, seuil);
+				    } else if (typeSeuillage == TypeSeuillage.DOUX) {
+				        projectionsSeuillage = seuillageDoux(projections, seuil);
+				    } else {
+				        throw new IllegalArgumentException("Type de seuillage inconnu : " + typeSeuillage);
+				    }
+				}
 
 
 		// 8. Reconstruction
-		List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillees);
+		List<Vector<Float>> vecteursCentresDebruites = proj(U.transpose(), projectionsSeuillage);
 
 		List<Vector<Float>> vecteursDebruites = new ArrayList<>();
 		Vector<Float> mv = mv_methode(vecteurs);
@@ -804,7 +820,7 @@ public class ImageDebruitee {
 	 */
 	
     public static double seuilVisuShrink(double sigma, double L) {
-        return sigma * Math.sqrt(2 * Math.log(L))*0.3;
+        return sigma * Math.sqrt(2 * Math.log(L))*0.5;
     }
     
     

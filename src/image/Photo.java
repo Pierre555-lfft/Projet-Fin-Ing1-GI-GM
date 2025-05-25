@@ -1,3 +1,4 @@
+
 package image;
 
 
@@ -174,13 +175,5 @@ public class Photo {
         	
         return result;
     }
-	
-	public void redimensionner(Float zoom) {
-        if (zoom < ZOOM_MIN || zoom > ZOOM_MAX) {
-            throw new IllegalArgumentException("Le zoom doit être entre " + ZOOM_MIN + " et " + ZOOM_MAX);
-        }
-        int newWidth = (int)(largeurInit * zoom);
-        int newHeight = (int)(hauteurInit * zoom);
-        this.image = new Image(this.filename, newWidth, newHeight, false, false);
-    }
 }
+
